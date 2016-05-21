@@ -28,6 +28,7 @@ public class Dijkstra {
 		  edgesMatrix = Field.getEdgesMatrix();
 		  edges = resolveEdges();
 	  }
+	  //sss
 	  public static List<Edge> resolveEdges() {
 		  List<Edge> allEdges = new ArrayList<Edge>();
 		  for (int i = 0 ; i < Field.NNUM - 1; i++) {
