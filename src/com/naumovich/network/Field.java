@@ -20,6 +20,8 @@ import com.naumovich.entity.Node;
 public class Field extends JPanel {
 	public static final int NNUM = com.naumovich.network.TestNetwork.NODES_NUM;
 	private static ArrayList<Node> nodes = new ArrayList<Node>(NNUM);
+	public static final String STATISTICS_FILE_1 = "statistics.txt";
+	public static final String STATISTICS_FILE_2 = "statistics2.txt";
 	Random rand = new Random();
 	private static ArrayList<ArrayList<Integer>> edgesMatrix = makeMatrix();
 	//private int[][] edgMatrix = new int[NNUM][NNUM];
@@ -101,7 +103,7 @@ public class Field extends JPanel {
 			row.add(2, n.getAmountOfRestransmitted()); // third column - number of retransmissions made
 			list.add(row);
 		}
-		writeToFile(list, "statistics.txt");
+		writeToFile(list, STATISTICS_FILE_1);
 		
 		long path = 0; long msg = 0; long status = 0;
 		for (Node n : nodes) {
@@ -109,7 +111,7 @@ public class Field extends JPanel {
 			msg += n.getAmountOfMsgChecks();
 			status += n.getAmountOfNodeStatusChecks();
 		}
-		writeToFile(new long[] {path / nodes.size(), msg / nodes.size(), status / nodes.size()}, "statistics2.txt");
+		writeToFile(new long[] {path / nodes.size(), msg / nodes.size(), status / nodes.size()}, STATISTICS_FILE_2);
 	}
 	private void writeToFile(ArrayList<ArrayList<Integer>> list, String fileName) {
 		Writer writer = null;
