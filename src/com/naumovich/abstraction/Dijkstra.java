@@ -10,17 +10,17 @@ import java.util.Map;
 import java.util.Set;
 
 import com.naumovich.entity.Edge;
-import com.naumovich.entity.Node;
+import com.naumovich.entity.NodeThread;
 import com.naumovich.network.Field;
 
 public class Dijkstra {
 	
-	  private static List<Node> nodes;
+	  private static List<NodeThread> nodes;
 	  private static List<Edge> edges;
-	  private Set<Node> settledNodes;
-	  private Set<Node> unSettledNodes;
-	  private Map<Node, Node> predecessors;
-	  private Map<Node, Double> distance;
+	  private Set<NodeThread> settledNodes;
+	  private Set<NodeThread> unSettledNodes;
+	  private Map<NodeThread, NodeThread> predecessors;
+	  private Map<NodeThread, Double> distance;
 	  private static ArrayList<ArrayList<Integer>> edgesMatrix;
 
 	  public Dijkstra() {
@@ -39,24 +39,24 @@ public class Dijkstra {
 		  }
 		  return allEdges;
 	  }
-	  public void execute(Node source) {
-	    settledNodes = new HashSet<Node>();
-	    unSettledNodes = new HashSet<Node>();
-	    distance = new HashMap<Node, Double>();
-	    predecessors = new HashMap<Node, Node>();
+	  public void execute(NodeThread source) {
+	    settledNodes = new HashSet<NodeThread>();
+	    unSettledNodes = new HashSet<NodeThread>();
+	    distance = new HashMap<NodeThread, Double>();
+	    predecessors = new HashMap<NodeThread, NodeThread>();
 	    distance.put(source, 0d);
 	    unSettledNodes.add(source);
 	    while (unSettledNodes.size() > 0) {
-	      Node node = getMinimum(unSettledNodes);
+	      NodeThread node = getMinimum(unSettledNodes);
 	      settledNodes.add(node);
 	      unSettledNodes.remove(node);
 	      findMinimalDistances(node);
 	    }
 	  }
 
-	  private void findMinimalDistances(Node node) {
-	    List<Node> adjacentNodes = getNeighbors(node);
-	    for (Node target : adjacentNodes) {
+	  private void findMinimalDistances(NodeThread node) {
+	    List<NodeThread> adjacentNodes = getNeighbors(node);
+	    for (NodeThread target : adjacentNodes) {
 	      if (getShortestDistance(target) > getShortestDistance(node)
 	          + getDistance(node, target)) {
 	        distance.put(target, getShortestDistance(node)
@@ -68,7 +68,7 @@ public class Dijkstra {
 
 	  }
 
-	  private double getDistance(Node node, Node target) {
+	  private double getDistance(NodeThread node, NodeThread target) {
 	    for (Edge edge : edges) {
 	      if (edge.getLeft().equals(node) && edge.getRight().equals(target) ||
 	    		  edge.getRight().equals(node) && edge.getLeft().equals(target)) {
@@ -78,8 +78,8 @@ public class Dijkstra {
 	    throw new RuntimeException("Should not happen");
 	  }
 
-	  private List<Node> getNeighbors(Node node) {
-	    List<Node> neighbors = new ArrayList<Node>();
+	  private List<NodeThread> getNeighbors(NodeThread node) {
+	    List<NodeThread> neighbors = new ArrayList<NodeThread>();
 	    for (Edge edge : edges) {
 	      if (edge.getLeft().equals(node) && !isSettled(edge.getRight()) )
 	    	  neighbors.add(edge.getRight());
@@ -90,9 +90,9 @@ public class Dijkstra {
 	    return neighbors;
 	  }
 
-	  private Node getMinimum(Set<Node> nodes) {
-	    Node minimum = null;
-	    for (Node n : nodes) {
+	  private NodeThread getMinimum(Set<NodeThread> nodes) {
+	    NodeThread minimum = null;
+	    for (NodeThread n : nodes) {
 	      if (minimum == null) {
 	        minimum = n;
 	      } else {
@@ -104,11 +104,11 @@ public class Dijkstra {
 	    return minimum;
 	  }
 
-	  private boolean isSettled(Node Node) {
+	  private boolean isSettled(NodeThread Node) {
 	    return settledNodes.contains(Node);
 	  }
 
-	  private double getShortestDistance(Node destination) {
+	  private double getShortestDistance(NodeThread destination) {
 	    Double d = distance.get(destination);
 	    if (d == null) {
 	      return Integer.MAX_VALUE;
@@ -121,9 +121,9 @@ public class Dijkstra {
 	   * This method returns the path from the source to the selected target and
 	   * NULL if no path exists
 	   */
-	  public LinkedList<Node> getPath(Node target) {
-	    LinkedList<Node> path = new LinkedList<Node>();
-	    Node step = target;
+	  public LinkedList<NodeThread> getPath(NodeThread target) {
+	    LinkedList<NodeThread> path = new LinkedList<NodeThread>();
+	    NodeThread step = target;
 	    // check if a path exists
 	    if (predecessors.get(step) == null) {
 	      return null;

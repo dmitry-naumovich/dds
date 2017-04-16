@@ -2,16 +2,16 @@ package com.naumovich.message;
 
 import java.util.List;
 
-import com.naumovich.entity.Node;
+import com.naumovich.entity.NodeThread;
 
 public class Message {
 
-	private Node source;
-	private Node destination;
+	private NodeThread source;
+	private NodeThread destination;
 	private Object data;
-	private List<Node> path;
+	private List<NodeThread> path;
 	
-	public Message(List<Node> path, Object data) {
+	public Message(List<NodeThread> path, Object data) {
 		this.source = path.get(0); 
 		this.destination = path.get(path.size() - 1);
 		this.data = data;
@@ -20,25 +20,25 @@ public class Message {
 	public void excludeFirstNodeFromPath() {
 		path.remove(0);
 	}
-	public Node getSource() {
+	public NodeThread getSource() {
 		return source;
 	}
 
-	public void setSource(Node source) {
+	public void setSource(NodeThread source) {
 		this.source = source;
 	}
 
-	public Node getDestination() {
+	public NodeThread getDestination() {
 		return destination;
 	}
 
-	public List<Node> getPath() {
+	public List<NodeThread> getPath() {
 		return path;
 	}
-	public void setPath(List<Node> path) {
+	public void setPath(List<NodeThread> path) {
 		this.path = path;
 	}
-	public void setDestination(Node destination) {
+	public void setDestination(NodeThread destination) {
 		this.destination = destination;
 	}
 

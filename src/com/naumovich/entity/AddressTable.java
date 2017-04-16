@@ -9,6 +9,7 @@ public class AddressTable implements Table {
 
 	private ArrayList<FourTuple<Integer, Chunk, Node, Integer>> addrTable;
 	private Node owner;
+	
 	public AddressTable(Node owner) {
 		addrTable = new ArrayList<FourTuple<Integer, Chunk, Node, Integer>>();
 		this.owner = owner;

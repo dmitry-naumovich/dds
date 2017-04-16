@@ -12,12 +12,12 @@ public class Chunk {
 	private String chunkID;
 	private long chunkSize;
 	private String parentFileName;
-	private Node originalOwner;
+	private NodeThread originalOwner;
 	private int orderNum;
 	private String chunkName;
 	private static int counter = 0;
 	
-	public Chunk(Node originalOwner, long chunkSize, String parentFileName, int orderNum) {
+	public Chunk(NodeThread originalOwner, long chunkSize, String parentFileName, int orderNum) {
 		this.originalOwner = originalOwner;
 		this.chunkID = MathOperations.getRandomHexString(40);
 		this.chunkSize = chunkSize;
@@ -42,17 +42,17 @@ public class Chunk {
 		return chs;
 	}
 	
-	public TwoTuple<Node, Integer> findNodeForMe() {
-		ArrayList<TwoTuple<Node, Integer>> allMetrics = new ArrayList<TwoTuple<Node, Integer>>();
+	public TwoTuple<NodeThread, Integer> findNodeForMe() {
+		ArrayList<TwoTuple<NodeThread, Integer>> allMetrics = new ArrayList<TwoTuple<NodeThread, Integer>>();
 		@SuppressWarnings("unchecked")
-		List<Node> nodes = (ArrayList<Node>) Field.getNodes().clone();
+		List<NodeThread> nodes = (ArrayList<NodeThread>) Field.getNodes().clone();
 		nodes.remove(this.originalOwner);
-		for (Node n: nodes) {
+		for (NodeThread n: nodes) {
 			if (n.isOnline())
-				allMetrics.add(new TwoTuple<Node, Integer>(n, MathOperations.findXORMetric(n.getNodeID(), this.chunkID)));
+				allMetrics.add(new TwoTuple<NodeThread, Integer>(n, MathOperations.findXORMetric(n.getNodeID(), this.chunkID)));
 		}
-		TwoTuple<Node, Integer> two = MathOperations.findMin(allMetrics);
-		return new TwoTuple<Node, Integer>(two.first, two.second);
+		TwoTuple<NodeThread, Integer> two = MathOperations.findMin(allMetrics);
+		return new TwoTuple<NodeThread, Integer>(two.first, two.second);
 	}
 	
 	@Override

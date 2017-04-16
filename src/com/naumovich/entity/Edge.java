@@ -3,11 +3,11 @@ package com.naumovich.entity;
 public class Edge {
 
 	//private final String id;
-	private Node left;
-	private Node right;
+	private NodeThread left;
+	private NodeThread right;
 	private double weight; // weight is compared with destination between left and right
 	
-	public Edge(Node left, Node right) {
+	public Edge(NodeThread left, NodeThread right) {
 		this.left = left;
 		this.right = right;
 		this.weight = countWeight();
@@ -17,11 +17,11 @@ public class Edge {
 		return Math.sqrt(Math.pow(left.getX() - right.getX(), 2) + Math.pow(left.getY() - right.getY(), 2));
 	}
 
-	public Node getLeft() {
+	public NodeThread getLeft() {
 		return left;
 	}
 
-	public Node getRight() {
+	public NodeThread getRight() {
 		return right;
 	}
 
