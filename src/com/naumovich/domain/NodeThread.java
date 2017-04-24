@@ -1,4 +1,4 @@
-package com.naumovich.entity;
+package com.naumovich.domain;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -28,8 +28,7 @@ public class NodeThread implements Runnable {
 	
 	public NodeThread(Field field) {
 		this.field = field;
-		node = new Node(field);
-		
+		node = new Node(this, field);
 		distributeFlag = false;
 		resCopyFlag = false;
 		
@@ -48,6 +47,14 @@ public class NodeThread implements Runnable {
 	
 	public void setDistributeFlag(boolean distributeFlag) {
 		this.distributeFlag = distributeFlag;
+	}
+	
+	
+	public boolean isResCopyFlag() {
+		return resCopyFlag;
+	}
+	public void setResCopyFlag(boolean resCopyFlag) {
+		this.resCopyFlag = resCopyFlag;
 	}
 	public double getX() {
 		return x;
@@ -133,5 +140,66 @@ public class NodeThread implements Runnable {
 	}
 		
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((color == null) ? 0 : color.hashCode());
+		result = prime * result + (distributeFlag ? 1231 : 1237);
+		result = prime * result + ((field == null) ? 0 : field.hashCode());
+		result = prime * result + ((node == null) ? 0 : node.hashCode());
+		result = prime * result + ((rand == null) ? 0 : rand.hashCode());
+		result = prime * result + (resCopyFlag ? 1231 : 1237);
+		long temp;
+		temp = Double.doubleToLongBits(speedX);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(speedY);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(x);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(y);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		NodeThread other = (NodeThread) obj;
+		if (color == null) {
+			if (other.color != null)
+				return false;
+		} else if (!color.equals(other.color))
+			return false;
+		if (distributeFlag != other.distributeFlag)
+			return false;
+		if (field == null) {
+			if (other.field != null)
+				return false;
+		} else if (!field.equals(other.field))
+			return false;
+		if (node == null) {
+			if (other.node != null)
+				return false;
+		} else if (!node.equals(other.node))
+			return false;
+		if (resCopyFlag != other.resCopyFlag)
+			return false;
+		if (Double.doubleToLongBits(speedX) != Double.doubleToLongBits(other.speedX))
+			return false;
+		if (Double.doubleToLongBits(speedY) != Double.doubleToLongBits(other.speedY))
+			return false;
+		if (Double.doubleToLongBits(x) != Double.doubleToLongBits(other.x))
+			return false;
+		if (Double.doubleToLongBits(y) != Double.doubleToLongBits(other.y))
+			return false;
+		return true;
+	}
+	
+	
 	
 }

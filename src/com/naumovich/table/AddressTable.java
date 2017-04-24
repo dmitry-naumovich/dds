@@ -1,11 +1,12 @@
-package com.naumovich.entity;
+package com.naumovich.table;
 
 import java.util.ArrayList;
 
-import com.naumovich.abstraction.FourTuple;
-import com.naumovich.abstraction.Table;
+import com.naumovich.domain.Chunk;
+import com.naumovich.domain.Node;
+import com.naumovich.util.tuple.FourTuple;
 
-public class AddressTable implements Table {
+public class AddressTable {
 
 	private ArrayList<FourTuple<Integer, Chunk, Node, Integer>> addrTable;
 	private Node owner;
@@ -24,7 +25,7 @@ public class AddressTable implements Table {
 		//System.out.println("Row: numOfChunk = " + numOfChunk + ", chunkId" + chunk.getChunkId() + ", nodeId = " + node.getNodeId() + ", metrics = " + metrics);
 		addrTable.add(new FourTuple<Integer, Chunk, Node, Integer>(numOfChunk, chunk, node, metrics));
 	}
-	public void setRow(int rowNum, Node node, int metrics) { // to realize later
+	public void setRow(int rowNum, Node node, int metrics) {
 		addrTable.set(rowNum, new FourTuple<Integer, Chunk, Node, Integer>(addrTable.get(rowNum).first,
 		addrTable.get(rowNum).second, node, metrics));
 	}
@@ -43,13 +44,46 @@ public class AddressTable implements Table {
 		return null;
 	}
 	
+	
+	
 	@Override
-	public void printTable() {
-		System.out.println("This is Address Table of " + owner);
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((addrTable == null) ? 0 : addrTable.hashCode());
+		result = prime * result + ((owner == null) ? 0 : owner.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AddressTable other = (AddressTable) obj;
+		if (addrTable == null) {
+			if (other.addrTable != null)
+				return false;
+		} else if (!addrTable.equals(other.addrTable))
+			return false;
+		if (owner == null) {
+			if (other.owner != null)
+				return false;
+		} else if (!owner.equals(other.owner))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("This is Address Table of " + owner);
 		for (int i = 0; i < addrTable.size(); i++) {
-			System.out.println(addrTable.get(i));
+			sb.append("\n" + (addrTable.get(i)));
 		}
-		
+		return sb.toString();
 	}
 	
 }

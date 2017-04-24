@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.naumovich.message.Message;
+import com.naumovich.domain.message.Message;
 
 public class MessageContainer {
 

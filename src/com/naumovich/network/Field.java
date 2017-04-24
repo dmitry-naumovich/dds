@@ -14,29 +14,43 @@ import java.util.Random;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import com.naumovich.entity.NodeThread;
+import com.naumovich.domain.Node;
+import com.naumovich.domain.NodeThread;
+
+import static com.naumovich.network.TestNetwork.NODES_NUM;
 
 @SuppressWarnings("serial")
 public class Field extends JPanel {
-	public static final int NNUM = com.naumovich.network.TestNetwork.NODES_NUM;
-	private static ArrayList<NodeThread> nodes = new ArrayList<NodeThread>(NNUM);
+	
+	private static ArrayList<Node> nodes = new ArrayList<>(NODES_NUM);
+	private static ArrayList<NodeThread> nodeThreads = new ArrayList<>(NODES_NUM);
+	
 	public static final String STATISTICS_FILE_1 = "statistics.txt";
 	public static final String STATISTICS_FILE_2 = "statistics2.txt";
+	
 	Random rand = new Random();
+	
 	private static ArrayList<ArrayList<Integer>> edgesMatrix = makeMatrix();
-	//private int[][] edgMatrix = new int[NNUM][NNUM];
+	//private int[][] edgMatrix = new int[NODES_NUM][NODES_NUM];
 	
 	public boolean paused;
 	
-	public NodeThread getNode(int i) {
+	public Node getNode(int i) {
 		return nodes.get(i);
+	}
+	public NodeThread getNodeThread(int i) {
+		return nodeThreads.get(i);
 	}
 	public int getNodeAmount() {
 		return nodes.size();
 	}
-	public static ArrayList<NodeThread> getNodes() {
+	public static ArrayList<NodeThread> getNodeThreads() {
+		return nodeThreads;
+	}
+	public static ArrayList<Node> getNodes() {
 		return nodes;
 	}
+	
 	/*public static ArrayList<NodeThread> getOnlineNodes() {
 		ArrayList<NodeThread> onNodes = new ArrayList<NodeThread>();
 		for (NodeThread n: nodes) {
@@ -57,10 +71,10 @@ public class Field extends JPanel {
 		repaintTimer.start();
 	}
 	public static ArrayList<ArrayList<Integer>> makeMatrix() {
-		ArrayList<ArrayList<Integer>> edgesMatrix = new ArrayList<ArrayList<Integer>>();
-		for (int i = 0; i < NNUM; i++) {
-			ArrayList<Integer> tmp = new ArrayList<Integer>();
-			for (int j = 0; j < NNUM; j++) {
+		ArrayList<ArrayList<Integer>> edgesMatrix = new ArrayList<>();
+		for (int i = 0; i < NODES_NUM; i++) {
+			ArrayList<Integer> tmp = new ArrayList<>();
+			for (int j = 0; j < NODES_NUM; j++) {
 				tmp.add(0);
 			}
 			edgesMatrix.add(tmp);
@@ -68,8 +82,10 @@ public class Field extends JPanel {
 		return edgesMatrix;
 
 	}
-	public void addNode() {
-		nodes.add(new NodeThread(this));
+	public void addNodeThread() {
+		NodeThread newNodeThread = new NodeThread(this);
+		nodeThreads.add(newNodeThread);
+		nodes.add(newNodeThread.getNode());		
 	}
 	public static ArrayList<ArrayList<Integer>> getEdgesMatrix() {
 		return edgesMatrix;
@@ -80,36 +96,36 @@ public class Field extends JPanel {
 	}
 	public void distributeFiles() {
 		for (int i = 0; i < 5; i++) {
-			nodes.get(rand.nextInt(NNUM)).setDistributeFlag(true);
+			nodeThreads.get(rand.nextInt(NODES_NUM)).setDistributeFlag(true);
 		}
 		
 	}
 	public void turnOffNodes() {
 		for (int i = 0; i < 10; i++) {
-			nodes.get(rand.nextInt(NNUM)).getNode().setOnline(false);
+			nodes.get(rand.nextInt(NODES_NUM)).setOnline(false);
 		}
 	}
 	public void turnOnAllNodes() {
-		for (NodeThread n: nodes) {
-			n.getNode().setOnline(true);
+		for (Node n: nodes) {
+			n.setOnline(true);
 		}
 	}
 	public void collectStatistics() {
 		ArrayList<ArrayList<Integer>> list = new ArrayList<ArrayList<Integer>>();
-		for (NodeThread n : nodes) {
+		for (Node n : nodes) {
 			ArrayList<Integer> row = new ArrayList<Integer>();
-			row.add(0, n.getNode().getPersNum()); // first column - node's number
-			row.add(1, n.getNode().getChunkStorage().size()); // second column - number of storing chunks
-			row.add(2, n.getNode().getAmountOfRestransmitted()); // third column - number of retransmissions made
+			row.add(0, n.getPersNum()); // first column - node's number
+			row.add(1, n.getChunkStorage().size()); // second column - number of storing chunks
+			row.add(2, n.getAmountOfRestransmitted()); // third column - number of retransmissions made
 			list.add(row);
 		}
 		writeToFile(list, STATISTICS_FILE_1);
 		
 		long path = 0; long msg = 0; long status = 0;
-		for (NodeThread n : nodes) {
-			path += n.getNode().getAmountOfFindingPath();
-			msg += n.getNode().getAmountOfMsgChecks();
-			status += n.getNode().getAmountOfNodeStatusChecks();
+		for (Node n : nodes) {
+			path += n.getAmountOfFindingPath();
+			msg += n.getAmountOfMsgChecks();
+			status += n.getAmountOfNodeStatusChecks();
 		}
 		writeToFile(new long[] {path / nodes.size(), msg / nodes.size(), status / nodes.size()}, STATISTICS_FILE_2);
 	}
@@ -159,7 +175,7 @@ public class Field extends JPanel {
 		super.paintComponent(g);
 		
 		Graphics2D canvas = (Graphics2D) g;
-		for (NodeThread n: nodes) {
+		for (NodeThread n: nodeThreads) {
 			n.paint(canvas); // draw the node as the ball
 			g.setColor(Color.BLACK);
 			g.setFont(new Font("Arial", Font.PLAIN, 10));
@@ -182,8 +198,8 @@ public class Field extends JPanel {
 	}
 	
 	public synchronized void showEdgesMatrix() {
-		for (int i = 0; i < NNUM; i++) {
-			for (int j = 0; j < NNUM; j++) {
+		for (int i = 0; i < NODES_NUM; i++) {
+			for (int j = 0; j < NODES_NUM; j++) {
 				if (i == j) System.out.print("- ");
 				else
 					System.out.print(edgesMatrix.get(i).get(j) + " ");
@@ -192,4 +208,5 @@ public class Field extends JPanel {
 		}
 	}
 
+	
 }

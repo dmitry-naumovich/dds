@@ -1,22 +1,27 @@
-package com.naumovich.entity;
+package com.naumovich.domain;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.naumovich.abstraction.Dijkstra;
-import com.naumovich.abstraction.FourTuple;
-import com.naumovich.abstraction.MathOperations;
-import com.naumovich.abstraction.TwoTuple;
-import com.naumovich.message.ChunkMessage;
-import com.naumovich.message.Message;
-import com.naumovich.message.ResCopyMessage;
+import com.naumovich.domain.message.ChunkMessage;
+import com.naumovich.domain.message.Message;
+import com.naumovich.domain.message.ResCopyMessage;
 import com.naumovich.network.Field;
 import com.naumovich.network.MessageContainer;
+import com.naumovich.table.AddressTable;
+import com.naumovich.table.ChunkTable;
+import com.naumovich.util.Dijkstra;
+import com.naumovich.util.MathOperations;
+import com.naumovich.util.tuple.FourTuple;
+import com.naumovich.util.tuple.TwoTuple;
+
+import static com.naumovich.network.TestNetwork.NODES_NUM;
 
 public class Node {
 	
+	private NodeThread nodeThread;
 	private Field field;
 	private String login;
 	private int persNum;
@@ -34,7 +39,8 @@ public class Node {
 	private MessageContainer msgContainer;
 	private static int counter = 0;
 	
-	public Node(Field field) {
+	public Node(NodeThread thread, Field field) {
+		this.nodeThread = thread;
 		this.field = field;
 		chunkStorage = Collections.synchronizedList(new ArrayList<Chunk>());
 		resCopyMsgs = new ArrayList<Message>();
@@ -46,6 +52,14 @@ public class Node {
 		msgContainer = new MessageContainer();
 	}
 	
+	public NodeThread getNodeThread() {
+		return nodeThread;
+	}
+
+	public void setNodeThread(NodeThread nodeThread) {
+		this.nodeThread = nodeThread;
+	}
+
 	public Field getField() {
 		return field;
 	}
@@ -133,7 +147,7 @@ public class Node {
 		int n = MathOperations.defineChunksAmount(file.getSize());
 		System.out.println(login + ": I distribute file '" + file.getFileName() + "' into " + n + " chunks");
 		List<Chunk> chunks = createChunks(file, n);
-		chTable = new ChunkTable(n));
+		chTable = new ChunkTable(n);
 		//addrTable = new AddressTable(this);
 		List<Chunk> chunksAndCopies = new ArrayList<Chunk>();
 		for (Chunk ch : chunks) {
@@ -143,15 +157,15 @@ public class Node {
 		}
 //		chTable.printTable();
 		for (Chunk ch : chunksAndCopies) {
-			TwoTuple<NodeThread, Integer> tuple = ch.findNodeForMe();
+			TwoTuple<Node, Integer> tuple = ch.findNodeForMe();
 			addrTable.addRow(ch.getOrderNum(), ch, tuple.first, tuple.second);
 			// encryptedChunk = ch.encrypt();
 		}
-		addrTable.printTable();
+		System.out.println(addrTable);
 		for (Chunk ch : chunksAndCopies) {
 			Dijkstra dijAlg = new Dijkstra(); // Dijkstra defines the route to destination
 			dijAlg.execute(this); // Dijkstra works
-			List<NodeThread> path = dijAlg.getPath(addrTable.getNodeByChunk(ch));
+			List<Node> path = dijAlg.getPath(addrTable.getNodeByChunk(ch));
 			amountOfFindingPath++;
 			System.out.println(this.getLogin() + ": I send " + ch.getChunkName() + " to " + 
 								addrTable.getNodeByChunk(ch).getLogin() + ". The way is: " + path);
@@ -191,19 +205,19 @@ public class Node {
 							chunkStorage.add((Chunk)m.getData());
 							break;
 			    		case "ResCopyMessage":
-							NodeThread receiver = ((TwoTuple<NodeThread, Chunk>)m.getData()).first;
-							Chunk chunkToCopy = ((TwoTuple<NodeThread, Chunk>)m.getData()).second;
+							Node receiver = ((TwoTuple<Node, Chunk>)m.getData()).first;
+							Chunk chunkToCopy = ((TwoTuple<Node, Chunk>)m.getData()).second;
 			    			
 			    			Dijkstra dijAlg = new Dijkstra(); // Dijkstra defines the route to destination
 			    			dijAlg.execute(this);
-			    			List<NodeThread> path = dijAlg.getPath(receiver);
+			    			List<Node> path = dijAlg.getPath(receiver);
 			    			amountOfFindingPath++;
 			    			System.out.println(this + ": I have to complete ResCopy of " + chunkToCopy + " to " + receiver
 			    					+ ". Path is: " + path);
 			    			if (path != null) {
 			    				Message newM = new ChunkMessage(path, getChunkByName(chunkToCopy.getChunkName()));
 			    				newM.excludeFirstNodeFromPath();
-			    				resCopyFlag = true;
+			    				nodeThread.setResCopyFlag(true);
 			    				resCopyMsgs.add(newM);
 			    			}
 			    			break;
@@ -237,7 +251,7 @@ public class Node {
 			    		//iterator.remove();
 			    		Dijkstra dijAlg = new Dijkstra(); // Dijkstra defines the route to destination
 		    			dijAlg.execute(this);
-		    			List<NodeThread> path = dijAlg.getPath(m.getDestination());
+		    			List<Node> path = dijAlg.getPath(m.getDestination());
 		    			amountOfFindingPath++;
 		    			System.out.println(this + ": WARNING! While retransmitting I've found out " + m.getPath().get(1)
 		    					+ " is offline. New path to destination " + m.getDestination() + " is: " + path);
@@ -252,9 +266,9 @@ public class Node {
 	}
 	
 	public void checkNeighbors() { // find neighbors and fill the edgesMatrix
-		ArrayList<NodeThread> nodes = Field.getNodes();	
-		if (nodes.size() == Field.NNUM) {	
-			for (NodeThread n: nodes) {
+		ArrayList<Node> nodes = Field.getNodes();	
+		if (nodes.size() == NODES_NUM) {	
+			for (Node n: nodes) {
 				amountOfNodeStatusChecks++;
 				if (isNeighborWith(n) && n.isOnline()) {
 					field.setEdgesMatrixCell(persNum, n.getPersNum(), 1);
@@ -267,9 +281,9 @@ public class Node {
 			}
 		}
 	}
-	public boolean isNeighborWith(NodeThread n) {
+	public boolean isNeighborWith(Node n) {
 		if (this.equals(n)) return false;
-		else if (Math.pow(x - n.getX(), 2) + Math.pow(y - n.getY(), 2) <= Math.pow(12*radius, 2)) {
+		else if (Math.pow(nodeThread.getX() - n.getNodeThread().getX(), 2) + Math.pow(nodeThread.getY() - n.getNodeThread().getY(), 2) <= Math.pow(12*NodeThread.getRadius(), 2)) {
 			// here if two nodes are neighbors
 			return true;
 		}
@@ -281,7 +295,7 @@ public class Node {
 			amountOfNodeStatusChecks++;
 			if (!tup.third.isOnline()) {
 				System.out.println(this + ": I've found out " + tup.third + " is offline");
-				TwoTuple<NodeThread, Integer> tup2 = tup.second.findNodeForMe();
+				TwoTuple<Node, Integer> tup2 = tup.second.findNodeForMe();
 				if (tup.second.equals(tup2.first)) {
 					break; // same node returned so no more need for reserve copying
 				}
@@ -293,10 +307,10 @@ public class Node {
 					System.out.println(this + ": new sender of " + chunkToSend + " is " + sender);
 					Dijkstra dijAlg = new Dijkstra(); // Dijkstra defines the route to destination
 					dijAlg.execute(this);
-					List<NodeThread> path = dijAlg.getPath(sender);
+					List<Node> path = dijAlg.getPath(sender);
 					amountOfFindingPath++;
 					if (path != null) {
-						Message resCopyMsg = new ResCopyMessage(path, new TwoTuple<NodeThread, Chunk>(tup2.first, chunkToSend) );
+						Message resCopyMsg = new ResCopyMessage(path, new TwoTuple<Node, Chunk>(tup2.first, chunkToSend) );
 						resCopyMsg.excludeFirstNodeFromPath();
 						msgContainer.addMsg(resCopyMsg);
 	    			}
@@ -308,7 +322,7 @@ public class Node {
 	public Integer getNewSender(int i) {
 		int orderNum = addrTable.getRow(i).first;
 		for (int j = 0; j < addrTable.getRowCount(); j++) {
-			FourTuple<Integer, Chunk, NodeThread, Integer> t = addrTable.getRow(j);
+			FourTuple<Integer, Chunk, Node, Integer> t = addrTable.getRow(j);
 			if (t.first == orderNum && !t.third.equals(addrTable.getRow(i).third)) {
 				return j;
 			}
@@ -332,17 +346,107 @@ public class Node {
 		}
 		return null;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((addrTable == null) ? 0 : addrTable.hashCode());
+		result = prime * result + (int) (amountOfFindingPath ^ (amountOfFindingPath >>> 32));
+		result = prime * result + (int) (amountOfMsgChecks ^ (amountOfMsgChecks >>> 32));
+		result = prime * result + (int) (amountOfNodeStatusChecks ^ (amountOfNodeStatusChecks >>> 32));
+		result = prime * result + amountOfRestransmitted;
+		result = prime * result + ((chTable == null) ? 0 : chTable.hashCode());
+		result = prime * result + ((chunkStorage == null) ? 0 : chunkStorage.hashCode());
+		result = prime * result + ((field == null) ? 0 : field.hashCode());
+		result = prime * result + (isOnline ? 1231 : 1237);
+		result = prime * result + ((login == null) ? 0 : login.hashCode());
+		result = prime * result + ((msgContainer == null) ? 0 : msgContainer.hashCode());
+		result = prime * result + ((nodeID == null) ? 0 : nodeID.hashCode());
+		result = prime * result + ((nodeThread == null) ? 0 : nodeThread.hashCode());
+		result = prime * result + persNum;
+		result = prime * result + ((resCopyMsgs == null) ? 0 : resCopyMsgs.hashCode());
+		return result;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
-		if (((Node)obj).nodeID == this.nodeID) 
+		if (this == obj)
 			return true;
-		else
+		if (obj == null)
 			return false;
-		
+		if (getClass() != obj.getClass())
+			return false;
+		Node other = (Node) obj;
+		if (addrTable == null) {
+			if (other.addrTable != null)
+				return false;
+		} else if (!addrTable.equals(other.addrTable))
+			return false;
+		if (amountOfFindingPath != other.amountOfFindingPath)
+			return false;
+		if (amountOfMsgChecks != other.amountOfMsgChecks)
+			return false;
+		if (amountOfNodeStatusChecks != other.amountOfNodeStatusChecks)
+			return false;
+		if (amountOfRestransmitted != other.amountOfRestransmitted)
+			return false;
+		if (chTable == null) {
+			if (other.chTable != null)
+				return false;
+		} else if (!chTable.equals(other.chTable))
+			return false;
+		if (chunkStorage == null) {
+			if (other.chunkStorage != null)
+				return false;
+		} else if (!chunkStorage.equals(other.chunkStorage))
+			return false;
+		if (field == null) {
+			if (other.field != null)
+				return false;
+		} else if (!field.equals(other.field))
+			return false;
+		if (isOnline != other.isOnline)
+			return false;
+		if (login == null) {
+			if (other.login != null)
+				return false;
+		} else if (!login.equals(other.login))
+			return false;
+		if (msgContainer == null) {
+			if (other.msgContainer != null)
+				return false;
+		} else if (!msgContainer.equals(other.msgContainer))
+			return false;
+		if (nodeID == null) {
+			if (other.nodeID != null)
+				return false;
+		} else if (!nodeID.equals(other.nodeID))
+			return false;
+		if (nodeThread == null) {
+			if (other.nodeThread != null)
+				return false;
+		} else if (!nodeThread.equals(other.nodeThread))
+			return false;
+		if (persNum != other.persNum)
+			return false;
+		if (resCopyMsgs == null) {
+			if (other.resCopyMsgs != null)
+				return false;
+		} else if (!resCopyMsgs.equals(other.resCopyMsgs))
+			return false;
+		return true;
 	}
+
 	@Override
 	public String toString() {
-		return login;
+		return "Node [nodeThread=" + nodeThread + ", field=" + field + ", login=" + login + ", persNum=" + persNum
+				+ ", nodeID=" + nodeID + ", chunkStorage=" + chunkStorage + ", resCopyMsgs=" + resCopyMsgs
+				+ ", chTable=" + chTable + ", addrTable=" + addrTable + ", isOnline=" + isOnline
+				+ ", amountOfRestransmitted=" + amountOfRestransmitted + ", amountOfMsgChecks=" + amountOfMsgChecks
+				+ ", amountOfNodeStatusChecks=" + amountOfNodeStatusChecks + ", amountOfFindingPath="
+				+ amountOfFindingPath + ", msgContainer=" + msgContainer + "]";
 	}
+	
 	
 }

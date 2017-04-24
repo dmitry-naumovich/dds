@@ -38,9 +38,8 @@ public class TestNetwork extends JFrame {
 		
 		nodeMenu.add(new AbstractAction(MenuItemNames.ACTION_ADD_NODES) {
 			public void actionPerformed(ActionEvent event) {
-				//field.addNode();
 				for (int i = 0; i < NODES_NUM; i++) {
-					field.addNode();
+					field.addNodeThread();
 				}
 				if (!pauseMenuItem.isEnabled() && !resumeMenuItem.isEnabled()) {
 					pauseMenuItem.setEnabled(true);

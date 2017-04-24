@@ -1,9 +1,10 @@
-package com.naumovich.abstraction;
+package com.naumovich.util;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import com.naumovich.entity.NodeThread;
+import com.naumovich.domain.Node;
+import com.naumovich.util.tuple.TwoTuple;
 
 public final class MathOperations {
 	
@@ -35,15 +36,15 @@ public final class MathOperations {
 		//System.out.println(metrics);
 		return metrics;
 	}
-	public static TwoTuple<NodeThread, Integer> findMin(ArrayList<TwoTuple<NodeThread, Integer>> list) {
-		NodeThread node = list.get(0).first; int minVal = list.get(0).second;
-		for (TwoTuple<NodeThread, Integer> el : list) {
+	public static TwoTuple<Node, Integer> findMin(ArrayList<TwoTuple<Node, Integer>> list) {
+		Node node = list.get(0).first; int minVal = list.get(0).second;
+		for (TwoTuple<Node, Integer> el : list) {
 			if (el.second <= minVal) {
 				node = el.first;
 				minVal = el.second;
 			}
 		}
-		return new TwoTuple<NodeThread, Integer>(node, minVal);
+		return new TwoTuple<Node, Integer>(node, minVal);
 	}
 	
 }

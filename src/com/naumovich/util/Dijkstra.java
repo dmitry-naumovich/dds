@@ -1,4 +1,4 @@
-package com.naumovich.abstraction;
+package com.naumovich.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,18 +9,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.naumovich.entity.Edge;
-import com.naumovich.entity.NodeThread;
+import com.naumovich.domain.Edge;
+import com.naumovich.domain.Node;
 import com.naumovich.network.Field;
+
+import static com.naumovich.network.TestNetwork.NODES_NUM;
 
 public class Dijkstra {
 	
-	  private static List<NodeThread> nodes;
+	  private static List<Node> nodes;
 	  private static List<Edge> edges;
-	  private Set<NodeThread> settledNodes;
-	  private Set<NodeThread> unSettledNodes;
-	  private Map<NodeThread, NodeThread> predecessors;
-	  private Map<NodeThread, Double> distance;
+	  private Set<Node> settledNodes;
+	  private Set<Node> unSettledNodes;
+	  private Map<Node, Node> predecessors;
+	  private Map<Node, Double> distance;
 	  private static ArrayList<ArrayList<Integer>> edgesMatrix;
 
 	  public Dijkstra() {
@@ -30,8 +32,8 @@ public class Dijkstra {
 	  }
 	  public static List<Edge> resolveEdges() {
 		  List<Edge> allEdges = new ArrayList<Edge>();
-		  for (int i = 0 ; i < Field.NNUM - 1; i++) {
-			  for (int j = i + 1; j < Field.NNUM; j++) {
+		  for (int i = 0 ; i < NODES_NUM - 1; i++) {
+			  for (int j = i + 1; j < NODES_NUM; j++) {
 				  if (edgesMatrix.get(i).get(j) == 1) {
 					 allEdges.add(new Edge(nodes.get(i), nodes.get(j)));
 				  }
@@ -39,24 +41,24 @@ public class Dijkstra {
 		  }
 		  return allEdges;
 	  }
-	  public void execute(NodeThread source) {
-	    settledNodes = new HashSet<NodeThread>();
-	    unSettledNodes = new HashSet<NodeThread>();
-	    distance = new HashMap<NodeThread, Double>();
-	    predecessors = new HashMap<NodeThread, NodeThread>();
+	  public void execute(Node source) {
+	    settledNodes = new HashSet<Node>();
+	    unSettledNodes = new HashSet<Node>();
+	    distance = new HashMap<Node, Double>();
+	    predecessors = new HashMap<Node, Node>();
 	    distance.put(source, 0d);
 	    unSettledNodes.add(source);
 	    while (unSettledNodes.size() > 0) {
-	      NodeThread node = getMinimum(unSettledNodes);
+	      Node node = getMinimum(unSettledNodes);
 	      settledNodes.add(node);
 	      unSettledNodes.remove(node);
 	      findMinimalDistances(node);
 	    }
 	  }
 
-	  private void findMinimalDistances(NodeThread node) {
-	    List<NodeThread> adjacentNodes = getNeighbors(node);
-	    for (NodeThread target : adjacentNodes) {
+	  private void findMinimalDistances(Node node) {
+	    List<Node> adjacentNodes = getNeighbors(node);
+	    for (Node target : adjacentNodes) {
 	      if (getShortestDistance(target) > getShortestDistance(node)
 	          + getDistance(node, target)) {
 	        distance.put(target, getShortestDistance(node)
@@ -68,7 +70,7 @@ public class Dijkstra {
 
 	  }
 
-	  private double getDistance(NodeThread node, NodeThread target) {
+	  private double getDistance(Node node, Node target) {
 	    for (Edge edge : edges) {
 	      if (edge.getLeft().equals(node) && edge.getRight().equals(target) ||
 	    		  edge.getRight().equals(node) && edge.getLeft().equals(target)) {
@@ -78,8 +80,8 @@ public class Dijkstra {
 	    throw new RuntimeException("Should not happen");
 	  }
 
-	  private List<NodeThread> getNeighbors(NodeThread node) {
-	    List<NodeThread> neighbors = new ArrayList<NodeThread>();
+	  private List<Node> getNeighbors(Node node) {
+	    List<Node> neighbors = new ArrayList<Node>();
 	    for (Edge edge : edges) {
 	      if (edge.getLeft().equals(node) && !isSettled(edge.getRight()) )
 	    	  neighbors.add(edge.getRight());
@@ -90,9 +92,9 @@ public class Dijkstra {
 	    return neighbors;
 	  }
 
-	  private NodeThread getMinimum(Set<NodeThread> nodes) {
-	    NodeThread minimum = null;
-	    for (NodeThread n : nodes) {
+	  private Node getMinimum(Set<Node> nodes) {
+	    Node minimum = null;
+	    for (Node n : nodes) {
 	      if (minimum == null) {
 	        minimum = n;
 	      } else {
@@ -104,11 +106,11 @@ public class Dijkstra {
 	    return minimum;
 	  }
 
-	  private boolean isSettled(NodeThread Node) {
+	  private boolean isSettled(Node Node) {
 	    return settledNodes.contains(Node);
 	  }
 
-	  private double getShortestDistance(NodeThread destination) {
+	  private double getShortestDistance(Node destination) {
 	    Double d = distance.get(destination);
 	    if (d == null) {
 	      return Integer.MAX_VALUE;
@@ -121,9 +123,9 @@ public class Dijkstra {
 	   * This method returns the path from the source to the selected target and
 	   * NULL if no path exists
 	   */
-	  public LinkedList<NodeThread> getPath(NodeThread target) {
-	    LinkedList<NodeThread> path = new LinkedList<NodeThread>();
-	    NodeThread step = target;
+	  public LinkedList<Node> getPath(Node target) {
+	    LinkedList<Node> path = new LinkedList<>();
+	    Node step = target;
 	    // check if a path exists
 	    if (predecessors.get(step) == null) {
 	      return null;
