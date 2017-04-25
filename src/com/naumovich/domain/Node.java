@@ -1,5 +1,7 @@
 package com.naumovich.domain;
 
+import static com.naumovich.network.TestNetwork.NODES_NUM;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -8,16 +10,13 @@ import java.util.List;
 import com.naumovich.domain.message.ChunkMessage;
 import com.naumovich.domain.message.Message;
 import com.naumovich.domain.message.ResCopyMessage;
-import com.naumovich.network.Field;
-import com.naumovich.network.MessageContainer;
+import com.naumovich.network.*;
 import com.naumovich.table.AddressTable;
 import com.naumovich.table.ChunkTable;
 import com.naumovich.util.Dijkstra;
 import com.naumovich.util.MathOperations;
 import com.naumovich.util.tuple.FourTuple;
 import com.naumovich.util.tuple.TwoTuple;
-
-import static com.naumovich.network.TestNetwork.NODES_NUM;
 
 public class Node {
 	
@@ -142,7 +141,10 @@ public class Node {
 		this.amountOfFindingPath = amountOfFindingPath;
 	}
 	
-	
+	// TODO: create ChunkManager and delegate to it the logics of distributing file, creating chunk copies 
+	// and defining the node to send the chunk to
+	// i.e. the manager maintains and returns chunk and address table
+	// 
 	public void distributeFile(File file) {
 		int n = MathOperations.defineChunksAmount(file.getSize());
 		System.out.println(login + ": I distribute file '" + file.getFileName() + "' into " + n + " chunks");
@@ -175,15 +177,15 @@ public class Node {
 				msgContainer.addMsg(msg);
 			}
 			
-			// moreover, ����� ��� ����������� ��������� ���-�� ����� ��������, ��� �������������� �����
-			// ��������, �� ���� 5 ������ ��� ����� ��������� 3
-			// ��� ����������� ����, ��� �� ���� ���� ������� ��� ��������� �����
-			// (��� �����, ������, ��������, ��� 8 ����)... ���� �� ���������
+			// moreover, можно для результатов забабахть что-то вроде подсчета, как распределяются копии
+			// например, на узел 5 попало две копии фрагмента 3
+			// или вероятность того, что на один узел попадут все фрагменты файла
+			// (без копий, просто, например, все 8 штук)... было бы интересно
 		}
 	}
 	
 	private ArrayList<Chunk> createChunks(File file, int n) {
-		ArrayList<Chunk> chunks = new ArrayList<Chunk>();
+		ArrayList<Chunk> chunks = new ArrayList<>();
 		for (int i = 0; i < n; i++) {
 			chunks.add(new Chunk(this, file.getSize() / n, file.getFileName(), i+1));
 		}

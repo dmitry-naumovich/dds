@@ -28,8 +28,6 @@ public class Field extends JPanel {
 	public static final String STATISTICS_FILE_1 = "statistics.txt";
 	public static final String STATISTICS_FILE_2 = "statistics2.txt";
 	
-	Random rand = new Random();
-	
 	private static ArrayList<ArrayList<Integer>> edgesMatrix = makeMatrix();
 	//private int[][] edgMatrix = new int[NODES_NUM][NODES_NUM];
 	
@@ -96,13 +94,13 @@ public class Field extends JPanel {
 	}
 	public void distributeFiles() {
 		for (int i = 0; i < 5; i++) {
-			nodeThreads.get(rand.nextInt(NODES_NUM)).setDistributeFlag(true);
+			nodeThreads.get(new Random().nextInt(NODES_NUM)).setDistributeFlag(true);
 		}
 		
 	}
 	public void turnOffNodes() {
 		for (int i = 0; i < 10; i++) {
-			nodes.get(rand.nextInt(NODES_NUM)).setOnline(false);
+			nodes.get(new Random().nextInt(NODES_NUM)).setOnline(false);
 		}
 	}
 	public void turnOnAllNodes() {
