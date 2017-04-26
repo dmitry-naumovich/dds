@@ -1,13 +1,14 @@
 package com.naumovich.table;
 
 import java.util.ArrayList;
-
+import java.util.Iterator;
 import com.naumovich.domain.Chunk;
 import com.naumovich.domain.Node;
 import com.naumovich.util.tuple.FourTuple;
 
-public class AddressTable {
+public class AddressTable implements Iterable<FourTuple<Integer, Chunk, Node, Integer>> {
 
+	//private Map<Integer, Set<ThreeTuple<String, String, Integer>>> locationTable;
 	private ArrayList<FourTuple<Integer, Chunk, Node, Integer>> addrTable;
 	private Node owner;
 	
@@ -44,7 +45,32 @@ public class AddressTable {
 		return null;
 	}
 	
+	@Override
+	public Iterator<FourTuple<Integer, Chunk, Node, Integer>> iterator() {
+		return new AddressTableIterator();
+	}
 	
+	private class AddressTableIterator implements Iterator<FourTuple<Integer, Chunk, Node, Integer>> {
+
+		private int curIndex;
+		
+		public AddressTableIterator() {
+			this.curIndex = 0;
+		}
+		@Override
+		public boolean hasNext() {
+			if (curIndex < addrTable.size()) {
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public FourTuple<Integer, Chunk, Node, Integer> next() {
+			return addrTable.get(curIndex++);
+		}
+		
+	}
 	
 	@Override
 	public int hashCode() {
@@ -84,6 +110,5 @@ public class AddressTable {
 			sb.append("\n" + (addrTable.get(i)));
 		}
 		return sb.toString();
-	}
-	
+	}	
 }

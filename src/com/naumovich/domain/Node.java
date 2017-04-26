@@ -12,11 +12,13 @@ import com.naumovich.domain.message.Message;
 import com.naumovich.domain.message.ResCopyMessage;
 import com.naumovich.network.*;
 import com.naumovich.table.AddressTable;
-import com.naumovich.table.ChunkTable;
 import com.naumovich.util.Dijkstra;
 import com.naumovich.util.MathOperations;
 import com.naumovich.util.tuple.FourTuple;
 import com.naumovich.util.tuple.TwoTuple;
+
+import manager.ChunkManager;
+import manager.RoutingManager;
 
 public class Node {
 	
@@ -27,7 +29,6 @@ public class Node {
 	private String nodeID;
 	private List<Chunk> chunkStorage;
 	private List<Message> resCopyMsgs;
-	private ChunkTable chTable;
 	private AddressTable addrTable;
 	private boolean isOnline;
 	private int amountOfRestransmitted = 0;
@@ -35,7 +36,9 @@ public class Node {
 	private long amountOfNodeStatusChecks = 0;
 	private long amountOfFindingPath = 0;
 	
-	private MessageContainer msgContainer;
+	private ChunkManager chunkManager;
+	private RoutingManager routingManager;
+
 	private static int counter = 0;
 	
 	public Node(NodeThread thread, Field field) {
@@ -48,7 +51,7 @@ public class Node {
 		login = "NodeThread" + counter++; 
 		isOnline = true;
 		addrTable = new AddressTable(this);
-		msgContainer = new MessageContainer();
+		chunkManager = new ChunkManager(this);
 	}
 	
 	public NodeThread getNodeThread() {
@@ -95,12 +98,6 @@ public class Node {
 	public void setResCopyMsgs(List<Message> resCopyMsgs) {
 		this.resCopyMsgs = resCopyMsgs;
 	}
-	public ChunkTable getChTable() {
-		return chTable;
-	}
-	public void setChTable(ChunkTable chTable) {
-		this.chTable = chTable;
-	}
 	public AddressTable getAddrTable() {
 		return addrTable;
 	}
@@ -119,78 +116,20 @@ public class Node {
 	public int getAmountOfRestransmitted() {
 		return amountOfRestransmitted;
 	}
-	public void setAmountOfRestransmitted(int amountOfRestransmitted) {
-		this.amountOfRestransmitted = amountOfRestransmitted;
-	}
 	public long getAmountOfMsgChecks() {
 		return amountOfMsgChecks;
-	}
-	public void setAmountOfMsgChecks(long amountOfMsgChecks) {
-		this.amountOfMsgChecks = amountOfMsgChecks;
 	}
 	public long getAmountOfNodeStatusChecks() {
 		return amountOfNodeStatusChecks;
 	}
-	public void setAmountOfNodeStatusChecks(long amountOfNodeStatusChecks) {
-		this.amountOfNodeStatusChecks = amountOfNodeStatusChecks;
-	}
 	public long getAmountOfFindingPath() {
 		return amountOfFindingPath;
 	}
-	public void setAmountOfFindingPath(long amountOfFindingPath) {
-		this.amountOfFindingPath = amountOfFindingPath;
-	}
 	
-	// TODO: create ChunkManager and delegate to it the logics of distributing file, creating chunk copies 
-	// and defining the node to send the chunk to
-	// i.e. the manager maintains and returns chunk and address table
-	// 
 	public void distributeFile(File file) {
-		int n = MathOperations.defineChunksAmount(file.getSize());
-		System.out.println(login + ": I distribute file '" + file.getFileName() + "' into " + n + " chunks");
-		List<Chunk> chunks = createChunks(file, n);
-		chTable = new ChunkTable(n);
-		//addrTable = new AddressTable(this);
-		List<Chunk> chunksAndCopies = new ArrayList<Chunk>();
-		for (Chunk ch : chunks) {
-			ArrayList<Chunk> alc = ch.makeCopies();
-			chTable.setRow(alc, ch.getOrderNum() - 1);
-			chunksAndCopies.addAll(alc);
-		}
-//		chTable.printTable();
-		for (Chunk ch : chunksAndCopies) {
-			TwoTuple<Node, Integer> tuple = ch.findNodeForMe();
-			addrTable.addRow(ch.getOrderNum(), ch, tuple.first, tuple.second);
-			// encryptedChunk = ch.encrypt();
-		}
-		System.out.println(addrTable);
-		for (Chunk ch : chunksAndCopies) {
-			Dijkstra dijAlg = new Dijkstra(); // Dijkstra defines the route to destination
-			dijAlg.execute(this); // Dijkstra works
-			List<Node> path = dijAlg.getPath(addrTable.getNodeByChunk(ch));
-			amountOfFindingPath++;
-			System.out.println(this.getLogin() + ": I send " + ch.getChunkName() + " to " + 
-								addrTable.getNodeByChunk(ch).getLogin() + ". The way is: " + path);
-			if (path != null) {
-				Message msg = new ChunkMessage(path, ch); 
-				msg.excludeFirstNodeFromPath();
-				msgContainer.addMsg(msg);
-			}
-			
-			// moreover, можно для результатов забабахть что-то вроде подсчета, как распределяются копии
-			// например, на узел 5 попало две копии фрагмента 3
-			// или вероятность того, что на один узел попадут все фрагменты файла
-			// (без копий, просто, например, все 8 штук)... было бы интересно
-		}
+		AddressTable table = chunkManager.createAddressTable(file);
+		routingManager.distributeChunks(this, table);
 	}
-	
-	private ArrayList<Chunk> createChunks(File file, int n) {
-		ArrayList<Chunk> chunks = new ArrayList<>();
-		for (int i = 0; i < n; i++) {
-			chunks.add(new Chunk(this, file.getSize() / n, file.getFileName(), i+1));
-		}
-		return chunks;
-	} 
 	
 	@SuppressWarnings("unchecked")
 	public void checkMsgContainer() {
@@ -291,6 +230,7 @@ public class Node {
 		}
 		return false;
 	}
+	
 	public void checkNodesStatus() {
 		for (int i = 0; i < addrTable.getRowCount(); i++) {
 			FourTuple<Integer, Chunk, Node, Integer> tup = addrTable.getRow(i);
@@ -314,7 +254,7 @@ public class Node {
 					if (path != null) {
 						Message resCopyMsg = new ResCopyMessage(path, new TwoTuple<Node, Chunk>(tup2.first, chunkToSend) );
 						resCopyMsg.excludeFirstNodeFromPath();
-						msgContainer.addMsg(resCopyMsg);
+						MessageContainer.addMsg(resCopyMsg);
 	    			}
 				}
 					
@@ -358,12 +298,10 @@ public class Node {
 		result = prime * result + (int) (amountOfMsgChecks ^ (amountOfMsgChecks >>> 32));
 		result = prime * result + (int) (amountOfNodeStatusChecks ^ (amountOfNodeStatusChecks >>> 32));
 		result = prime * result + amountOfRestransmitted;
-		result = prime * result + ((chTable == null) ? 0 : chTable.hashCode());
 		result = prime * result + ((chunkStorage == null) ? 0 : chunkStorage.hashCode());
 		result = prime * result + ((field == null) ? 0 : field.hashCode());
 		result = prime * result + (isOnline ? 1231 : 1237);
 		result = prime * result + ((login == null) ? 0 : login.hashCode());
-		result = prime * result + ((msgContainer == null) ? 0 : msgContainer.hashCode());
 		result = prime * result + ((nodeID == null) ? 0 : nodeID.hashCode());
 		result = prime * result + ((nodeThread == null) ? 0 : nodeThread.hashCode());
 		result = prime * result + persNum;
@@ -393,11 +331,6 @@ public class Node {
 			return false;
 		if (amountOfRestransmitted != other.amountOfRestransmitted)
 			return false;
-		if (chTable == null) {
-			if (other.chTable != null)
-				return false;
-		} else if (!chTable.equals(other.chTable))
-			return false;
 		if (chunkStorage == null) {
 			if (other.chunkStorage != null)
 				return false;
@@ -414,11 +347,6 @@ public class Node {
 			if (other.login != null)
 				return false;
 		} else if (!login.equals(other.login))
-			return false;
-		if (msgContainer == null) {
-			if (other.msgContainer != null)
-				return false;
-		} else if (!msgContainer.equals(other.msgContainer))
 			return false;
 		if (nodeID == null) {
 			if (other.nodeID != null)
@@ -444,10 +372,10 @@ public class Node {
 	public String toString() {
 		return "Node [nodeThread=" + nodeThread + ", field=" + field + ", login=" + login + ", persNum=" + persNum
 				+ ", nodeID=" + nodeID + ", chunkStorage=" + chunkStorage + ", resCopyMsgs=" + resCopyMsgs
-				+ ", chTable=" + chTable + ", addrTable=" + addrTable + ", isOnline=" + isOnline
+				+ ", addrTable=" + addrTable + ", isOnline=" + isOnline
 				+ ", amountOfRestransmitted=" + amountOfRestransmitted + ", amountOfMsgChecks=" + amountOfMsgChecks
 				+ ", amountOfNodeStatusChecks=" + amountOfNodeStatusChecks + ", amountOfFindingPath="
-				+ amountOfFindingPath + ", msgContainer=" + msgContainer + "]";
+				+ amountOfFindingPath + " ]";
 	}
 	
 	

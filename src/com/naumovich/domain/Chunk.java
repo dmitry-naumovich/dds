@@ -34,8 +34,8 @@ public class Chunk {
 	public String getChunkName() {
 		return chunkName;
 	}
-	public ArrayList<Chunk> makeCopies() {
-		ArrayList<Chunk> chs = new ArrayList<Chunk>();
+	public List<Chunk> makeCopies() {
+		List<Chunk> chs = new ArrayList<>();
 		chs.add(this);
 		for (int i = 0; i < 4; i++) 
 			chs.add(new Chunk(this.originalOwner, this.chunkSize, this.parentFileName, this.orderNum));
@@ -43,7 +43,7 @@ public class Chunk {
 	}
 	
 	public TwoTuple<Node, Integer> findNodeForMe() {
-		ArrayList<TwoTuple<Node, Integer>> allMetrics = new ArrayList<>();
+		List<TwoTuple<Node, Integer>> allMetrics = new ArrayList<>();
 		@SuppressWarnings("unchecked")
 		List<Node> nodes = (ArrayList<Node>) Field.getNodes().clone(); // ????????????????? clone???????? not implemented?
 		nodes.remove(this.originalOwner);
