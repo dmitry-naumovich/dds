@@ -6,7 +6,7 @@ public final class MenuItemNames {
 	public static final String ACTION_COLLECT_STATS = "Collect statistics";
 	public static final String ACTION_DISTRIBUTE = "Distribute files";
 	public static final String ACTION_RESUME_MOTION = "Resume motion";
-	public static final String ACTION_SHOW_MATRIX = "Show adjantency matrix";
+	public static final String ACTION_SHOW_MATRIX = "Show adjaсency matrix";
 	public static final String ACTION_STOP_MOTION = "Stop motion";
 	public static final String ACTION_TURN_OFF_SOME = "Turn off some nodes";
 	public static final String ACTION_TURN_ON_ALL = "Turn on all nodes";

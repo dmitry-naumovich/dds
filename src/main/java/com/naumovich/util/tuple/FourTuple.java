@@ -11,7 +11,7 @@ public class FourTuple<A, B, C, D> extends ThreeTuple<A, B, C> {
 
 	@Override
 	public String toString() {
-		return "FourTuple [fourth=" + fourth + ", third=" + third + ", first=" + first + ", second=" + second + "]";
+		return "FourTuple [first=" + first + ", second=" + second + ", third=" + third + ", fourth=" + fourth + "]";
 	}
 	
 }

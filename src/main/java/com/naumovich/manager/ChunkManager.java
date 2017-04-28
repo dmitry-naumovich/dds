@@ -1,9 +1,4 @@
-package manager;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+package com.naumovich.manager;
 
 import com.naumovich.domain.Chunk;
 import com.naumovich.domain.File;
@@ -11,6 +6,11 @@ import com.naumovich.domain.Node;
 import com.naumovich.table.AddressTable;
 import com.naumovich.util.MathOperations;
 import com.naumovich.util.tuple.TwoTuple;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ChunkManager {
 
@@ -27,7 +27,7 @@ public class ChunkManager {
 		System.out.println(owner.getLogin() + ": I distribute file '" + file.getFileName() + "' into " + n + " chunks");
 		List<Chunk> chunks = createChunks(file, n);
 		
-		AddressTable addrTable = new AddressTable(owner);
+		AddressTable addressTable = new AddressTable(owner);
 		
 		List<Chunk> chunksAndCopies = new ArrayList<>();
 		for (Chunk ch : chunks) {
@@ -37,14 +37,12 @@ public class ChunkManager {
 		
 		for (Chunk ch : chunksAndCopies) {
 			TwoTuple<Node, Integer> tuple = ch.findNodeForMe();
-			addrTable.addRow(ch.getOrderNum(), ch, tuple.first, tuple.second);
+			addressTable.addRow(ch.getOrderNum(), ch, tuple.first, tuple.second);
 			// encryptedChunk = ch.encrypt();
 		}
 		
-		addressTableMap.put(file, addrTable);
-		//System.out.println(addrTable);
-		
-		return addrTable;
+		addressTableMap.put(file, addressTable);
+		return addressTable;
 	}
 	
 	private ArrayList<Chunk> createChunks(File file, int n) {
@@ -53,10 +51,5 @@ public class ChunkManager {
 			chunks.add(new Chunk(owner, file.getSize() / n, file.getFileName(), i+1));
 		}
 		return chunks;
-	} 
-	
-	
-	
-	
-
+	}
 }

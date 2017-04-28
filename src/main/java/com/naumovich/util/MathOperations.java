@@ -7,10 +7,11 @@ import com.naumovich.domain.Node;
 import com.naumovich.util.tuple.TwoTuple;
 
 public final class MathOperations {
-	
+
+	private static final Random rand = new Random();
+
 	public static String getRandomHexString(int numchars) {
-		Random rand = new Random();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while (sb.length() < numchars) {
             sb.append(Integer.toHexString(rand.nextInt()));
         }
@@ -51,7 +52,7 @@ public final class MathOperations {
 				minVal = el.second;
 			}
 		}
-		return new TwoTuple<Node, Integer>(node, minVal);
+		return new TwoTuple<>(node, minVal);
 	}
 	
 }

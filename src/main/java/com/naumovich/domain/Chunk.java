@@ -49,10 +49,10 @@ public class Chunk {
 		nodes.remove(this.originalOwner);
 		for (Node n: nodes) {
 			if (n.isOnline())
-				allMetrics.add(new TwoTuple<Node, Integer>(n, MathOperations.findXORMetric(n.getNodeID(), this.chunkID)));
+				allMetrics.add(new TwoTuple<>(n, MathOperations.findXORMetric(n.getNodeID(), this.chunkID)));
 		}
 		TwoTuple<Node, Integer> two = MathOperations.findMin(allMetrics);
-		return new TwoTuple<Node, Integer>(two.first, two.second);
+		return new TwoTuple<>(two.first, two.second);
 	}
 	@Override
 	public int hashCode() {

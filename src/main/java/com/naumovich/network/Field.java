@@ -98,7 +98,7 @@ public class Field extends JPanel {
 		}
 		
 	}
-	public void turnOffNodes() {
+	public void turnOffSomeNodes() {
 		for (int i = 0; i < 10; i++) {
 			nodes.get(new Random().nextInt(NODES_NUM)).setOnline(false);
 		}
@@ -109,12 +109,12 @@ public class Field extends JPanel {
 		}
 	}
 	public void collectStatistics() {
-		ArrayList<ArrayList<Integer>> list = new ArrayList<ArrayList<Integer>>();
+		ArrayList<ArrayList<Integer>> list = new ArrayList<>();
 		for (Node n : nodes) {
-			ArrayList<Integer> row = new ArrayList<Integer>();
+			ArrayList<Integer> row = new ArrayList<>();
 			row.add(0, n.getPersNum()); // first column - node's number
 			row.add(1, n.getChunkStorage().size()); // second column - number of storing chunks
-			row.add(2, n.getAmountOfRestransmitted()); // third column - number of retransmissions made
+			row.add(2, n.getAmountOfRetransmitted()); // third column - number of retransmissions made
 			list.add(row);
 		}
 		writeToFile(list, STATISTICS_FILE_1);
@@ -127,6 +127,7 @@ public class Field extends JPanel {
 		}
 		writeToFile(new long[] {path / nodes.size(), msg / nodes.size(), status / nodes.size()}, STATISTICS_FILE_2);
 	}
+
 	private void writeToFile(ArrayList<ArrayList<Integer>> list, String fileName) {
 		Writer writer = null;
 		try {
@@ -150,21 +151,12 @@ public class Field extends JPanel {
 		}
 	}
 	private void writeToFile(long[] array, String fileName) {
-		Writer writer = null;
-		try {
-		    writer = new BufferedWriter(new OutputStreamWriter(
-		          new FileOutputStream(fileName), "utf-8"));
+		try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName), "utf-8")) ) {
 		    for (int i = 0; i < array.length; i++) {
 		    		writer.append(String.valueOf(array[i]) + ";");
 		    }
 		} catch (IOException ex) {
-		  ex.toString();
-		} finally {
-		   try {
-			   writer.close();
-		   } catch (Exception ex) {
-			   ex.toString();
-		   }
+		  //TODO do smth
 		}
 	}
 	public void paintComponent(Graphics g) {
@@ -195,7 +187,7 @@ public class Field extends JPanel {
 		notifyAll();
 	}
 	
-	public synchronized void showEdgesMatrix() {
+	synchronized void showEdgesMatrix() {
 		for (int i = 0; i < NODES_NUM; i++) {
 			for (int j = 0; j < NODES_NUM; j++) {
 				if (i == j) System.out.print("- ");

@@ -13,7 +13,7 @@ public class AddressTable implements Iterable<FourTuple<Integer, Chunk, Node, In
 	private Node owner;
 	
 	public AddressTable(Node owner) {
-		addrTable = new ArrayList<FourTuple<Integer, Chunk, Node, Integer>>();
+		addrTable = new ArrayList<>();
 		this.owner = owner;
 	}
 	
@@ -24,10 +24,10 @@ public class AddressTable implements Iterable<FourTuple<Integer, Chunk, Node, In
 	public void addRow(int numOfChunk, Chunk chunk, Node node, int metrics) {
 		//System.out.println("AddressTable.addRow() method");
 		//System.out.println("Row: numOfChunk = " + numOfChunk + ", chunkId" + chunk.getChunkId() + ", nodeId = " + node.getNodeId() + ", metrics = " + metrics);
-		addrTable.add(new FourTuple<Integer, Chunk, Node, Integer>(numOfChunk, chunk, node, metrics));
+		addrTable.add(new FourTuple<>(numOfChunk, chunk, node, metrics));
 	}
 	public void setRow(int rowNum, Node node, int metrics) {
-		addrTable.set(rowNum, new FourTuple<Integer, Chunk, Node, Integer>(addrTable.get(rowNum).first,
+		addrTable.set(rowNum, new FourTuple<>(addrTable.get(rowNum).first,
 		addrTable.get(rowNum).second, node, metrics));
 	}
 	public FourTuple<Integer, Chunk, Node, Integer> getRow(int rowNum) {
@@ -105,7 +105,7 @@ public class AddressTable implements Iterable<FourTuple<Integer, Chunk, Node, In
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder("This is Address Table of " + owner);
+		StringBuilder sb = new StringBuilder("This is Address Table of " + owner.getLogin());
 		for (int i = 0; i < addrTable.size(); i++) {
 			sb.append("\n" + (addrTable.get(i)));
 		}

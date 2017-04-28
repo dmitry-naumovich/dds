@@ -7,20 +7,19 @@ import javax.swing.*;
 
 import com.naumovich.util.MenuItemNames;
 
-@SuppressWarnings("serial")
 public class TestNetwork extends JFrame {
 
 	public static final int NODES_NUM = 40;
+	private static final String J_FRAME_TITLE = "DDS algorithm testing";
 	private static final int WIDTH = 600;
 	private static final int HEIGHT = 480;
+
 	private JMenuItem pauseMenuItem;
 	private JMenuItem resumeMenuItem;
 	private Field field = new Field();
-	
-	public static final String JFRAME_TITLE = "DDS algorithm testing";
-	
+
 	public TestNetwork() {
-		super(JFRAME_TITLE);
+		super(J_FRAME_TITLE);
 		setSize(WIDTH, HEIGHT);
 		Toolkit kit = Toolkit.getDefaultToolkit();
 		setLocation((kit.getScreenSize().width - WIDTH)/2, (kit.getScreenSize().height - HEIGHT)/2);
@@ -28,6 +27,12 @@ public class TestNetwork extends JFrame {
 		createMenu();
 		getContentPane().add(field, BorderLayout.CENTER);
 	}
+
+    public static void main(String[] args) {
+        TestNetwork testNet = new TestNetwork();
+        testNet.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        testNet.setVisible(true);
+    }
 	
 	private void createMenu() {
 		JMenuBar menuBar = new JMenuBar();
@@ -49,7 +54,7 @@ public class TestNetwork extends JFrame {
 		nodeMenu.add(new AbstractAction(MenuItemNames.ACTION_TURN_OFF_SOME) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				field.turnOffNodes();
+				field.turnOffSomeNodes();
 			}
 		}).setEnabled(true);
 		nodeMenu.add(new AbstractAction(MenuItemNames.ACTION_TURN_ON_ALL) {
@@ -104,10 +109,4 @@ public class TestNetwork extends JFrame {
 		menuBar.add(nodeMenu);
 		menuBar.add(controlMenu);
 	}
-	
-	public static void main(String[] args) {
-		TestNetwork testNet = new TestNetwork();
-		testNet.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		testNet.setVisible(true);
-	}	
 }
