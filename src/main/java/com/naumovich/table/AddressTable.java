@@ -22,8 +22,6 @@ public class AddressTable implements Iterable<FourTuple<Integer, Chunk, Node, In
 	}
 
 	public void addRow(int numOfChunk, Chunk chunk, Node node, int metrics) {
-		//System.out.println("AddressTable.addRow() method");
-		//System.out.println("Row: numOfChunk = " + numOfChunk + ", chunkId" + chunk.getChunkId() + ", nodeId = " + node.getNodeId() + ", metrics = " + metrics);
 		addrTable.add(new FourTuple<>(numOfChunk, chunk, node, metrics));
 	}
 	public void setRow(int rowNum, Node node, int metrics) {
@@ -36,6 +34,7 @@ public class AddressTable implements Iterable<FourTuple<Integer, Chunk, Node, In
 	public int getRowCount() {
 		return addrTable.size();
 	}
+
 	public Node getNodeByChunk(Chunk ch) {
 		for (FourTuple<Integer, Chunk, Node, Integer> fTup : addrTable) {
 			if (fTup.second == ch) {

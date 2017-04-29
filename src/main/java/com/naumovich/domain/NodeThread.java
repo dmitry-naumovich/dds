@@ -73,8 +73,9 @@ public class NodeThread implements Runnable {
 	@Override
 	public void run() { // runs for every node
 		try {
+			// TODO remove true and fieldCanIMove here and remove wait() and notify() perhaps ?
 			while (true) {
-				field.canMove(this); // checking whether the "pause" is pressed or not
+				field.canIMove(); // checking whether the "pause" is pressed or not
 				for (int i = 0; i < 120; i++) {
 					if (node.isOnline()) {
 						if (resCopyFlag) {
@@ -83,7 +84,7 @@ public class NodeThread implements Runnable {
 						}
 						if (distributeFlag) {
 							node.distributeFile(new File("file " + i * rand.nextInt(1000), 100 + rand.nextInt(10000)));
-							setDistributeFlag(false);
+							distributeFlag = false;
 						}
 						color = new Color(92, 194, 242);
 						node.checkMessageContainer(); // retransmit or receive chunks
@@ -112,6 +113,7 @@ public class NodeThread implements Runnable {
 							x += speedX;
 							y += speedY;
 						}
+						// TODO maybe catch Thread.sleep exceptin here
 						Thread.sleep(1);
 					}
 
@@ -120,6 +122,7 @@ public class NodeThread implements Runnable {
 			}
 		} catch (InterruptedException ex) {
 		    //TODO handle an exception in any way
+
         }
 	}
 }

@@ -6,12 +6,13 @@ import com.naumovich.domain.Node;
 import com.naumovich.table.AddressTable;
 import com.naumovich.util.MathOperations;
 import com.naumovich.util.tuple.TwoTuple;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+@Slf4j
 public class ChunkManager {
 
 	private Map<File, AddressTable> addressTableMap;
@@ -24,7 +25,7 @@ public class ChunkManager {
 	
 	public AddressTable createAddressTable(File file) {
 		int n = MathOperations.defineChunksAmount(file.getSize());
-		System.out.println(owner.getLogin() + ": I distribute file '" + file.getFileName() + "' into " + n + " chunks");
+		log.info(owner.getLogin() + ": I distribute file '" + file.getFileName() + "' into " + n + " chunks");
 		List<Chunk> chunks = createChunks(file, n);
 		
 		AddressTable addressTable = new AddressTable(owner);

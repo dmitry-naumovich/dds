@@ -12,7 +12,9 @@ import com.naumovich.table.AddressTable;
 import com.naumovich.util.Dijkstra;
 import com.naumovich.util.tuple.FourTuple;
 import com.naumovich.util.tuple.TwoTuple;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class DijkstraRoutingManager implements RoutingManager {
 
 	
@@ -23,8 +25,9 @@ public class DijkstraRoutingManager implements RoutingManager {
 			dijAlg.execute(owner); // Dijkstra works
 			List<Node> path = dijAlg.getPath(tableRow.third);
 			owner.incrementAmountOfFindingPath();
-			System.out.println(owner.getLogin() + ": I send " + tableRow.second.getChunkName() + " to " +
-					tableRow.third.getLogin() + ". The way is: " + path);
+			log.debug(owner.getLogin() + ": I send " + tableRow.second.getChunkName() + " to " +
+                    tableRow.third.getLogin() + ". The way is: " + path);
+
 			if (path != null) {
 				Message msg = new ChunkMessage(path, tableRow.second);
 				msg.excludeFirstNodeFromPath();
@@ -46,7 +49,7 @@ public class DijkstraRoutingManager implements RoutingManager {
 			FourTuple<Integer, Chunk, Node, Integer> tup = addressTable.getRow(i);
 			owner.incrementAmountOfNodeStatusChecks();
 			if (!tup.third.isOnline()) {
-				System.out.println(owner.getLogin() + ": I've found out " + tup.third + " is offline");
+				log.debug(owner.getLogin() + ": I've found out " + tup.third + " is offline");
 				TwoTuple<Node, Integer> tup2 = tup.second.findNodeForMe();
 				if (tup.third.equals(tup2.first)) {
 					break; // same node returned so no more need for reserve copying
@@ -56,7 +59,7 @@ public class DijkstraRoutingManager implements RoutingManager {
 					int rowOfSender = getNewSender(addressTable, i);
 					Node sender = addressTable.getRow(rowOfSender).third;
 					Chunk chunkToSend = addressTable.getRow(rowOfSender).second;
-					System.out.println(owner.getLogin() + ": new sender of " + chunkToSend + " is " + sender);
+					log.debug(owner.getLogin() + ": new sender of " + chunkToSend + " is " + sender);
 					Dijkstra dijAlg = new Dijkstra(); // Dijkstra defines the route to destination
 					dijAlg.execute(owner);
 					List<Node> path = dijAlg.getPath(sender);
