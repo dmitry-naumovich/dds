@@ -23,14 +23,14 @@ public class TestNetwork extends JFrame {
 		setSize(WIDTH, HEIGHT);
 		Toolkit kit = Toolkit.getDefaultToolkit();
 		setLocation((kit.getScreenSize().width - WIDTH)/2, (kit.getScreenSize().height - HEIGHT)/2);
-		setExtendedState(MAXIMIZED_BOTH);
+		//setExtendedState(MAXIMIZED_BOTH);
 		createMenu();
 		getContentPane().add(field, BorderLayout.CENTER);
 	}
 
     public static void main(String[] args) {
         TestNetwork testNet = new TestNetwork();
-        testNet.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        testNet.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         testNet.setVisible(true);
     }
 	

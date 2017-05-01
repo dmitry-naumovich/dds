@@ -4,9 +4,9 @@ import java.util.List;
 
 import com.naumovich.domain.Chunk;
 import com.naumovich.domain.Node;
+import com.naumovich.domain.message.BackupMessage;
 import com.naumovich.domain.message.ChunkMessage;
 import com.naumovich.domain.message.Message;
-import com.naumovich.domain.message.ResCopyMessage;
 import com.naumovich.network.MessageContainer;
 import com.naumovich.table.AddressTable;
 import com.naumovich.util.Dijkstra;
@@ -65,9 +65,9 @@ public class DijkstraRoutingManager implements RoutingManager {
 					List<Node> path = dijAlg.getPath(sender);
 					owner.incrementAmountOfFindingPath();
 					if (path != null) {
-						Message resCopyMsg = new ResCopyMessage(path, new TwoTuple<>(tup2.first, chunkToSend) );
-						resCopyMsg.excludeFirstNodeFromPath();
-						MessageContainer.addMsg(resCopyMsg);
+						Message backupMsg = new BackupMessage(path, new TwoTuple<>(tup2.first, chunkToSend) );
+						backupMsg.excludeFirstNodeFromPath();
+						MessageContainer.addMsg(backupMsg);
 					}
 				}
 

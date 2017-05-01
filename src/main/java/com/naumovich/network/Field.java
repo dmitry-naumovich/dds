@@ -1,13 +1,6 @@
 package com.naumovich.network;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -16,19 +9,17 @@ import javax.swing.Timer;
 
 import com.naumovich.domain.Node;
 import com.naumovich.domain.NodeThread;
+import com.naumovich.util.MathOperations;
 
 import static com.naumovich.network.TestNetwork.NODES_NUM;
 
-@SuppressWarnings("serial")
 public class Field extends JPanel {
 
     private static ArrayList<Node> nodes = new ArrayList<>(NODES_NUM);
     private static ArrayList<NodeThread> nodeThreads = new ArrayList<>(NODES_NUM);
     private static final Random rand = new Random();
 
-
-    private static ArrayList<ArrayList<Integer>> edgesMatrix = makeMatrix();
-    //private int[][] edgMatrix = new int[NODES_NUM][NODES_NUM];
+    private static int[][] edgesMatrix = new int[NODES_NUM][NODES_NUM];
 
     private boolean paused;
 
@@ -67,32 +58,19 @@ public class Field extends JPanel {
         new Timer(10, ev -> repaint()).start();
     }
 
-    public static ArrayList<ArrayList<Integer>> makeMatrix() {
-        ArrayList<ArrayList<Integer>> edgesMatrix = new ArrayList<>();
-        for (int i = 0; i < NODES_NUM; i++) {
-            ArrayList<Integer> tmp = new ArrayList<>();
-            for (int j = 0; j < NODES_NUM; j++) {
-                tmp.add(0);
-            }
-            edgesMatrix.add(tmp);
-        }
-        return edgesMatrix;
-
-    }
-
     public void addNodeThread() {
         NodeThread newNodeThread = new NodeThread(this);
         nodeThreads.add(newNodeThread);
         nodes.add(newNodeThread.getNode());
+        new Thread(newNodeThread).start();
     }
 
-    public static ArrayList<ArrayList<Integer>> getEdgesMatrix() {
+    public static int[][] getEdgesMatrix() {
         return edgesMatrix;
     }
 
     public void setEdgesMatrixCell(int i, int j, int value) {
-        edgesMatrix.get(j).set(i, value); // case it's ArrayList
-        //edgMatrix[i][j] = value;        // case it's simple array
+        edgesMatrix[i][j] = value;        // case it's simple array
     }
 
     public void distributeFiles() {
@@ -118,6 +96,7 @@ public class Field extends JPanel {
         StatisticsCollector.collectStatistics(nodes);
     }
 
+    @Override
     public void paintComponent(Graphics g) {
         //g.drawString("", x, y);
         super.paintComponent(g);
@@ -149,15 +128,7 @@ public class Field extends JPanel {
     }
 
     synchronized void showEdgesMatrix() {
-        for (int i = 0; i < NODES_NUM; i++) {
-            for (int j = 0; j < NODES_NUM; j++) {
-                if (i == j) System.out.print("- ");
-                else
-                    System.out.print(edgesMatrix.get(i).get(j) + " ");
-            }
-            System.out.print("\n");
-        }
+        MathOperations.printEdgesMatrix(edgesMatrix);
     }
-
 
 }

@@ -3,34 +3,31 @@ package com.naumovich.domain;
 import static com.naumovich.network.TestNetwork.NODES_NUM;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import com.naumovich.domain.message.Message;
-import com.naumovich.domain.message.ResCopyMessage;
 import com.naumovich.manager.ChunkManager;
 import com.naumovich.manager.DijkstraRoutingManager;
 import com.naumovich.manager.MessageManager;
 import com.naumovich.manager.RoutingManager;
 import com.naumovich.network.*;
 import com.naumovich.table.AddressTable;
-import com.naumovich.util.Dijkstra;
 import com.naumovich.util.MathOperations;
-import com.naumovich.util.tuple.FourTuple;
-import com.naumovich.util.tuple.TwoTuple;
 import lombok.extern.slf4j.Slf4j;
 
 //TODO: override toString, hashCode and equals after Node entity completed
 @Slf4j
 public class Node {
 
+    private static int counter = 0;
+
     private NodeThread nodeThread;
     private final Field field;
-    private final String login;
-    private final int persNum;
-    private final String nodeID;
-    private ChunkStorage chunkStorage;
+    private final int persNum = counter;
+    private final String login = "Node" + counter++;
+    private final String nodeID = MathOperations.getRandomHexString(40);
+    private ChunkStorage chunkStorage = new ChunkStorage();
     private AddressTable addrTable;
-    private boolean isOnline;
+    private boolean isOnline = true;
+
     private int amountOfRetransmitted;
     private long amountOfMsgChecks;
     private long amountOfNodeStatusChecks;
@@ -40,16 +37,9 @@ public class Node {
     private RoutingManager routingManager;
     private MessageManager messageManager;
 
-    private static int counter = 0;
-
     public Node(NodeThread thread, Field field) {
         this.nodeThread = thread;
         this.field = field;
-        chunkStorage = new ChunkStorage();
-        persNum = counter;
-        nodeID = MathOperations.getRandomHexString(40);
-        login = "Node" + counter++;
-        isOnline = true;
 
         chunkManager = new ChunkManager(this);
         routingManager = new DijkstraRoutingManager();
@@ -146,7 +136,7 @@ public class Node {
 
     public boolean isNeighborWith(Node n) {
         if (this.equals(n)) return false;
-        else if (Math.pow(nodeThread.getX() - n.getNodeThread().getX(), 2) + Math.pow(nodeThread.getY() - n.getNodeThread().getY(), 2) <= Math.pow(12 * NodeThread.getRadius(), 2)) {
+        else if (Math.pow(nodeThread.getX() - n.getNodeThread().getX(), 2) + Math.pow(nodeThread.getY() - n.getNodeThread().getY(), 2) <= Math.pow(20 * NodeThread.getRadius(), 2)) {
             // here if two nodes are neighbors
             return true;
         }
@@ -159,8 +149,8 @@ public class Node {
         }
     }
 
-    public void makeResCopy() {
-        messageManager.makeResCopy();
+    public void makeBackup() {
+        messageManager.makeBackup();
     }
 
     @Override

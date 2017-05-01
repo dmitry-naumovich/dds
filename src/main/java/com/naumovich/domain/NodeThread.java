@@ -13,6 +13,8 @@ public class NodeThread implements Runnable {
     private static Random rand = new Random();
     private static final double speed = 0.01;
     private static final int radius = 8;
+    private static final Color WHITE_COLOR = new Color(255, 255, 255);
+    private static final Color BLUE_COLOR = new Color(92, 194, 242);
 
     private Field field;
 	private Node node;
@@ -23,13 +25,11 @@ public class NodeThread implements Runnable {
 	private double speedY;
 	
 	private boolean distributeFlag;
-	private boolean resCopyFlag;
+	private boolean backupFlag;
 	
 	public NodeThread(Field field) {
 		this.field = field;
 		node = new Node(this, field);
-		distributeFlag = false;
-		resCopyFlag = false;
 		
 		double angle = Math.random()*2*Math.PI;
 		speedX = speed*Math.cos(angle);
@@ -37,15 +37,13 @@ public class NodeThread implements Runnable {
 		color = new Color(92, 194, 242);
 		x = Math.random()*(field.getSize().getWidth() - 2*radius) + radius;
 		y = Math.random()*(field.getSize().getHeight() - 2*radius) + radius;
-		Thread thisThread = new Thread(this);
-		thisThread.start();
 	}
 	
 	public void setDistributeFlag(boolean distributeFlag) {
 		this.distributeFlag = distributeFlag;
 	}
-	public void setResCopyFlag(boolean resCopyFlag) {
-		this.resCopyFlag = resCopyFlag;
+	public void setBackupFlag(boolean backupFlag) {
+		this.backupFlag = backupFlag;
 	}
 	public double getX() {
 		return x;
@@ -61,6 +59,7 @@ public class NodeThread implements Runnable {
 	public Node getNode() {
 		return node;
 	}
+
 	public void paint(Graphics2D canvas) {
 		canvas.setColor(color);
 		canvas.setPaint(color);
@@ -73,20 +72,19 @@ public class NodeThread implements Runnable {
 	@Override
 	public void run() { // runs for every node
 		try {
-			// TODO remove true and fieldCanIMove here and remove wait() and notify() perhaps ?
-			while (true) {
+			while (true) {// TODO remove true and fieldCanIMove here and remove wait() and notify() perhaps ?
 				field.canIMove(); // checking whether the "pause" is pressed or not
 				for (int i = 0; i < 120; i++) {
 					if (node.isOnline()) {
-						if (resCopyFlag) {
-							node.makeResCopy();
-							resCopyFlag = false;
+						if (backupFlag) {
+							node.makeBackup();
+							backupFlag = false;
 						}
 						if (distributeFlag) {
 							node.distributeFile(new File("file " + i * rand.nextInt(1000), 100 + rand.nextInt(10000)));
 							distributeFlag = false;
 						}
-						color = new Color(92, 194, 242);
+						color = BLUE_COLOR;
 						node.checkMessageContainer(); // retransmit or receive chunks
 						node.checkNodesStatus();
 						if (i % 120 == 0) {
@@ -94,7 +92,7 @@ public class NodeThread implements Runnable {
 						}
 					}
 					if (!node.isOnline()) {
-						color = new Color(255, 255, 255);
+						color = WHITE_COLOR;
 					}
 					if (i % 40 == 0) {
 						if (x + speedX <= radius) {

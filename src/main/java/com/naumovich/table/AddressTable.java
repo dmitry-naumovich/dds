@@ -16,17 +16,12 @@ public class AddressTable implements Iterable<FourTuple<Integer, Chunk, Node, In
 		addrTable = new ArrayList<>();
 		this.owner = owner;
 	}
-	
-	public Node getOwner() {
-		return owner;
-	}
 
 	public void addRow(int numOfChunk, Chunk chunk, Node node, int metrics) {
 		addrTable.add(new FourTuple<>(numOfChunk, chunk, node, metrics));
 	}
 	public void setRow(int rowNum, Node node, int metrics) {
-		addrTable.set(rowNum, new FourTuple<>(addrTable.get(rowNum).first,
-		addrTable.get(rowNum).second, node, metrics));
+		addrTable.set(rowNum, new FourTuple<>(addrTable.get(rowNum).first, addrTable.get(rowNum).second, node, metrics));
 	}
 	public FourTuple<Integer, Chunk, Node, Integer> getRow(int rowNum) {
 		return addrTable.get(rowNum);

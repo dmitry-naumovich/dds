@@ -23,7 +23,7 @@ public class Dijkstra {
     private Set<Node> unSettledNodes;
     private Map<Node, Node> predecessors;
     private Map<Node, Double> distance;
-    private static ArrayList<ArrayList<Integer>> edgesMatrix;
+    private static int[][] edgesMatrix;
 
     public Dijkstra() {
         nodes = Field.getNodes();
@@ -50,7 +50,7 @@ public class Dijkstra {
         List<Edge> allEdges = new ArrayList<>();
         for (int i = 0; i < NODES_NUM - 1; i++) {
             for (int j = i + 1; j < NODES_NUM; j++) {
-                if (edgesMatrix.get(i).get(j) == 1) {
+                if (edgesMatrix[i][j] == 1) {
                     allEdges.add(new Edge(nodes.get(i), nodes.get(j)));
                 }
             }
