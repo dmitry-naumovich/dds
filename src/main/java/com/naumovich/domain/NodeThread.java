@@ -111,7 +111,6 @@ public class NodeThread implements Runnable {
 							x += speedX;
 							y += speedY;
 						}
-						// TODO maybe catch Thread.sleep exceptin here
 						Thread.sleep(1);
 					}
 

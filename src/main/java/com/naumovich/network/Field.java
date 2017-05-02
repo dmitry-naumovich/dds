@@ -10,6 +10,7 @@ import javax.swing.Timer;
 import com.naumovich.domain.Node;
 import com.naumovich.domain.NodeThread;
 import com.naumovich.util.MathOperations;
+import com.naumovich.util.StatisticsCollector;
 
 public class Field extends JPanel {
 

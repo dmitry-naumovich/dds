@@ -1,4 +1,4 @@
-package com.naumovich.network;
+package com.naumovich.util;
 
 import com.naumovich.domain.Node;
 import lombok.extern.slf4j.Slf4j;

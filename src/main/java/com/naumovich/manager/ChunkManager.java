@@ -15,6 +15,7 @@ import java.util.Map;
 @Slf4j
 public class ChunkManager {
 
+    private static final int AMOUNT_OF_CHUNK_COPIES = 4;
 	private Map<File, AddressTable> addressTableMap;
 	private Node owner;
 	
@@ -26,16 +27,9 @@ public class ChunkManager {
 	public AddressTable createAddressTable(File file) {
 		int n = MathOperations.defineChunksAmount(file.getSize());
 		log.info(owner.getLogin() + ": I distribute file '" + file.getFileName() + "' into " + n + " chunks");
-		List<Chunk> chunks = createChunks(file, n);
-		
+		List<Chunk> chunksAndCopies = createChunksAndCopies(file, n);
+
 		AddressTable addressTable = new AddressTable(owner);
-		
-		List<Chunk> chunksAndCopies = new ArrayList<>();
-		for (Chunk ch : chunks) {
-			List<Chunk> alc = ch.makeCopies();
-			chunksAndCopies.addAll(alc);
-		}
-		
 		for (Chunk ch : chunksAndCopies) {
 			TwoTuple<Node, Integer> tuple = ch.findNodeForMe();
 			addressTable.addRow(ch.getOrderNum(), ch, tuple.first, tuple.second);
@@ -45,12 +39,20 @@ public class ChunkManager {
 		addressTableMap.put(file, addressTable);
 		return addressTable;
 	}
-	
-	private ArrayList<Chunk> createChunks(File file, int n) {
+
+
+	private List<Chunk> createChunksAndCopies(File file, int n) {
 		ArrayList<Chunk> chunks = new ArrayList<>();
 		for (int i = 0; i < n; i++) {
 			chunks.add(new Chunk(owner, file.getSize() / n, file.getFileName(), i+1));
 		}
-		return chunks;
+
+		List<Chunk> chunksAndCopies = new ArrayList<>();
+		for (Chunk ch : chunks) {
+			List<Chunk> alc = ch.makeCopies(AMOUNT_OF_CHUNK_COPIES);
+			chunksAndCopies.addAll(alc);
+		}
+
+		return chunksAndCopies;
 	}
 }

@@ -21,7 +21,7 @@ public class Dijkstra {
     private Set<Node> unSettledNodes = new HashSet<>();
     private Map<Node, Node> predecessors = new HashMap<>();
     private Map<Node, Double> distance = new HashMap<>();
-    private static int[][] edgesMatrix;
+    private int[][] edgesMatrix;
 
     private Dijkstra() {
         nodes = Field.getNodes();

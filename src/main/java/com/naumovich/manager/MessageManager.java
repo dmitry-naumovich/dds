@@ -99,7 +99,7 @@ public class MessageManager {
                 log.debug(owner.getLogin() + ": I retransmit BackupMessage of " + ((TwoTuple<NodeThread, Chunk>) m.getData()).second + " further");
                 break;
         }
-        owner.incrementAmountOfRestransmitted();
+        owner.incrementAmountOfRetransmitted();
         m.excludeFirstNodeFromPath();
     }
 

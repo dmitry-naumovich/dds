@@ -103,7 +103,7 @@ public class Node {
         amountOfNodeStatusChecks++;
     }
 
-    public void incrementAmountOfRestransmitted() {
+    public void incrementAmountOfRetransmitted() {
         amountOfRetransmitted++;
     }
 

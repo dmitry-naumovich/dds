@@ -35,10 +35,10 @@ public class Chunk {
 	public String getChunkName() {
 		return chunkName;
 	}
-	public List<Chunk> makeCopies() {
+	public List<Chunk> makeCopies(int numOfCopies) {
 		List<Chunk> chs = new ArrayList<>();
 		chs.add(this);
-		for (int i = 0; i < 4; i++) 
+		for (int i = 0; i < numOfCopies; i++)
 			chs.add(new Chunk(this.originalOwner, this.chunkSize, this.parentFileName, this.orderNum));
 		return chs;
 	}
