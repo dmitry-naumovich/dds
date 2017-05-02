@@ -1,13 +1,10 @@
 package com.naumovich.util;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import com.naumovich.domain.Node;
 import com.naumovich.util.tuple.TwoTuple;
-
-import static com.naumovich.network.TestNetwork.NODES_NUM;
 
 public final class MathOperations {
 
@@ -59,8 +56,8 @@ public final class MathOperations {
 	}
 
 	public static void printEdgesMatrix(int[][] edgesMatrix) {
-		for (int i = 0; i < NODES_NUM; i++) {
-			for (int j = 0; j < NODES_NUM; j++) {
+		for (int i = 0; i < edgesMatrix.length; i++) {
+			for (int j = 0; j < edgesMatrix[i].length; j++) {
 				if (i == j) {
 					System.out.print("- ");
 				}

@@ -17,14 +17,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DijkstraRoutingManager implements RoutingManager {
 
-	
 	@Override
 	public void distributeChunks(Node owner, AddressTable addressTable) {
-		for (FourTuple<Integer, Chunk, Node, Integer> tableRow : addressTable) {
-			Dijkstra dijAlg = new Dijkstra(); // Dijkstra defines the route to destination
-			dijAlg.execute(owner); // Dijkstra works
-			List<Node> path = dijAlg.getPath(tableRow.third);
-			owner.incrementAmountOfFindingPath();
+
+	    for (FourTuple<Integer, Chunk, Node, Integer> tableRow : addressTable) {
+
+	        List<Node> path = Dijkstra.findPathWithDijkstra(owner, tableRow.third);
 			log.debug(owner.getLogin() + ": I send " + tableRow.second.getChunkName() + " to " +
                     tableRow.third.getLogin() + ". The way is: " + path);
 
@@ -52,7 +50,7 @@ public class DijkstraRoutingManager implements RoutingManager {
 				log.debug(owner.getLogin() + ": I've found out " + tup.third + " is offline");
 				TwoTuple<Node, Integer> tup2 = tup.second.findNodeForMe();
 				if (tup.third.equals(tup2.first)) {
-					break; // same node returned so no more need for reserve copying
+					break; // same node returned so no more need for backupk
 				}
 				else {
 					addressTable.setRow(i, tup2.first, tup2.second);
@@ -60,10 +58,7 @@ public class DijkstraRoutingManager implements RoutingManager {
 					Node sender = addressTable.getRow(rowOfSender).third;
 					Chunk chunkToSend = addressTable.getRow(rowOfSender).second;
 					log.debug(owner.getLogin() + ": new sender of " + chunkToSend + " is " + sender);
-					Dijkstra dijAlg = new Dijkstra(); // Dijkstra defines the route to destination
-					dijAlg.execute(owner);
-					List<Node> path = dijAlg.getPath(sender);
-					owner.incrementAmountOfFindingPath();
+					List<Node> path = Dijkstra.findPathWithDijkstra(owner, sender);
 					if (path != null) {
 						Message backupMsg = new BackupMessage(path, new TwoTuple<>(tup2.first, chunkToSend) );
 						backupMsg.excludeFirstNodeFromPath();

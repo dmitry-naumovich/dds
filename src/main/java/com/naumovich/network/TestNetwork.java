@@ -9,7 +9,7 @@ import com.naumovich.util.MenuItemNames;
 
 public class TestNetwork extends JFrame {
 
-	public static final int NODES_NUM = 40;
+	private static final int NODES_AMOUNT_TO_ADD = 40;
 	private static final String J_FRAME_TITLE = "DDS algorithm testing";
 	private static final int WIDTH = 600;
 	private static final int HEIGHT = 480;
@@ -43,9 +43,7 @@ public class TestNetwork extends JFrame {
 		
 		nodeMenu.add(new AbstractAction(MenuItemNames.ACTION_ADD_NODES) {
 			public void actionPerformed(ActionEvent event) {
-				for (int i = 0; i < NODES_NUM; i++) {
-					field.addNodeThread();
-				}
+				field.addNodesToField(NODES_AMOUNT_TO_ADD);
 				if (!pauseMenuItem.isEnabled() && !resumeMenuItem.isEnabled()) {
 					pauseMenuItem.setEnabled(true);
 				}

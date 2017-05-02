@@ -9,13 +9,14 @@ import com.naumovich.util.tuple.TwoTuple;
 
 public class Chunk {
 
+	private static int counter = 0;
+
+	private Node originalOwner;
 	private String chunkID;
 	private long chunkSize;
 	private String parentFileName;
-	private Node originalOwner;
 	private int orderNum;
 	private String chunkName;
-	private static int counter = 0;
 	
 	public Chunk(Node originalOwner, long chunkSize, String parentFileName, int orderNum) {
 		this.originalOwner = originalOwner;
@@ -44,8 +45,7 @@ public class Chunk {
 	
 	public TwoTuple<Node, Integer> findNodeForMe() {
 		List<TwoTuple<Node, Integer>> allMetrics = new ArrayList<>();
-		@SuppressWarnings("unchecked")
-		List<Node> nodes = (ArrayList<Node>) Field.getNodes().clone(); // ????????????????? clone???????? not implemented?
+		List<Node> nodes = new ArrayList<>(Field.getNodes());
 		nodes.remove(this.originalOwner);
 		for (Node n: nodes) {
 			if (n.isOnline())

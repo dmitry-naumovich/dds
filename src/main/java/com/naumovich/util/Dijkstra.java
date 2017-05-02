@@ -13,29 +13,31 @@ import com.naumovich.domain.Edge;
 import com.naumovich.domain.Node;
 import com.naumovich.network.Field;
 
-import static com.naumovich.network.TestNetwork.NODES_NUM;
-
 public class Dijkstra {
 
-    private static List<Node> nodes;
-    private static List<Edge> edges;
-    private Set<Node> settledNodes;
-    private Set<Node> unSettledNodes;
-    private Map<Node, Node> predecessors;
-    private Map<Node, Double> distance;
+    private List<Node> nodes;
+    private List<Edge> edges;
+    private Set<Node> settledNodes = new HashSet<>();
+    private Set<Node> unSettledNodes = new HashSet<>();
+    private Map<Node, Node> predecessors = new HashMap<>();
+    private Map<Node, Double> distance = new HashMap<>();
     private static int[][] edgesMatrix;
 
-    public Dijkstra() {
+    private Dijkstra() {
         nodes = Field.getNodes();
         edgesMatrix = Field.getEdgesMatrix();
         edges = resolveEdges();
     }
 
-    public void execute(Node source) {
-        settledNodes = new HashSet<>();
-        unSettledNodes = new HashSet<>();
-        distance = new HashMap<>();
-        predecessors = new HashMap<>();
+    public synchronized static List<Node> findPathWithDijkstra(Node source, Node destination) {
+        Dijkstra dijAlg = new Dijkstra();
+        dijAlg.execute(source);
+        List<Node> path = dijAlg.getPath(destination);
+        source.incrementAmountOfFindingPath();
+        return path;
+    }
+
+    private void execute(Node source) {
         distance.put(source, 0d);
         unSettledNodes.add(source);
         while (unSettledNodes.size() > 0) {
@@ -46,10 +48,10 @@ public class Dijkstra {
         }
     }
 
-    private static List<Edge> resolveEdges() {
+    private List<Edge> resolveEdges() {
         List<Edge> allEdges = new ArrayList<>();
-        for (int i = 0; i < NODES_NUM - 1; i++) {
-            for (int j = i + 1; j < NODES_NUM; j++) {
+        for (int i = 0; i < nodes.size() - 1; i++) {
+            for (int j = i + 1; j < nodes.size(); j++) {
                 if (edgesMatrix[i][j] == 1) {
                     allEdges.add(new Edge(nodes.get(i), nodes.get(j)));
                 }
@@ -125,7 +127,7 @@ public class Dijkstra {
      * This method returns the path from the source to the selected target and
      * NULL if no path exists
      */
-    public LinkedList<Node> getPath(Node target) {
+    private LinkedList<Node> getPath(Node target) {
         LinkedList<Node> path = new LinkedList<>();
         Node step = target;
         // check if a path exists

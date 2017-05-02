@@ -1,7 +1,5 @@
 package com.naumovich.domain;
 
-import static com.naumovich.network.TestNetwork.NODES_NUM;
-
 import java.util.ArrayList;
 
 import com.naumovich.manager.ChunkManager;
@@ -120,23 +118,23 @@ public class Node {
 
     public void findNeighbors() { // find neighbors and fill the edgesMatrix
         ArrayList<Node> nodes = Field.getNodes();
-        if (nodes.size() == NODES_NUM) {
-            for (Node n : nodes) {
-                amountOfNodeStatusChecks++;
-                if (isNeighborWith(n) && n.isOnline()) {
-                    field.setEdgesMatrixCell(persNum, n.getPersNum(), 1);
-                    field.setEdgesMatrixCell(n.getPersNum(), persNum, 1);
-                } else {
-                    field.setEdgesMatrixCell(persNum, n.getPersNum(), 0);
-                    field.setEdgesMatrixCell(n.getPersNum(), persNum, 0);
-                }
+        for (Node n : nodes) {
+            amountOfNodeStatusChecks++;
+            if (isNeighborWith(n) && n.isOnline()) {
+                field.setEdgesMatrixCell(persNum, n.getPersNum(), 1);
+                field.setEdgesMatrixCell(n.getPersNum(), persNum, 1);
+            } else {
+                field.setEdgesMatrixCell(persNum, n.getPersNum(), 0);
+                field.setEdgesMatrixCell(n.getPersNum(), persNum, 0);
             }
         }
     }
 
     public boolean isNeighborWith(Node n) {
-        if (this.equals(n)) return false;
-        else if (Math.pow(nodeThread.getX() - n.getNodeThread().getX(), 2) + Math.pow(nodeThread.getY() - n.getNodeThread().getY(), 2) <= Math.pow(20 * NodeThread.getRadius(), 2)) {
+        if (this.equals(n)) {
+            return false;
+        }
+        else if (Math.pow(nodeThread.getX() - n.getNodeThread().getX(), 2) + Math.pow(nodeThread.getY() - n.getNodeThread().getY(), 2) <= Math.pow(12 * NodeThread.getRadius(), 2)) {
             // here if two nodes are neighbors
             return true;
         }
