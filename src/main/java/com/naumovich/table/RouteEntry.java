@@ -17,4 +17,59 @@ public class RouteEntry {
     private List<Node> precursors;
     private int lifeTime;
 
+    public Node getDestinationNode() {
+        return destinationNode;
+    }
+
+    public void setDestinationNode(Node destinationNode) {
+        this.destinationNode = destinationNode;
+    }
+
+    public int getDestinationSequenceNum() {
+        return destinationSequenceNum;
+    }
+
+    public void setDestinationSequenceNum(int destinationSequenceNum) {
+        this.destinationSequenceNum = destinationSequenceNum;
+    }
+
+    public int getHopCount() {
+        return hopCount;
+    }
+
+    public void setHopCount(int hopCount) {
+        this.hopCount = hopCount;
+    }
+
+    public int getLastHopCount() {
+        return lastHopCount;
+    }
+
+    public void setLastHopCount(int lastHopCount) {
+        this.lastHopCount = lastHopCount;
+    }
+
+    public Node getNextHop() {
+        return nextHop;
+    }
+
+    public void setNextHop(Node nextHop) {
+        this.nextHop = nextHop;
+    }
+
+    public List<Node> getPrecursors() {
+        return precursors;
+    }
+
+    public void setPrecursors(List<Node> precursors) {
+        this.precursors = precursors;
+    }
+
+    public int getLifeTime() {
+        return lifeTime;
+    }
+
+    public void setLifeTime(int lifeTime) {
+        this.lifeTime = lifeTime;
+    }
 }

@@ -5,20 +5,19 @@ import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
 import java.util.Random;
 
+import static com.naumovich.configuration.FieldConfiguration.*;
 import com.naumovich.network.Field;
+
 
 //TODO: override toString (?), hashCode and equals after NodeThread completed
 public class NodeThread implements Runnable {
 
     private static Random rand = new Random();
-    private static final double speed = 0.01;
-    private static final int radius = 8;
-    private static final Color WHITE_COLOR = new Color(255, 255, 255);
-    private static final Color BLUE_COLOR = new Color(92, 194, 242);
 
     private Field field;
 	private Node node;
-	private Color color;
+
+    private Color color;
 	private double x;
 	private double y;
 	private double speedX;
@@ -35,10 +34,13 @@ public class NodeThread implements Runnable {
 		speedX = speed*Math.cos(angle);
 		speedY = speed*Math.sin(angle);
 		color = new Color(92, 194, 242);
-		x = Math.random()*(field.getSize().getWidth() - 2*radius) + radius;
-		y = Math.random()*(field.getSize().getHeight() - 2*radius) + radius;
+		x = Math.random()*(field.getSize().getWidth() - 2* radius) + radius;
+		y = Math.random()*(field.getSize().getHeight() - 2* radius) + radius;
 	}
-	
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
 	public void setDistributeFlag(boolean distributeFlag) {
 		this.distributeFlag = distributeFlag;
 	}
@@ -63,7 +65,7 @@ public class NodeThread implements Runnable {
 	public void paint(Graphics2D canvas) {
 		canvas.setColor(color);
 		canvas.setPaint(color);
-		Ellipse2D.Double node = new Ellipse2D.Double(x - radius, y - radius, 2*radius, 2*radius);
+		Ellipse2D.Double node = new Ellipse2D.Double(x - radius, y - radius, 2* radius, 2* radius);
 		canvas.draw(node);
 		canvas.fill(node);
 	}
@@ -84,15 +86,11 @@ public class NodeThread implements Runnable {
 							node.distributeFile(new File("file " + i * rand.nextInt(1000), 100 + rand.nextInt(10000)));
 							distributeFlag = false;
 						}
-						color = BLUE_COLOR;
 						node.checkMessageContainer(); // retransmit or receive chunks
 						node.checkNodesStatus();
 						if (i % 120 == 0) {
 							node.findNeighbors();    // find current neighbors and fill the edgesMatrix
 						}
-					}
-					if (!node.isOnline()) {
-						color = WHITE_COLOR;
 					}
 					if (i % 40 == 0) {
 						if (x + speedX <= radius) {

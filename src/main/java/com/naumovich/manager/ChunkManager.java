@@ -12,16 +12,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.naumovich.configuration.DdsConfigurationParameters.AMOUNT_OF_CHUNK_COPIES;
 @Slf4j
 public class ChunkManager {
 
-    private static final int AMOUNT_OF_CHUNK_COPIES = 4;
-	private Map<File, AddressTable> addressTableMap;
 	private Node owner;
 	
 	public ChunkManager(Node owner) {
 		this.owner = owner;
-		addressTableMap = new HashMap<>();
 	}
 	
 	public AddressTable createAddressTable(File file) {
@@ -35,8 +34,6 @@ public class ChunkManager {
 			addressTable.addRow(ch.getOrderNum(), ch, tuple.first, tuple.second);
 			// encryptedChunk = ch.encrypt();
 		}
-		
-		addressTableMap.put(file, addressTable);
 		return addressTable;
 	}
 

@@ -20,6 +20,7 @@ public class Field extends JPanel {
     private static ArrayList<NodeThread> nodeThreads = new ArrayList<>();
     private static int[][] edgesMatrix;
 
+
     private boolean paused;
 
     public Field() {
@@ -32,6 +33,7 @@ public class Field extends JPanel {
     }
 
     public void addNodesToField(int amount) {
+        pause();
         int totalNodesAmount = amount;
         if (!nodes.isEmpty()) {
             totalNodesAmount += nodes.size();
@@ -40,6 +42,7 @@ public class Field extends JPanel {
         for (int i = 0; i < amount; i++) {
             addNodeThread();
         }
+        resume();
     }
 
     private void addNodeThread() {
@@ -76,22 +79,16 @@ public class Field extends JPanel {
         }
     }
 
-    public void collectStatistics() {
-        StatisticsCollector.collectStatistics(nodes);
-    }
-
     @Override
     public void paintComponent(Graphics g) {
         //g.drawString("", x, y);
         super.paintComponent(g);
-
         Graphics2D canvas = (Graphics2D) g;
         for (NodeThread n : nodeThreads) {
             n.paint(canvas); // draw the node as the ball
             g.setColor(Color.BLACK);
             g.setFont(new Font("Arial", Font.PLAIN, 10));
             g.drawString(Integer.toString(n.getNode().getPersNum()), (int) (n.getX() - NodeThread.getRadius()), (int) (n.getY() + NodeThread.getRadius()));
-
         }
         //canvas.drawLine(x1, y1, x2, y2);
     }
@@ -111,8 +108,12 @@ public class Field extends JPanel {
         notifyAll();
     }
 
-    synchronized void showEdgesMatrix() {
+    public void showEdgesMatrix() {
         MathOperations.printEdgesMatrix(edgesMatrix);
+    }
+
+    public void collectStatistics() {
+        StatisticsCollector.collectStatistics(nodes);
     }
 
 }

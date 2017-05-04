@@ -6,45 +6,36 @@ import com.naumovich.domain.Chunk;
 import com.naumovich.domain.Node;
 import com.naumovich.util.tuple.FourTuple;
 
-public class AddressTable implements Iterable<FourTuple<Integer, Chunk, Node, Integer>> {
+public class AddressTable implements Iterable<AddressTableEntry> {
 
-	//private Map<Integer, Set<ThreeTuple<String, String, Integer>>> locationTable;
-	private ArrayList<FourTuple<Integer, Chunk, Node, Integer>> addrTable;
+	private ArrayList<AddressTableEntry> addressTable;
 	private Node owner;
 	
 	public AddressTable(Node owner) {
-		addrTable = new ArrayList<>();
+		addressTable = new ArrayList<>();
 		this.owner = owner;
 	}
 
 	public void addRow(int numOfChunk, Chunk chunk, Node node, int metrics) {
-		addrTable.add(new FourTuple<>(numOfChunk, chunk, node, metrics));
+		addressTable.add(new AddressTableEntry(numOfChunk, chunk, node, metrics));
 	}
 	public void setRow(int rowNum, Node node, int metrics) {
-		addrTable.set(rowNum, new FourTuple<>(addrTable.get(rowNum).first, addrTable.get(rowNum).second, node, metrics));
+		addressTable.set(rowNum, new AddressTableEntry(addressTable.get(rowNum).getOrderNum(),
+				addressTable.get(rowNum).getChunk(), node, metrics));
 	}
-	public FourTuple<Integer, Chunk, Node, Integer> getRow(int rowNum) {
-		return addrTable.get(rowNum);
+	public AddressTableEntry getRow(int rowNum) {
+		return addressTable.get(rowNum);
 	}
 	public int getRowCount() {
-		return addrTable.size();
-	}
-
-	public Node getNodeByChunk(Chunk ch) {
-		for (FourTuple<Integer, Chunk, Node, Integer> fTup : addrTable) {
-			if (fTup.second == ch) {
-				return fTup.third;
-			}
-		}
-		return null;
+		return addressTable.size();
 	}
 	
 	@Override
-	public Iterator<FourTuple<Integer, Chunk, Node, Integer>> iterator() {
+	public Iterator<AddressTableEntry> iterator() {
 		return new AddressTableIterator();
 	}
 	
-	private class AddressTableIterator implements Iterator<FourTuple<Integer, Chunk, Node, Integer>> {
+	private class AddressTableIterator implements Iterator<AddressTableEntry> {
 
 		private int curIndex;
 		
@@ -53,15 +44,15 @@ public class AddressTable implements Iterable<FourTuple<Integer, Chunk, Node, In
 		}
 		@Override
 		public boolean hasNext() {
-			if (curIndex < addrTable.size()) {
+			if (curIndex < addressTable.size()) {
 				return true;
 			}
 			return false;
 		}
 
 		@Override
-		public FourTuple<Integer, Chunk, Node, Integer> next() {
-			return addrTable.get(curIndex++);
+		public AddressTableEntry next() {
+			return addressTable.get(curIndex++);
 		}
 		
 	}
@@ -70,7 +61,7 @@ public class AddressTable implements Iterable<FourTuple<Integer, Chunk, Node, In
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((addrTable == null) ? 0 : addrTable.hashCode());
+		result = prime * result + ((addressTable == null) ? 0 : addressTable.hashCode());
 		result = prime * result + ((owner == null) ? 0 : owner.hashCode());
 		return result;
 	}
@@ -84,10 +75,10 @@ public class AddressTable implements Iterable<FourTuple<Integer, Chunk, Node, In
 		if (getClass() != obj.getClass())
 			return false;
 		AddressTable other = (AddressTable) obj;
-		if (addrTable == null) {
-			if (other.addrTable != null)
+		if (addressTable == null) {
+			if (other.addressTable != null)
 				return false;
-		} else if (!addrTable.equals(other.addrTable))
+		} else if (!addressTable.equals(other.addressTable))
 			return false;
 		if (owner == null) {
 			if (other.owner != null)
@@ -100,8 +91,8 @@ public class AddressTable implements Iterable<FourTuple<Integer, Chunk, Node, In
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("This is Address Table of " + owner.getLogin());
-		for (int i = 0; i < addrTable.size(); i++) {
-			sb.append("\n" + (addrTable.get(i)));
+		for (int i = 0; i < addressTable.size(); i++) {
+			sb.append("\n" + (addressTable.get(i)));
 		}
 		return sb.toString();
 	}	

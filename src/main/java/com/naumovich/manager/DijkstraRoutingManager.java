@@ -9,6 +9,7 @@ import com.naumovich.domain.message.ChunkMessage;
 import com.naumovich.domain.message.Message;
 import com.naumovich.network.MessageContainer;
 import com.naumovich.table.AddressTable;
+import com.naumovich.table.AddressTableEntry;
 import com.naumovich.util.Dijkstra;
 import com.naumovich.util.tuple.FourTuple;
 import com.naumovich.util.tuple.TwoTuple;
@@ -20,14 +21,14 @@ public class DijkstraRoutingManager implements RoutingManager {
 	@Override
 	public void distributeChunks(Node owner, AddressTable addressTable) {
 
-	    for (FourTuple<Integer, Chunk, Node, Integer> tableRow : addressTable) {
+	    for (AddressTableEntry entry : addressTable) {
 
-	        List<Node> path = Dijkstra.findPathWithDijkstra(owner, tableRow.third);
-			log.debug(owner.getLogin() + ": I send " + tableRow.second.getChunkName() + " to " +
-                    tableRow.third.getLogin() + ". The way is: " + path);
+	        List<Node> path = Dijkstra.findPathWithDijkstra(owner, entry.getNode());
+			log.debug(owner.getLogin() + ": I send " + entry.getChunk().getChunkName() + " to " +
+                    entry.getNode().getLogin() + ". The way is: " + path);
 
 			if (path != null) {
-				Message msg = new ChunkMessage(path, tableRow.second);
+				Message msg = new ChunkMessage(path, entry.getChunk());
 				msg.excludeFirstNodeFromPath();
 				MessageContainer.addMsg(msg);
 			}
@@ -37,30 +38,28 @@ public class DijkstraRoutingManager implements RoutingManager {
 			// или вероятность того, что на один узел попадут все фрагменты файла
 			// (без копий, просто, например, все 8 штук)... было бы интересно
 		}
-
-
 	}
 
 	@Override
 	public void checkNodesStatus(Node owner, AddressTable addressTable) {
 		for (int i = 0; i < addressTable.getRowCount(); i++) {
-			FourTuple<Integer, Chunk, Node, Integer> tup = addressTable.getRow(i);
+			AddressTableEntry entry = addressTable.getRow(i);
 			owner.incrementAmountOfNodeStatusChecks();
-			if (!tup.third.isOnline()) {
-				log.debug(owner.getLogin() + ": I've found out " + tup.third + " is offline");
-				TwoTuple<Node, Integer> tup2 = tup.second.findNodeForMe();
-				if (tup.third.equals(tup2.first)) {
-					break; // same node returned so no more need for backupk
+			if (!entry.getNode().isOnline()) {
+				log.debug(owner.getLogin() + ": I've found out " + entry.getNode() + " is offline");
+				TwoTuple<Node, Integer> nodeAndMetrics = entry.getChunk().findNodeForMe();
+				if (entry.getNode().equals(nodeAndMetrics.first)) {
+					break; // same node returned so no more need for backup
 				}
 				else {
-					addressTable.setRow(i, tup2.first, tup2.second);
+					addressTable.setRow(i, nodeAndMetrics.first, nodeAndMetrics.second);
 					int rowOfSender = getNewSender(addressTable, i);
-					Node sender = addressTable.getRow(rowOfSender).third;
-					Chunk chunkToSend = addressTable.getRow(rowOfSender).second;
+					Node sender = addressTable.getRow(rowOfSender).getNode();
+					Chunk chunkToSend = addressTable.getRow(rowOfSender).getChunk();
 					log.debug(owner.getLogin() + ": new sender of " + chunkToSend + " is " + sender);
 					List<Node> path = Dijkstra.findPathWithDijkstra(owner, sender);
 					if (path != null) {
-						Message backupMsg = new BackupMessage(path, new TwoTuple<>(tup2.first, chunkToSend) );
+						Message backupMsg = new BackupMessage(path, new TwoTuple<>(nodeAndMetrics.first, chunkToSend) );
 						backupMsg.excludeFirstNodeFromPath();
 						MessageContainer.addMsg(backupMsg);
 					}
@@ -71,10 +70,10 @@ public class DijkstraRoutingManager implements RoutingManager {
 	}
 
 	private int getNewSender(AddressTable addressTable, int i) {
-		int orderNum = addressTable.getRow(i).first;
+		int orderNum = addressTable.getRow(i).getOrderNum();
 		for (int j = 0; j < addressTable.getRowCount(); j++) {
-			FourTuple<Integer, Chunk, Node, Integer> t = addressTable.getRow(j);
-			if (t.first == orderNum && !t.third.equals(addressTable.getRow(i).third)) {
+			AddressTableEntry entry = addressTable.getRow(j);
+			if (entry.getOrderNum() == orderNum && !entry.getNode().equals(addressTable.getRow(i).getNode())) {
 				return j;
 			}
 		}

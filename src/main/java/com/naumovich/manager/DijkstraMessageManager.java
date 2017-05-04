@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 @Slf4j
-public class MessageManager {
+public class DijkstraMessageManager {
 
     private static final String MESSAGE_TYPE_CHUNK = "ChunkMessage";
     private static final String MESSAGE_TYPE_BACKUP = "BackupMessage";
@@ -22,7 +22,7 @@ public class MessageManager {
     private Node owner;
     private List<Message> backupMessages = new ArrayList<>();
 
-    public MessageManager(Node owner) {
+    public DijkstraMessageManager(Node owner) {
         this.owner = owner;
     }
 

@@ -1,15 +1,17 @@
 package com.naumovich.domain;
 
-import java.util.ArrayList;
+import java.util.*;
 
-import com.naumovich.manager.ChunkManager;
-import com.naumovich.manager.DijkstraRoutingManager;
-import com.naumovich.manager.MessageManager;
-import com.naumovich.manager.RoutingManager;
+import com.naumovich.domain.message.Message;
+import com.naumovich.manager.*;
 import com.naumovich.network.*;
 import com.naumovich.table.AddressTable;
+import com.naumovich.table.RouteEntry;
 import com.naumovich.util.MathOperations;
 import lombok.extern.slf4j.Slf4j;
+
+import static com.naumovich.configuration.FieldConfiguration.BLUE_COLOR;
+import static com.naumovich.configuration.FieldConfiguration.WHITE_COLOR;
 
 //TODO: override toString, hashCode and equals after Node entity completed
 @Slf4j
@@ -23,7 +25,12 @@ public class Node {
     private final String login = "Node" + counter++;
     private final String nodeID = MathOperations.getRandomHexString(40);
     private ChunkStorage chunkStorage = new ChunkStorage();
-    private AddressTable addrTable;
+
+    public List<RouteEntry> getRoutingTable() {
+        return routingTable;
+    }
+
+    private List<RouteEntry> routingTable = new ArrayList<>();
     private boolean isOnline = true;
 
     private int amountOfRetransmitted;
@@ -31,17 +38,22 @@ public class Node {
     private long amountOfNodeStatusChecks;
     private long amountOfFindingPath;
 
+    private Map<File, AddressTable> addressTableMap;
+
     private ChunkManager chunkManager;
     private RoutingManager routingManager;
-    private MessageManager messageManager;
+    private DijkstraMessageManager dijkstraMessageManager;
+    private AodvMessageManager aodvMessageManager;
 
     public Node(NodeThread thread, Field field) {
         this.nodeThread = thread;
         this.field = field;
 
+        addressTableMap = new HashMap<>();
         chunkManager = new ChunkManager(this);
         routingManager = new DijkstraRoutingManager();
-        messageManager = new MessageManager(this);
+        dijkstraMessageManager = new DijkstraMessageManager(this);
+        aodvMessageManager = new AodvMessageManager();
     }
 
     public NodeThread getNodeThread() {
@@ -70,8 +82,12 @@ public class Node {
 
     public void setOnline(boolean isOnline) {
         this.isOnline = isOnline;
+
         if (isOnline == false) {
+            nodeThread.setColor(WHITE_COLOR);
             log.debug(login + ": I'm offline!");
+        } else {
+            nodeThread.setColor(BLUE_COLOR);
         }
     }
 
@@ -108,12 +124,13 @@ public class Node {
     }
 
     public void distributeFile(File file) {
-        this.addrTable = chunkManager.createAddressTable(file);
-        routingManager.distributeChunks(this, addrTable);
+        AddressTable table = chunkManager.createAddressTable(file);
+        addressTableMap.put(file, table);
+        routingManager.distributeChunks(this, table);
     }
 
     public void checkMessageContainer() {
-        messageManager.checkMessageContainer();
+        dijkstraMessageManager.checkMessageContainer();
     }
 
     public void findNeighbors() { // find neighbors and fill the edgesMatrix
@@ -135,24 +152,28 @@ public class Node {
             return false;
         }
         else if (Math.pow(nodeThread.getX() - n.getNodeThread().getX(), 2) + Math.pow(nodeThread.getY() - n.getNodeThread().getY(), 2) <= Math.pow(12 * NodeThread.getRadius(), 2)) {
-            // here if two nodes are neighbors
             return true;
         }
         return false;
     }
 
     public void checkNodesStatus() {
-        if (addrTable != null) {
-            routingManager.checkNodesStatus(this, addrTable);
+        Iterator it = addressTableMap.entrySet().iterator();
+        while (it.hasNext()) {
+            routingManager.checkNodesStatus(this, (AddressTable)((Map.Entry)it.next()).getValue());
         }
     }
 
     public void makeBackup() {
-        messageManager.makeBackup();
+        dijkstraMessageManager.makeBackup();
     }
 
     @Override
     public String toString() {
         return login;
+    }
+
+    public void receiveMessage(Message m) {
+        aodvMessageManager.receiveMessage(this, m);
     }
 }
