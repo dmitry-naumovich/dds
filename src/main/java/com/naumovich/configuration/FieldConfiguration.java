@@ -5,6 +5,8 @@ import java.awt.*;
 /**
  * Created by dzmitry on 4.5.17.
  */
+
+//TODO: move here many model parameters and rename this class to ModelConfiguration
 public class FieldConfiguration {
 
     public static final Color WHITE_COLOR = new Color(255, 255, 255);

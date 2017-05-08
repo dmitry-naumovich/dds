@@ -3,6 +3,8 @@ package com.naumovich.configuration;
 /**
  * Created by dzmitry on 2.5.17.
  */
+
+//TODO: rename this class to AodvConfiguration
 public class AodvConfigurationParameters {
 
     public static final int ACTIVE_ROUTE_TIMEOUT_MILLIS = 3000;

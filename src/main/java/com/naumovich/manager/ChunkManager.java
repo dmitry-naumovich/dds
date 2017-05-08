@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.naumovich.configuration.DdsConfigurationParameters.AMOUNT_OF_CHUNK_COPIES;
+
+//TODO: move methods findNodeForMe and makeCopies from Chunk class to here
 @Slf4j
 public class ChunkManager {
 
