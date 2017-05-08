@@ -1,10 +1,10 @@
-#Model for Distributed Data Storing Algorithm Testing
+# Model for Distributed Data Storing Algorithm Testing
 
-Necessarily describe the model here
+Here goes the short description
 
-#Distributed Data Storing Algorithm
+## Distributed Data Storing Algorithm
 
-#Dynamic Routing
+## Dynamic Routing
 
-#About author and project goal
+## About author and project goal
 
