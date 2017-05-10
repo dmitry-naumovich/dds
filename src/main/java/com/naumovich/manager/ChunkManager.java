@@ -3,19 +3,17 @@ package com.naumovich.manager;
 import com.naumovich.domain.Chunk;
 import com.naumovich.domain.File;
 import com.naumovich.domain.Node;
+import com.naumovich.network.Field;
 import com.naumovich.table.AddressTable;
 import com.naumovich.util.MathOperations;
 import com.naumovich.util.tuple.TwoTuple;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static com.naumovich.configuration.DdsConfigurationParameters.AMOUNT_OF_CHUNK_COPIES;
+import static com.naumovich.configuration.DdsConfiguration.AMOUNT_OF_CHUNK_COPIES;
 
-//TODO: move methods findNodeForMe and makeCopies from Chunk class to here
 @Slf4j
 public class ChunkManager {
 
@@ -32,9 +30,8 @@ public class ChunkManager {
 
 		AddressTable addressTable = new AddressTable(owner);
 		for (Chunk ch : chunksAndCopies) {
-			TwoTuple<Node, Integer> tuple = ch.findNodeForMe();
+			TwoTuple<Node, Integer> tuple = findNodeForChunk(ch);
 			addressTable.addRow(ch.getOrderNum(), ch, tuple.first, tuple.second);
-			// encryptedChunk = ch.encrypt();
 		}
 		return addressTable;
 	}
@@ -48,10 +45,31 @@ public class ChunkManager {
 
 		List<Chunk> chunksAndCopies = new ArrayList<>();
 		for (Chunk ch : chunks) {
-			List<Chunk> alc = ch.makeCopies(AMOUNT_OF_CHUNK_COPIES);
+			List<Chunk> alc = makeChunkCopies(ch, AMOUNT_OF_CHUNK_COPIES);
 			chunksAndCopies.addAll(alc);
 		}
 
 		return chunksAndCopies;
 	}
+
+	private List<Chunk> makeChunkCopies(Chunk chunk, int numOfCopies) {
+		List<Chunk> chs = new ArrayList<>();
+		chs.add(chunk);
+		for (int i = 0; i < numOfCopies; i++) {
+			chs.add(new Chunk(chunk.getOriginalOwner(), chunk.getChunkSize(), chunk.getParentFileName(), chunk.getOrderNum()));
+		}
+		return chs;
+	}
+
+	private TwoTuple<Node, Integer> findNodeForChunk(Chunk chunk) {
+		List<TwoTuple<Node, Integer>> allMetrics = new ArrayList<>();
+		List<Node> allNodes = new ArrayList<>(Field.getNodes());
+		allNodes.remove(chunk.getOriginalOwner());
+		for (Node n: allNodes) {
+			if (n.isOnline())
+				allMetrics.add(new TwoTuple<>(n, MathOperations.findXORMetric(n.getNodeID(), chunk.getChunkID())));
+		}
+		return MathOperations.findMin(allMetrics);
+	}
+
 }

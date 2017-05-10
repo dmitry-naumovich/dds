@@ -3,8 +3,8 @@ package com.naumovich.manager;
 import com.naumovich.domain.Chunk;
 import com.naumovich.domain.Node;
 import com.naumovich.domain.NodeThread;
-import com.naumovich.domain.message.ChunkMessage;
-import com.naumovich.domain.message.Message;
+import com.naumovich.domain.message.dijkstra.ChunkMessage;
+import com.naumovich.domain.message.dijkstra.DdsMessage;
 import com.naumovich.network.MessageContainer;
 import com.naumovich.util.Dijkstra;
 import com.naumovich.util.tuple.TwoTuple;
@@ -14,30 +14,31 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 @Slf4j
-public class DijkstraMessageManager {
+public class DijkstraMessageManager implements MessageManager {
 
     private static final String MESSAGE_TYPE_CHUNK = "ChunkMessage";
     private static final String MESSAGE_TYPE_BACKUP = "BackupMessage";
 
     private Node owner;
-    private List<Message> backupMessages = new ArrayList<>();
+    private List<DdsMessage> backupMessages = new ArrayList<>();
 
     public DijkstraMessageManager(Node owner) {
         this.owner = owner;
     }
 
     public void makeBackup() {
-        List<Message> messages = MessageContainer.allMsgs;
+        List<DdsMessage> messages = MessageContainer.allMsgs;
         synchronized (messages) {
             messages.addAll(backupMessages);
         }
     }
 
+    @Override
     public void checkMessageContainer() {
-        List<Message> msgs = MessageContainer.allMsgs;
+        List<DdsMessage> msgs = MessageContainer.allMsgs;
         synchronized (msgs) {
-            for (Iterator<Message> iterator = msgs.iterator(); iterator.hasNext(); ) {
-                Message m = iterator.next();
+            for (Iterator<DdsMessage> iterator = msgs.iterator(); iterator.hasNext(); ) {
+                DdsMessage m = iterator.next();
                 owner.incrementAmountOfMsgChecks();
                 if (owner.equals(m.getPath().get(0)) && owner.equals(m.getDestination())) { // i'm next and i'm destination
                     receiveMessage(m);
@@ -59,7 +60,7 @@ public class DijkstraMessageManager {
         }
     }
 
-    private void receiveMessage(Message m) {
+    private void receiveMessage(DdsMessage m) {
         switch (m.getClass().getSimpleName()) {
             case MESSAGE_TYPE_CHUNK:
                 saveAndStore(m);
@@ -70,12 +71,12 @@ public class DijkstraMessageManager {
         }
     }
 
-    private void saveAndStore(Message m) {
+    private void saveAndStore(DdsMessage m) {
         log.debug(owner.getLogin() + ": I accept " + m.getData() + " to store it");
         owner.getChunkStorage().add((Chunk) m.getData());
     }
 
-    private void backupMessage(Message m) {
+    private void backupMessage(DdsMessage m) {
         Node receiver = ((TwoTuple<Node, Chunk>) m.getData()).first;
         Chunk chunkToCopy = ((TwoTuple<Node, Chunk>) m.getData()).second;
 
@@ -83,14 +84,14 @@ public class DijkstraMessageManager {
         log.debug(owner.getLogin() + ": I have to complete backup of " + chunkToCopy + " to " + receiver
                 + ". Path is: " + path);
         if (path != null) {
-            Message newM = new ChunkMessage(path, owner.getChunkStorage().getChunkByName(chunkToCopy.getChunkName()));
+            DdsMessage newM = new ChunkMessage(path, owner.getChunkStorage().getChunkByName(chunkToCopy.getChunkName()));
             newM.excludeFirstNodeFromPath();
             owner.getNodeThread().setBackupFlag(true);
             backupMessages.add(newM);
         }
     }
 
-    private void retransmitMessage(Message m) {
+    private void retransmitMessage(DdsMessage m) {
         switch (m.getClass().getSimpleName()) {
             case MESSAGE_TYPE_CHUNK:
                 log.debug(owner.getLogin() + ": I retransmit " + m.getData() + " further");
@@ -103,7 +104,7 @@ public class DijkstraMessageManager {
         m.excludeFirstNodeFromPath();
     }
 
-    private void findNewPathAndRetransmit(Message m) {
+    private void findNewPathAndRetransmit(DdsMessage m) {
         List<Node> path = Dijkstra.findPathWithDijkstra(owner, m.getDestination());
         log.debug(owner.getLogin() + ": WARNING! While retransmitting I've found out " + m.getPath().get(1)
                 + " is offline. New path to destination " + m.getDestination() + " is: " + path);

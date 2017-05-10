@@ -6,8 +6,8 @@ import java.awt.*;
  * Created by dzmitry on 4.5.17.
  */
 
-//TODO: move here many model parameters and rename this class to ModelConfiguration
-public class FieldConfiguration {
+//TODO: move here many model parameters
+public class ModelConfiguration {
 
     public static final Color WHITE_COLOR = new Color(255, 255, 255);
     public static final Color BLUE_COLOR = new Color(92, 194, 242);

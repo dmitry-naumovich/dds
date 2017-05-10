@@ -5,7 +5,9 @@ import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
 import java.util.Random;
 
-import static com.naumovich.configuration.FieldConfiguration.*;
+import static com.naumovich.configuration.ModelConfiguration.*;
+
+import com.naumovich.configuration.ModelConfiguration;
 import com.naumovich.network.Field;
 
 
@@ -33,7 +35,7 @@ public class NodeThread implements Runnable {
 		double angle = Math.random()*2*Math.PI;
 		speedX = speed*Math.cos(angle);
 		speedY = speed*Math.sin(angle);
-		color = new Color(92, 194, 242);
+		color = ModelConfiguration.BLUE_COLOR;
 		x = Math.random()*(field.getSize().getWidth() - 2* radius) + radius;
 		y = Math.random()*(field.getSize().getHeight() - 2* radius) + radius;
 	}
@@ -78,10 +80,10 @@ public class NodeThread implements Runnable {
 				field.canIMove(); // checking whether the "pause" is pressed or not
 				for (int i = 0; i < 120; i++) {
 					if (node.isOnline()) {
-						if (backupFlag) {
-							node.makeBackup();
-							backupFlag = false;
-						}
+//						if (backupFlag) {
+//							node.makeBackup();
+//							backupFlag = false;
+//						}
 						if (distributeFlag) {
 							node.distributeFile(new File("file " + i * rand.nextInt(1000), 100 + rand.nextInt(10000)));
 							distributeFlag = false;

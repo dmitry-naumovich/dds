@@ -9,20 +9,36 @@ import java.util.List;
  */
 public class RouteEntry {
 
-    private Node destinationNode;
+    private String destinationNode;
     private int destinationSequenceNum;
     private int hopCount;
     private int lastHopCount;
-    private Node nextHop;
-    private List<Node> precursors;
+    private String nextHop;
+    private List<String> precursors;
     private int lifeTime;
 
-    public Node getDestinationNode() {
+    public String getDestinationNode() {
         return destinationNode;
     }
 
-    public void setDestinationNode(Node destinationNode) {
+    public void setDestinationNode(String destinationNode) {
         this.destinationNode = destinationNode;
+    }
+
+    public String getNextHop() {
+        return nextHop;
+    }
+
+    public void setNextHop(String nextHop) {
+        this.nextHop = nextHop;
+    }
+
+    public List<String> getPrecursors() {
+        return precursors;
+    }
+
+    public void setPrecursors(List<String> precursors) {
+        this.precursors = precursors;
     }
 
     public int getDestinationSequenceNum() {
@@ -47,22 +63,6 @@ public class RouteEntry {
 
     public void setLastHopCount(int lastHopCount) {
         this.lastHopCount = lastHopCount;
-    }
-
-    public Node getNextHop() {
-        return nextHop;
-    }
-
-    public void setNextHop(Node nextHop) {
-        this.nextHop = nextHop;
-    }
-
-    public List<Node> getPrecursors() {
-        return precursors;
-    }
-
-    public void setPrecursors(List<Node> precursors) {
-        this.precursors = precursors;
     }
 
     public int getLifeTime() {

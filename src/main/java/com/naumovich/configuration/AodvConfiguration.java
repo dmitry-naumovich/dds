@@ -4,8 +4,7 @@ package com.naumovich.configuration;
  * Created by dzmitry on 2.5.17.
  */
 
-//TODO: rename this class to AodvConfiguration
-public class AodvConfigurationParameters {
+public class AodvConfiguration {
 
     public static final int ACTIVE_ROUTE_TIMEOUT_MILLIS = 3000;
     public static final int ALLOWED_HELLO_LOSS = 2;

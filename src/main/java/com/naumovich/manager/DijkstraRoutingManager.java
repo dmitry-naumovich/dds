@@ -4,14 +4,13 @@ import java.util.List;
 
 import com.naumovich.domain.Chunk;
 import com.naumovich.domain.Node;
-import com.naumovich.domain.message.BackupMessage;
-import com.naumovich.domain.message.ChunkMessage;
-import com.naumovich.domain.message.Message;
+import com.naumovich.domain.message.dijkstra.BackupMessage;
+import com.naumovich.domain.message.dijkstra.ChunkMessage;
+import com.naumovich.domain.message.dijkstra.DdsMessage;
 import com.naumovich.network.MessageContainer;
 import com.naumovich.table.AddressTable;
 import com.naumovich.table.AddressTableEntry;
 import com.naumovich.util.Dijkstra;
-import com.naumovich.util.tuple.FourTuple;
 import com.naumovich.util.tuple.TwoTuple;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,7 +27,7 @@ public class DijkstraRoutingManager implements RoutingManager {
                     entry.getNode().getLogin() + ". The way is: " + path);
 
 			if (path != null) {
-				Message msg = new ChunkMessage(path, entry.getChunk());
+				DdsMessage msg = new ChunkMessage(path, entry.getChunk());
 				msg.excludeFirstNodeFromPath();
 				MessageContainer.addMsg(msg);
 			}
@@ -42,7 +41,7 @@ public class DijkstraRoutingManager implements RoutingManager {
 
 	@Override
 	public void checkNodesStatus(Node owner, AddressTable addressTable) {
-		for (int i = 0; i < addressTable.getRowCount(); i++) {
+		/*for (int i = 0; i < addressTable.getRowCount(); i++) {
 			AddressTableEntry entry = addressTable.getRow(i);
 			owner.incrementAmountOfNodeStatusChecks();
 			if (!entry.getNode().isOnline()) {
@@ -59,14 +58,14 @@ public class DijkstraRoutingManager implements RoutingManager {
 					log.debug(owner.getLogin() + ": new sender of " + chunkToSend + " is " + sender);
 					List<Node> path = Dijkstra.findPathWithDijkstra(owner, sender);
 					if (path != null) {
-						Message backupMsg = new BackupMessage(path, new TwoTuple<>(nodeAndMetrics.first, chunkToSend) );
+						DdsMessage backupMsg = new BackupMessage(path, new TwoTuple<>(nodeAndMetrics.first, chunkToSend) );
 						backupMsg.excludeFirstNodeFromPath();
 						MessageContainer.addMsg(backupMsg);
 					}
 				}
 
 			}
-		}
+		}*/
 	}
 
 	private int getNewSender(AddressTable addressTable, int i) {

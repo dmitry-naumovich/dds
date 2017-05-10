@@ -1,17 +1,17 @@
-package com.naumovich.domain.message;
+package com.naumovich.domain.message.dijkstra;
 
 import java.util.List;
 
 import com.naumovich.domain.Node;
 
-public class Message {
+public class DdsMessage {
 
 	private Node source;
 	private Node destination;
 	private Object data;
 	private List<Node> path;
 	
-	public Message(List<Node> path, Object data) {
+	public DdsMessage(List<Node> path, Object data) {
 		this.source = path.get(0); 
 		this.destination = path.get(path.size() - 1);
 		this.data = data;
@@ -73,7 +73,7 @@ public class Message {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Message other = (Message) obj;
+		DdsMessage other = (DdsMessage) obj;
 		if (data == null) {
 			if (other.data != null)
 				return false;
@@ -99,7 +99,7 @@ public class Message {
 
 	@Override
 	public String toString() {
-		return "Message [source=" + source + ", destination=" + destination + ", data=" + data + ", path=" + path + "]";
+		return "DdsMessage [source=" + source + ", destination=" + destination + ", data=" + data + ", path=" + path + "]";
 	}
 	
 }

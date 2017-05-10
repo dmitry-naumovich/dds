@@ -43,16 +43,20 @@ public final class MathOperations {
 	}
 	
 	public static TwoTuple<Node, Integer> findMin(List<TwoTuple<Node, Integer>> list) {
-		Node node = list.get(0).first; 
-		int minVal = list.get(0).second;
-		
-		for (TwoTuple<Node, Integer> el : list) {
-			if (el.second <= minVal) {
-				node = el.first;
-				minVal = el.second;
+		if (list.isEmpty()) {
+			return null;
+		} else {
+			Node node = list.get(0).first;
+			int minVal = list.get(0).second;
+
+			for (TwoTuple<Node, Integer> el : list) {
+				if (el.second <= minVal) {
+					node = el.first;
+					minVal = el.second;
+				}
 			}
+			return new TwoTuple<>(node, minVal);
 		}
-		return new TwoTuple<>(node, minVal);
 	}
 
 	public static void printEdgesMatrix(int[][] edgesMatrix) {

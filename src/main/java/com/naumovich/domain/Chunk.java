@@ -1,11 +1,6 @@
 package com.naumovich.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.naumovich.network.Field;
 import com.naumovich.util.MathOperations;
-import com.naumovich.util.tuple.TwoTuple;
 
 public class Chunk {
 
@@ -26,6 +21,16 @@ public class Chunk {
 		this.orderNum = orderNum;
 		this.chunkName = "Chunk" + orderNum + counter++;
 	}
+
+	public Node getOriginalOwner() {
+		return originalOwner;
+	}
+	public long getChunkSize() {
+		return chunkSize;
+	}
+	public String getParentFileName() {
+		return parentFileName;
+	}
 	public int getOrderNum() {
 		return orderNum;
 	}
@@ -35,25 +40,7 @@ public class Chunk {
 	public String getChunkName() {
 		return chunkName;
 	}
-	public List<Chunk> makeCopies(int numOfCopies) {
-		List<Chunk> chs = new ArrayList<>();
-		chs.add(this);
-		for (int i = 0; i < numOfCopies; i++)
-			chs.add(new Chunk(this.originalOwner, this.chunkSize, this.parentFileName, this.orderNum));
-		return chs;
-	}
-	
-	public TwoTuple<Node, Integer> findNodeForMe() {
-		List<TwoTuple<Node, Integer>> allMetrics = new ArrayList<>();
-		List<Node> nodes = new ArrayList<>(Field.getNodes());
-		nodes.remove(this.originalOwner);
-		for (Node n: nodes) {
-			if (n.isOnline())
-				allMetrics.add(new TwoTuple<>(n, MathOperations.findXORMetric(n.getNodeID(), this.chunkID)));
-		}
-		TwoTuple<Node, Integer> two = MathOperations.findMin(allMetrics);
-		return new TwoTuple<>(two.first, two.second);
-	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

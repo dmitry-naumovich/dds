@@ -6,6 +6,7 @@ import com.naumovich.domain.Chunk;
 import com.naumovich.domain.Node;
 import com.naumovich.util.tuple.FourTuple;
 
+//TODO: rename address table to location table
 public class AddressTable implements Iterable<AddressTableEntry> {
 
 	private ArrayList<AddressTableEntry> addressTable;

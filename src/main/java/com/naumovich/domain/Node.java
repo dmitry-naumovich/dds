@@ -2,7 +2,8 @@ package com.naumovich.domain;
 
 import java.util.*;
 
-import com.naumovich.domain.message.Message;
+import com.naumovich.domain.message.aodv.AodvMessage;
+import com.naumovich.domain.message.aodv.IpMessage;
 import com.naumovich.manager.*;
 import com.naumovich.network.*;
 import com.naumovich.table.AddressTable;
@@ -10,8 +11,8 @@ import com.naumovich.table.RouteEntry;
 import com.naumovich.util.MathOperations;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.naumovich.configuration.FieldConfiguration.BLUE_COLOR;
-import static com.naumovich.configuration.FieldConfiguration.WHITE_COLOR;
+import static com.naumovich.configuration.ModelConfiguration.BLUE_COLOR;
+import static com.naumovich.configuration.ModelConfiguration.WHITE_COLOR;
 
 //TODO: override toString, hashCode and equals after Node entity completed
 @Slf4j
@@ -42,8 +43,7 @@ public class Node {
 
     private ChunkManager chunkManager;
     private RoutingManager routingManager;
-    private DijkstraMessageManager dijkstraMessageManager;
-    private AodvMessageManager aodvMessageManager;
+    private MessageManager messageManager;
 
     public Node(NodeThread thread, Field field) {
         this.nodeThread = thread;
@@ -51,9 +51,10 @@ public class Node {
 
         addressTableMap = new HashMap<>();
         chunkManager = new ChunkManager(this);
-        routingManager = new DijkstraRoutingManager();
-        dijkstraMessageManager = new DijkstraMessageManager(this);
-        aodvMessageManager = new AodvMessageManager();
+        //routingManager = new DijkstraRoutingManager();
+        routingManager = new AodvRoutingManager();
+        //messageManager = new DijkstraMessageManager(this);
+        messageManager = new AodvMessageManager(this);
     }
 
     public NodeThread getNodeThread() {
@@ -130,7 +131,7 @@ public class Node {
     }
 
     public void checkMessageContainer() {
-        dijkstraMessageManager.checkMessageContainer();
+        messageManager.checkMessageContainer();
     }
 
     public void findNeighbors() { // find neighbors and fill the edgesMatrix
@@ -165,7 +166,7 @@ public class Node {
     }
 
     public void makeBackup() {
-        dijkstraMessageManager.makeBackup();
+        ((DijkstraMessageManager)messageManager).makeBackup();
     }
 
     @Override
@@ -173,7 +174,7 @@ public class Node {
         return login;
     }
 
-    public void receiveMessage(Message m) {
-        aodvMessageManager.receiveMessage(this, m);
+    public void receiveMessage(IpMessage m) {
+        ((AodvMessageManager)messageManager).receiveMessage(m);
     }
 }
