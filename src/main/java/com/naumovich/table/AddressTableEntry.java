@@ -12,10 +12,10 @@ public class AddressTableEntry {
 
     private int orderNum;
     private Chunk chunk;
-    private Node node;
+    private String node;
     private int metric;
 
-    public AddressTableEntry(int orderNum, Chunk chunk, Node node, int metric) {
+    public AddressTableEntry(int orderNum, Chunk chunk, String node, int metric) {
         this.orderNum = orderNum;
         this.chunk = chunk;
         this.node = node;
@@ -38,11 +38,11 @@ public class AddressTableEntry {
         this.chunk = chunk;
     }
 
-    public Node getNode() {
+    public String getNode() {
         return node;
     }
 
-    public void setNode(Node node) {
+    public void setNode(String node) {
         this.node = node;
     }
 

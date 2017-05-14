@@ -2,7 +2,6 @@ package com.naumovich.domain;
 
 import java.util.*;
 
-import com.naumovich.domain.message.aodv.AodvMessage;
 import com.naumovich.domain.message.aodv.IpMessage;
 import com.naumovich.manager.*;
 import com.naumovich.network.*;
@@ -45,6 +44,9 @@ public class Node {
     private RoutingManager routingManager;
     private MessageManager messageManager;
 
+    private int floodId;
+    private int seqNumber;
+
     public Node(NodeThread thread, Field field) {
         this.nodeThread = thread;
         this.field = field;
@@ -55,6 +57,30 @@ public class Node {
         routingManager = new AodvRoutingManager();
         //messageManager = new DijkstraMessageManager(this);
         messageManager = new AodvMessageManager(this);
+    }
+
+    public int getFloodId() {
+        return floodId;
+    }
+
+    public void setFloodId(int floodId) {
+        this.floodId = floodId;
+    }
+
+    public void incrementFloodId() {
+        floodId++;
+    }
+
+    public int getSeqNumber() {
+        return seqNumber;
+    }
+
+    public void setSeqNumber(int seqNumber) {
+        this.seqNumber = seqNumber;
+    }
+
+    public void incrementSeqNumber() {
+        seqNumber++;
     }
 
     public NodeThread getNodeThread() {
