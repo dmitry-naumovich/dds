@@ -1,9 +1,8 @@
 package com.naumovich.manager;
 
 import com.naumovich.domain.Node;
-import com.naumovich.domain.message.aodv.AodvChunkMessage;
-import com.naumovich.domain.message.aodv.AodvMessage;
 import com.naumovich.domain.message.aodv.IpMessage;
+import com.naumovich.domain.message.aodv.RouteRequest;
 import com.naumovich.network.Field;
 import com.naumovich.table.AddressTable;
 import com.naumovich.table.AddressTableEntry;
@@ -19,29 +18,30 @@ public class AodvRoutingManager implements  RoutingManager {
     @Override
     public void distributeChunks(Node owner, AddressTable addressTable) {
         for (AddressTableEntry entry : addressTable) {
-            String nextHop = getNextHopIfPresent(entry.getNode().getLogin(), owner.getRoutingTable());
+            Node nextHop = getNextHopIfPresent(entry.getNode(), owner.getRoutingTable());
             if (nextHop != null) {
-                AodvMessage chunkMessage = new AodvChunkMessage(entry.getChunk());
-                IpMessage ipMessage = new IpMessage(); // change constructor in ipmessage
-                Field.getNodeByLogin(nextHop).receiveMessage(ipMessage);
+                IpMessage ipMessage = new IpMessage(owner, nextHop, entry);
+                nextHop.receiveMessage(ipMessage);
             } else {
-                generateRreqFlood();
+                generateRreqFlood(owner, entry.getNode());
             }
         }
     }
 
-    private String getNextHopIfPresent(String node, List<RouteEntry> routingTable) {
+    private Node getNextHopIfPresent(String node, List<RouteEntry> routingTable) {
         for (RouteEntry entry : routingTable) {
-            if (entry.getDestinationNode().equals(node) && entry.getDestinationSequenceNum() >= 0) {
-                return entry.getNextHop();
+            if (entry.getDestinationNode().equals(node) && entry.getDestinationSequenceNum() > 0) {
+                return Field.getNodeByLogin(entry.getNextHop());
             }
         }
         return null;
     }
 
     // TODO: implement
-    private void generateRreqFlood() {
-        // RREQ = new RREQ
+    private void generateRreqFlood(Node owner, String destination) {
+        owner.incrementFloodId();
+        owner.incrementSeqNumber();
+        RouteRequest request = new RouteRequest(owner.getFloodId(), destination, 0, owner.getLogin(), owner.getSeqNumber(), true);
         // findNeighbors
         // for each neighbor send rreq
     }
