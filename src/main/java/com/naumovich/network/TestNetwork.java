@@ -6,10 +6,10 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 
 import com.naumovich.util.MenuItemNames;
+import static com.naumovich.configuration.ModelConfiguration.NODES_AMOUNT_TO_ADD;
 
 public class TestNetwork extends JFrame {
 
-	private static final int NODES_AMOUNT_TO_ADD = 40;
 	private static final String J_FRAME_TITLE = "DDS algorithm testing";
 	private static final int WIDTH = 600;
 	private static final int HEIGHT = 480;

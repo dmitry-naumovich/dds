@@ -11,6 +11,7 @@ import com.naumovich.domain.Node;
 import com.naumovich.domain.NodeThread;
 import com.naumovich.util.MathOperations;
 import com.naumovich.util.StatisticsCollector;
+import static com.naumovich.configuration.ModelConfiguration.*;
 
 public class Field extends JPanel {
 
@@ -65,14 +66,14 @@ public class Field extends JPanel {
     }
 
     public void distributeFiles() {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < FILES_AMOUNT_TO_DISTRIBUTE; i++) {
             nodeThreads.get(rand.nextInt(nodes.size())).setDistributeFlag(true);
         }
 
     }
 
     public void turnOffSomeNodes() {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < NODES_AMOUNT_TO_TURN_OFF; i++) {
             nodes.get(new Random().nextInt(nodes.size())).setOnline(false);
         }
     }
