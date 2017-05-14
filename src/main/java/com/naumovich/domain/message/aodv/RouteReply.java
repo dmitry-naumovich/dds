@@ -10,8 +10,8 @@ public class RouteReply extends AodvMessage {
     private final static int TYPE = 2;
     private boolean aFlag;
     private int hopCount;
-    private Node destinationNode;
-    private int destSequenceNum;
+    private Node destNode;
+    private int destSN;
     private Node sourceNode;
     private int lifetime;
 

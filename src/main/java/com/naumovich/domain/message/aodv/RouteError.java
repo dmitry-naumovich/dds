@@ -9,9 +9,8 @@ public class RouteError extends AodvMessage {
 
     public final static int TYPE = 3;
     private boolean nFlag;
-    private int destCount;
-    private Node destinationNode; //unreachable
-    private int destSequenceNum;
+    private Node destNode;
+    private int destSN;
 
     @Override
     public int getMessageType() {
