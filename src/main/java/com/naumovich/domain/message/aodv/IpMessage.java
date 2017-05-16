@@ -11,20 +11,20 @@ public class IpMessage {
     private String sourceNode;
     private String destNode;
     private AodvMessage data;
-    private int ttl;
+    private int hl;
 
-    public IpMessage(String sourceNode, String destNode, AodvMessage data, int ttl) {
+    public IpMessage(String sourceNode, String destNode, AodvMessage data, int hl) {
         this.sourceNode = sourceNode;
         this.destNode = destNode;
         this.data = data;
-        this.ttl = ttl;
+        this.hl = hl;
     }
 
-    public IpMessage(Node sourceNode, Node nextHop, AddressTableEntry entry) {
-        this.sourceNode = sourceNode.getLogin();
-        this.destNode = nextHop.getLogin();
+    public IpMessage(String sourceNode, String nextHop, AddressTableEntry entry, int hl) {
+        this.sourceNode = sourceNode;
+        this.destNode = nextHop;
         data = new AodvChunkMessage(entry.getNode(), entry.getChunk());
-        ttl = entry.getMetric();
+        this.hl = hl;
     }
 
     public int getMessageType() {

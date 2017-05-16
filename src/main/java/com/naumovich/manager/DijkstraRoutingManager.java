@@ -7,6 +7,7 @@ import com.naumovich.domain.Node;
 import com.naumovich.domain.message.dijkstra.BackupMessage;
 import com.naumovich.domain.message.dijkstra.ChunkMessage;
 import com.naumovich.domain.message.dijkstra.DdsMessage;
+import com.naumovich.network.Field;
 import com.naumovich.network.MessageContainer;
 import com.naumovich.table.AddressTable;
 import com.naumovich.table.AddressTableEntry;
@@ -22,9 +23,9 @@ public class DijkstraRoutingManager implements RoutingManager {
 
 	    for (AddressTableEntry entry : addressTable) {
 
-	        List<Node> path = Dijkstra.findPathWithDijkstra(owner, entry.getNode());
+	        List<Node> path = Dijkstra.findPathWithDijkstra(owner, Field.getNodeByLogin(entry.getNode()));
 			log.debug(owner.getLogin() + ": I send " + entry.getChunk().getChunkName() + " to " +
-                    entry.getNode().getLogin() + ". The way is: " + path);
+                    entry.getNode() + ". The way is: " + path);
 
 			if (path != null) {
 				DdsMessage msg = new ChunkMessage(path, entry.getChunk());
@@ -41,22 +42,23 @@ public class DijkstraRoutingManager implements RoutingManager {
 
 	@Override
 	public void checkNodesStatus(Node owner, AddressTable addressTable) {
-		/*for (int i = 0; i < addressTable.getRowCount(); i++) {
+		for (int i = 0; i < addressTable.getRowCount(); i++) {
 			AddressTableEntry entry = addressTable.getRow(i);
 			owner.incrementAmountOfNodeStatusChecks();
-			if (!entry.getNode().isOnline()) {
-				log.debug(owner.getLogin() + ": I've found out " + entry.getNode() + " is offline");
-				TwoTuple<Node, Integer> nodeAndMetrics = entry.getChunk().findNodeForMe();
+			Node chunkSaver = Field.getNodeByLogin(entry.getNode());
+			if (!chunkSaver.isOnline()) {
+				log.debug(owner.getLogin() + ": I've found out " + chunkSaver.getLogin() + " is offline");
+				TwoTuple<Node, Integer> nodeAndMetrics = owner.getChunkManager().findNodeForChunk(entry.getChunk());
 				if (entry.getNode().equals(nodeAndMetrics.first)) {
 					break; // same node returned so no more need for backup
 				}
 				else {
 					addressTable.setRow(i, nodeAndMetrics.first, nodeAndMetrics.second);
 					int rowOfSender = getNewSender(addressTable, i);
-					Node sender = addressTable.getRow(rowOfSender).getNode();
+					String sender = addressTable.getRow(rowOfSender).getNode();
 					Chunk chunkToSend = addressTable.getRow(rowOfSender).getChunk();
 					log.debug(owner.getLogin() + ": new sender of " + chunkToSend + " is " + sender);
-					List<Node> path = Dijkstra.findPathWithDijkstra(owner, sender);
+					List<Node> path = Dijkstra.findPathWithDijkstra(owner, Field.getNodeByLogin(sender));
 					if (path != null) {
 						DdsMessage backupMsg = new BackupMessage(path, new TwoTuple<>(nodeAndMetrics.first, chunkToSend) );
 						backupMsg.excludeFirstNodeFromPath();
@@ -65,7 +67,7 @@ public class DijkstraRoutingManager implements RoutingManager {
 				}
 
 			}
-		}*/
+		}
 	}
 
 	private int getNewSender(AddressTable addressTable, int i) {

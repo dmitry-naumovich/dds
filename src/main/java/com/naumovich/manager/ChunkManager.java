@@ -61,7 +61,7 @@ public class ChunkManager {
 		return chs;
 	}
 
-	private TwoTuple<Node, Integer> findNodeForChunk(Chunk chunk) {
+	public TwoTuple<Node, Integer> findNodeForChunk(Chunk chunk) {
 		List<TwoTuple<Node, Integer>> allMetrics = new ArrayList<>();
 		List<Node> allNodes = new ArrayList<>(Field.getNodes());
 		allNodes.remove(chunk.getOriginalOwner());

@@ -43,6 +43,7 @@ public class Node {
     private ChunkManager chunkManager;
     private RoutingManager routingManager;
     private MessageManager messageManager;
+    private RreqBufferManager rreqBufferManager;
 
     private int floodId;
     private int seqNumber;
@@ -57,6 +58,8 @@ public class Node {
         routingManager = new AodvRoutingManager();
         //messageManager = new DijkstraMessageManager(this);
         messageManager = new AodvMessageManager(this);
+        rreqBufferManager = new RreqBufferManager(this);
+
     }
 
     public int getFloodId() {
@@ -101,6 +104,10 @@ public class Node {
 
     public ChunkStorage getChunkStorage() {
         return chunkStorage;
+    }
+
+    public ChunkManager getChunkManager() {
+        return chunkManager;
     }
 
     public boolean isOnline() {

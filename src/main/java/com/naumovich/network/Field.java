@@ -49,6 +49,7 @@ public class Field extends JPanel {
     public static Node getNodeByLogin(String login) {
         return nodes.get(Integer.valueOf(login.substring(4)));
     }
+    public static Node getNodeByPersNum(int persNum) { return nodes.get(persNum); }
 
     private void addNodeThread() {
         NodeThread newNodeThread = new NodeThread(this);
