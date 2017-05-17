@@ -36,8 +36,8 @@ public class NodeThread implements Runnable {
 		speedX = speed*Math.cos(angle);
 		speedY = speed*Math.sin(angle);
 		color = ModelConfiguration.BLUE_COLOR;
-		x = Math.random()*(field.getSize().getWidth() - 2* radius) + radius;
-		y = Math.random()*(field.getSize().getHeight() - 2* radius) + radius;
+		x = Math.random()*(field.getSize().getWidth() - 2* RADIUS) + RADIUS;
+		y = Math.random()*(field.getSize().getHeight() - 2* RADIUS) + RADIUS;
 	}
 
     public void setColor(Color color) {
@@ -55,9 +55,6 @@ public class NodeThread implements Runnable {
 	public double getY() {
 		return y;
 	}
-	public static int getRadius() {
-		return radius;
-	}
 	
 	
 	public Node getNode() {
@@ -67,7 +64,7 @@ public class NodeThread implements Runnable {
 	public void paint(Graphics2D canvas) {
 		canvas.setColor(color);
 		canvas.setPaint(color);
-		Ellipse2D.Double node = new Ellipse2D.Double(x - radius, y - radius, 2* radius, 2* radius);
+		Ellipse2D.Double node = new Ellipse2D.Double(x - RADIUS, y - RADIUS, 2* RADIUS, 2* RADIUS);
 		canvas.draw(node);
 		canvas.fill(node);
 	}
@@ -95,18 +92,18 @@ public class NodeThread implements Runnable {
 						}
 					}
 					if (i % 40 == 0) {
-						if (x + speedX <= radius) {
+						if (x + speedX <= RADIUS) {
 							speedX = -speedX;
-							x = radius;
-						} else if (x + speedX >= field.getWidth() - radius) {
+							x = RADIUS;
+						} else if (x + speedX >= field.getWidth() - RADIUS) {
 							speedX = -speedX;
-							x = new Double(field.getWidth() - radius).intValue();
-						} else if (y + speedY <= radius) {
+							x = new Double(field.getWidth() - RADIUS).intValue();
+						} else if (y + speedY <= RADIUS) {
 							speedY = -speedY;
-							y = radius;
-						} else if (y + speedY >= field.getHeight() - radius) {
+							y = RADIUS;
+						} else if (y + speedY >= field.getHeight() - RADIUS) {
 							speedY = -speedY;
-							y = new Double(field.getHeight() - radius).intValue();
+							y = new Double(field.getHeight() - RADIUS).intValue();
 						} else {
 							x += speedX;
 							y += speedY;

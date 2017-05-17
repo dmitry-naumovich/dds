@@ -28,4 +28,60 @@ public class RouteRequest extends AodvMessage {
     public int getMessageType() {
         return TYPE;
     }
+
+    public boolean isgFlag() {
+        return gFlag;
+    }
+
+    public void setgFlag(boolean gFlag) {
+        this.gFlag = gFlag;
+    }
+
+    public int getHopCount() {
+        return hopCount;
+    }
+
+    public void setHopCount(int hopCount) {
+        this.hopCount = hopCount;
+    }
+
+    public int getFloodId() {
+        return floodId;
+    }
+
+    public void setFloodId(int floodId) {
+        this.floodId = floodId;
+    }
+
+    public String getDestNode() {
+        return destNode;
+    }
+
+    public void setDestNode(String destNode) {
+        this.destNode = destNode;
+    }
+
+    public int getDestSN() {
+        return destSN;
+    }
+
+    public void setDestSN(int destSN) {
+        this.destSN = destSN;
+    }
+
+    public String getSourceNode() {
+        return sourceNode;
+    }
+
+    public void setSourceNode(String sourceNode) {
+        this.sourceNode = sourceNode;
+    }
+
+    public int getSourceSN() {
+        return sourceSN;
+    }
+
+    public void setSourceSN(int sourceSN) {
+        this.sourceSN = sourceSN;
+    }
 }

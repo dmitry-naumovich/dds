@@ -5,13 +5,12 @@ import java.util.*;
 import com.naumovich.domain.message.aodv.IpMessage;
 import com.naumovich.manager.*;
 import com.naumovich.network.*;
-import com.naumovich.table.AddressTable;
+import com.naumovich.table.FileDistributionTable;
 import com.naumovich.table.RouteEntry;
 import com.naumovich.util.MathOperations;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.naumovich.configuration.ModelConfiguration.BLUE_COLOR;
-import static com.naumovich.configuration.ModelConfiguration.WHITE_COLOR;
+import static com.naumovich.configuration.ModelConfiguration.*;
 
 //TODO: override toString, hashCode and equals after Node entity completed
 @Slf4j
@@ -38,11 +37,11 @@ public class Node {
     private long amountOfNodeStatusChecks;
     private long amountOfFindingPath;
 
-    private Map<File, AddressTable> addressTableMap;
+    private Map<File, FileDistributionTable> addressTableMap;
 
     private ChunkManager chunkManager;
-    private RoutingManager routingManager;
-    private MessageManager messageManager;
+    private AodvRoutingManager routingManager;
+    private AodvMessageManager messageManager;
     private RreqBufferManager rreqBufferManager;
 
     private int floodId;
@@ -54,9 +53,7 @@ public class Node {
 
         addressTableMap = new HashMap<>();
         chunkManager = new ChunkManager(this);
-        //routingManager = new DijkstraRoutingManager();
-        routingManager = new AodvRoutingManager();
-        //messageManager = new DijkstraMessageManager(this);
+        routingManager = new AodvRoutingManager(this);
         messageManager = new AodvMessageManager(this);
         rreqBufferManager = new RreqBufferManager(this);
 
@@ -110,6 +107,18 @@ public class Node {
         return chunkManager;
     }
 
+    public RreqBufferManager getRreqBufferManager() {
+        return rreqBufferManager;
+    }
+
+    public AodvRoutingManager getRoutingManager() {
+        return routingManager;
+    }
+
+    public AodvMessageManager getMessageManager() {
+        return messageManager;
+    }
+
     public boolean isOnline() {
         return isOnline;
     }
@@ -158,9 +167,9 @@ public class Node {
     }
 
     public void distributeFile(File file) {
-        AddressTable table = chunkManager.createAddressTable(file);
+        FileDistributionTable table = chunkManager.createAddressTable(file);
         addressTableMap.put(file, table);
-        routingManager.distributeChunks(this, table);
+        routingManager.distributeChunks(table);
     }
 
     public void checkMessageContainer() {
@@ -185,7 +194,9 @@ public class Node {
         if (this.equals(n)) {
             return false;
         }
-        else if (Math.pow(nodeThread.getX() - n.getNodeThread().getX(), 2) + Math.pow(nodeThread.getY() - n.getNodeThread().getY(), 2) <= Math.pow(12 * NodeThread.getRadius(), 2)) {
+        else if (Math.pow(nodeThread.getX() - n.getNodeThread().getX(), 2) +
+                Math.pow(nodeThread.getY() - n.getNodeThread().getY(), 2) <=
+                Math.pow(NEIGHBOR_DISTANCE_PARAMETER * RADIUS, 2)) {
             return true;
         }
         return false;
@@ -194,13 +205,14 @@ public class Node {
     public void checkNodesStatus() {
         Iterator it = addressTableMap.entrySet().iterator();
         while (it.hasNext()) {
-            routingManager.checkNodesStatus(this, (AddressTable)((Map.Entry)it.next()).getValue());
+            routingManager.checkNodesStatus((FileDistributionTable)((Map.Entry)it.next()).getValue());
         }
     }
 
-    public void makeBackup() {
-        ((DijkstraMessageManager)messageManager).makeBackup();
-    }
+    //TODO: consider this method and its usage
+    /*public void makeBackup() {
+        (messageManager.makeBackup();
+    }*/
 
     @Override
     public String toString() {
@@ -208,6 +220,6 @@ public class Node {
     }
 
     public void receiveMessage(IpMessage m) {
-        ((AodvMessageManager)messageManager).receiveMessage(m);
+        messageManager.receiveMessage(m);
     }
 }
