@@ -72,4 +72,18 @@ public class RouteEntry {
     public void setLifeTime(int lifeTime) {
         this.lifeTime = lifeTime;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("RouteEntry{");
+        sb.append("destinationNode='").append(destinationNode).append('\'');
+        sb.append(", destinationSequenceNum=").append(destinationSequenceNum);
+        sb.append(", hopCount=").append(hopCount);
+        sb.append(", lastHopCount=").append(lastHopCount);
+        sb.append(", nextHop='").append(nextHop).append('\'');
+        sb.append(", precursors=").append(precursors);
+        sb.append(", lifeTime=").append(lifeTime);
+        sb.append('}');
+        return sb.toString();
+    }
 }

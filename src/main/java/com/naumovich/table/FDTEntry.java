@@ -1,21 +1,20 @@
 package com.naumovich.table;
 
 import com.naumovich.domain.Chunk;
-import com.naumovich.domain.Node;
 
 import java.util.Objects;
 
 /**
  * Created by dzmitry on 4.5.17.
  */
-public class AddressTableEntry {
+public class FDTEntry {
 
     private int orderNum;
     private Chunk chunk;
     private String node;
     private int metric;
 
-    public AddressTableEntry(int orderNum, Chunk chunk, String node, int metric) {
+    public FDTEntry(int orderNum, Chunk chunk, String node, int metric) {
         this.orderNum = orderNum;
         this.chunk = chunk;
         this.node = node;
@@ -63,7 +62,7 @@ public class AddressTableEntry {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        AddressTableEntry that = (AddressTableEntry) o;
+        FDTEntry that = (FDTEntry) o;
         return orderNum == that.orderNum &&
                 metric == that.metric &&
                 Objects.equals(chunk, that.chunk) &&
@@ -72,7 +71,7 @@ public class AddressTableEntry {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("AddressTableEntry{");
+        final StringBuilder sb = new StringBuilder("FDTEntry{");
         sb.append("orderNum=").append(orderNum);
         sb.append(", chunk=").append(chunk);
         sb.append(", node=").append(node);
