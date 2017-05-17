@@ -94,7 +94,7 @@ public class Field extends JPanel {
             n.paint(canvas); // draw the node as the ball
             g.setColor(Color.BLACK);
             g.setFont(new Font("Arial", Font.PLAIN, 10));
-            g.drawString(Integer.toString(n.getNode().getPersNum()), (int) (n.getX() - NodeThread.getRadius()), (int) (n.getY() + NodeThread.getRadius()));
+            g.drawString(Integer.toString(n.getNode().getPersNum()), (int) (n.getX() - RADIUS), (int) (n.getY() + RADIUS));
         }
         //canvas.drawLine(x1, y1, x2, y2);
     }

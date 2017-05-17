@@ -16,22 +16,24 @@ import java.util.List;
 public class RreqBufferManager {
 
     private Node owner;
-    private List<TwoTuple<IpMessage, Long>> floodings;
+    private List<TwoTuple<RouteRequest, Long>> rreqBuffer;
 
     public RreqBufferManager(Node owner) {
         this.owner = owner;
-        floodings = new ArrayList<>();
+        rreqBuffer = new ArrayList<>();
         BufferCleaner cleaner = new BufferCleaner();
         Thread thread = new Thread(cleaner);
         thread.start();
     }
-    public void addFloodingId(IpMessage rreqIpMessage, long timeMillis) {
-        floodings.add(new TwoTuple<>(rreqIpMessage, timeMillis));
+    public void addRequestToBuffer(RouteRequest request) {
+        rreqBuffer.add(new TwoTuple<>(request, System.currentTimeMillis()));
     }
 
-    public boolean containsRreq(IpMessage rreqIpMessage) {
-        if (floodings.contains(rreqIpMessage)) {
-            return true;
+    public boolean containsRreq(RouteRequest request) {
+        for (TwoTuple<RouteRequest, Long> rec : rreqBuffer) {
+            if (rec.first.equals(request)) {
+                return true;
+            }
         }
         return false;
     }
@@ -42,12 +44,9 @@ public class RreqBufferManager {
         public void run() {
             try {
                 Thread.sleep(30000);
-                synchronized (floodings) {
-                    for (Iterator iter = floodings.iterator(); iter.hasNext(); ) {
-                        if (System.currentTimeMillis() - ((TwoTuple<Integer, Long>)iter.next()).second >= AodvConfiguration.FLOOD_RECORD_TIME) {
-                            iter.remove();
-                        }
-                    }
+                synchronized (rreqBuffer) {
+                    rreqBuffer.removeIf((TwoTuple<RouteRequest, Long> entry) ->
+                            System.currentTimeMillis() - entry.second >= AodvConfiguration.FLOOD_RECORD_TIME);
                 }
             } catch (InterruptedException e) {
                 //TODO: handle

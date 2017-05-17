@@ -5,28 +5,39 @@ import com.naumovich.domain.Node;
 import com.naumovich.domain.message.aodv.IpMessage;
 import com.naumovich.domain.message.aodv.RouteRequest;
 import com.naumovich.network.Field;
-import com.naumovich.table.AddressTable;
-import com.naumovich.table.AddressTableEntry;
+import com.naumovich.table.FDTEntry;
+import com.naumovich.table.FileDistributionTable;
 import com.naumovich.table.RouteEntry;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by dzmitry on 4.5.17.
  */
-public class AodvRoutingManager implements  RoutingManager {
+@Slf4j
+public class AodvRoutingManager {
 
-    @Override
-    public void distributeChunks(Node owner, AddressTable addressTable) {
-        for (AddressTableEntry entry : addressTable) {
+    private Node owner;
+
+    public AodvRoutingManager(Node owner) {
+        this.owner = owner;
+    }
+
+    public void distributeChunks(FileDistributionTable fileDistributionTable) {
+        for (FDTEntry entry : fileDistributionTable) {
+            log.debug(owner.getLogin() + ": I proceed " + entry);
             RouteEntry route = getRouteIfActual(entry.getNode(), owner.getRoutingTable());
             if (route != null) {
                 Node nextHop = Field.getNodeByLogin(route.getNextHop());
                 IpMessage ipMessage = new IpMessage(owner.getLogin(), nextHop.getLogin(), entry, route.getHopCount());
+                log.debug(owner.getLogin() + ": I've got a route: " + route);
                 nextHop.receiveMessage(ipMessage);
             } else {
-                generateRreqFlood(owner, entry.getNode());
+                log.debug(owner.getLogin() + ": I don't have a route, starting flood");
+                generateRreqFlood(entry.getNode());
             }
         }
     }
@@ -41,18 +52,23 @@ public class AodvRoutingManager implements  RoutingManager {
     }
 
     // TODO: implement
-    private void generateRreqFlood(Node owner, String destination) {
+    private void generateRreqFlood(String destination) {
         owner.incrementFloodId();
         owner.incrementSeqNumber();
         RouteRequest request = new RouteRequest(owner.getFloodId(), destination, 0, owner.getLogin(), owner.getSeqNumber(), true);
-        List<Node> neighbors = findNeighbors(owner);
+        broadcastRouteRequest(request);
+    }
+
+    protected void broadcastRouteRequest(RouteRequest request) {
+        List<Node> neighbors = findNeighbors();
+        log.debug(owner.getLogin() + ": my neighbors are: " + Arrays.toString(neighbors.toArray()));
         for (Node neighbor : neighbors) {
             IpMessage ipMessage = new IpMessage(owner.getLogin(), neighbor.getLogin(), request, AodvConfiguration.TTL_START);
             neighbor.receiveMessage(ipMessage);
         }
     }
 
-    private List<Node> findNeighbors(Node owner) {
+    private List<Node> findNeighbors() {
         List<Node> neighbors = new ArrayList<>();
         int[] nodeEdgesMatrixRow = Field.getEdgesMatrix()[owner.getPersNum()];
         for (int i = 0; i < nodeEdgesMatrixRow.length; i++) {
@@ -64,8 +80,7 @@ public class AodvRoutingManager implements  RoutingManager {
     }
 
     // TODO: implement it
-    @Override
-    public void checkNodesStatus(Node owner, AddressTable addressTable) {
+    public void checkNodesStatus(FileDistributionTable fileDistributionTable) {
 
     }
 }

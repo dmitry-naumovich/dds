@@ -4,7 +4,7 @@ import com.naumovich.domain.Chunk;
 import com.naumovich.domain.File;
 import com.naumovich.domain.Node;
 import com.naumovich.network.Field;
-import com.naumovich.table.AddressTable;
+import com.naumovich.table.FileDistributionTable;
 import com.naumovich.util.MathOperations;
 import com.naumovich.util.tuple.TwoTuple;
 import lombok.extern.slf4j.Slf4j;
@@ -22,18 +22,20 @@ public class ChunkManager {
 	public ChunkManager(Node owner) {
 		this.owner = owner;
 	}
-	
-	public AddressTable createAddressTable(File file) {
-		int n = MathOperations.defineChunksAmount(file.getSize());
+
+	//TODO: return chunks amount definition depending on size
+	public FileDistributionTable createAddressTable(File file) {
+		//int n = MathOperations.defineChunksAmount(file.getSize());
+		int n = 1;
 		log.info(owner.getLogin() + ": I distribute file '" + file.getFileName() + "' into " + n + " chunks");
 		List<Chunk> chunksAndCopies = createChunksAndCopies(file, n);
 
-		AddressTable addressTable = new AddressTable(owner);
+		FileDistributionTable fileDistributionTable = new FileDistributionTable(owner);
 		for (Chunk ch : chunksAndCopies) {
 			TwoTuple<Node, Integer> tuple = findNodeForChunk(ch);
-			addressTable.addRow(ch.getOrderNum(), ch, tuple.first, tuple.second);
+			fileDistributionTable.addRow(ch.getOrderNum(), ch, tuple.first, tuple.second);
 		}
-		return addressTable;
+		return fileDistributionTable;
 	}
 
 
