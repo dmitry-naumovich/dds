@@ -6,6 +6,7 @@ package com.naumovich.configuration;
 public class DdsConfiguration {
 
 
-    public static final int AMOUNT_OF_CHUNK_COPIES = 4;
+    public static final int AMOUNT_OF_CHUNK_COPIES = 0;
+
 
 }
