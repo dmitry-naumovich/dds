@@ -1,5 +1,7 @@
 package com.naumovich.domain.message.aodv;
 
+import java.util.Objects;
+
 public class RouteReply extends AodvMessage {
 
     private final static int TYPE = 2;
@@ -72,5 +74,36 @@ public class RouteReply extends AodvMessage {
 
     public void setLifetime(int lifetime) {
         this.lifetime = lifetime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RouteReply that = (RouteReply) o;
+        return aFlag == that.aFlag &&
+                hopCount == that.hopCount &&
+                destSN == that.destSN &&
+                lifetime == that.lifetime &&
+                Objects.equals(destNode, that.destNode) &&
+                Objects.equals(sourceNode, that.sourceNode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(aFlag, hopCount, destNode, destSN, sourceNode, lifetime);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("RouteReply{");
+        sb.append("aFlag=").append(aFlag);
+        sb.append(", hopCount=").append(hopCount);
+        sb.append(", destNode='").append(destNode).append('\'');
+        sb.append(", destSN=").append(destSN);
+        sb.append(", sourceNode='").append(sourceNode).append('\'');
+        sb.append(", lifetime=").append(lifetime);
+        sb.append('}');
+        return sb.toString();
     }
 }
