@@ -7,15 +7,14 @@ import java.util.List;
 import com.naumovich.domain.Chunk;
 import com.naumovich.domain.Node;
 
-//TODO: rename address table to location table
 public class FileDistributionTable implements Iterable<FDTEntry> {
 
-	private List<FDTEntry> fdtTable;
 	private Node owner;
-	
+	private List<FDTEntry> fdtTable;
+
 	public FileDistributionTable(Node owner) {
-		fdtTable = new ArrayList<>();
 		this.owner = owner;
+		fdtTable = new ArrayList<>();
 	}
 
 	public void addRow(int numOfChunk, Chunk chunk, Node node, int metrics) {
@@ -28,7 +27,8 @@ public class FileDistributionTable implements Iterable<FDTEntry> {
 	public FDTEntry getRow(int rowNum) {
 		return fdtTable.get(rowNum);
 	}
-	public int getRowCount() {
+
+	public int getTableSize() {
 		return fdtTable.size();
 	}
 	

@@ -1,28 +1,40 @@
 package com.naumovich.table;
 
-import com.naumovich.domain.Node;
-
 import java.util.List;
+import java.util.Objects;
 
 /**
- * Created by dzmitry on 2.5.17.
+ * This class describes table entry of RoutingTable
+ * Created by Dzmitry on 2.5.17.
+ *
+ * @Author Dzmitry Naumovich
  */
 public class RouteEntry {
 
-    private String destinationNode;
-    private int destinationSequenceNum;
+    private String destNode;
+    private int destSN;
     private int hopCount;
     private int lastHopCount;
     private String nextHop;
     private List<String> precursors;
     private int lifeTime;
 
-    public String getDestinationNode() {
-        return destinationNode;
+    public RouteEntry(String destNode, int destSN, int hopCount, int lastHopCount, String nextHop, List<String> precursors, int lifeTime) {
+        this.destNode = destNode;
+        this.destSN = destSN;
+        this.hopCount = hopCount;
+        this.lastHopCount = lastHopCount;
+        this.nextHop = nextHop;
+        this.precursors = precursors;
+        this.lifeTime = lifeTime;
     }
 
-    public void setDestinationNode(String destinationNode) {
-        this.destinationNode = destinationNode;
+    public String getDestNode() {
+        return destNode;
+    }
+
+    public void setDestNode(String destNode) {
+        this.destNode = destNode;
     }
 
     public String getNextHop() {
@@ -41,12 +53,12 @@ public class RouteEntry {
         this.precursors = precursors;
     }
 
-    public int getDestinationSequenceNum() {
-        return destinationSequenceNum;
+    public int getDestSN() {
+        return destSN;
     }
 
-    public void setDestinationSequenceNum(int destinationSequenceNum) {
-        this.destinationSequenceNum = destinationSequenceNum;
+    public void setDestSN(int destSN) {
+        this.destSN = destSN;
     }
 
     public int getHopCount() {
@@ -74,10 +86,29 @@ public class RouteEntry {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RouteEntry entry = (RouteEntry) o;
+        return destSN == entry.destSN &&
+                hopCount == entry.hopCount &&
+                lastHopCount == entry.lastHopCount &&
+                lifeTime == entry.lifeTime &&
+                Objects.equals(destNode, entry.destNode) &&
+                Objects.equals(nextHop, entry.nextHop) &&
+                Objects.equals(precursors, entry.precursors);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(destNode, destSN, hopCount, lastHopCount, nextHop, precursors, lifeTime);
+    }
+
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("RouteEntry{");
-        sb.append("destinationNode='").append(destinationNode).append('\'');
-        sb.append(", destinationSequenceNum=").append(destinationSequenceNum);
+        sb.append("destNode='").append(destNode).append('\'');
+        sb.append(", destSN=").append(destSN);
         sb.append(", hopCount=").append(hopCount);
         sb.append(", lastHopCount=").append(lastHopCount);
         sb.append(", nextHop='").append(nextHop).append('\'');
