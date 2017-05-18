@@ -70,7 +70,7 @@ public class AodvMessageManager {
         log.debug(owner.getLogin() + ": I've received RouteRequest, originator is " + request.getSourceNode());
         if (request.getDestNode().equals(owner.getLogin())) {
             log.debug(owner.getLogin() + ": I am destination and I suggest a path me and now I will generate RREP");
-            // maintain reverse route
+            maintainReverseRoute(message);
             if (request.getDestSN() > owner.getSeqNumber()) {
                 owner.setSeqNumber(request.getDestSN());
             }

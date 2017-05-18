@@ -29,7 +29,7 @@ public class AodvRoutingManager {
     public void distributeChunks(FileDistributionTable fileDistributionTable) {
         for (FDTEntry entry : fileDistributionTable) {
             log.debug(owner.getLogin() + ": I proceed " + entry);
-            RouteEntry route = getRouteIfActual(entry.getNode(), owner.getRoutingTable());
+            RouteEntry route = owner.getRoutingTable().getActualRouteTo(entry.getNode());
             if (route != null) {
                 Node nextHop = Field.getNodeByLogin(route.getNextHop());
                 IpMessage ipMessage = new IpMessage(owner.getLogin(), nextHop.getLogin(), entry, route.getHopCount());
@@ -40,15 +40,6 @@ public class AodvRoutingManager {
                 generateRreqFlood(entry.getNode());
             }
         }
-    }
-
-    private RouteEntry getRouteIfActual(String node, List<RouteEntry> routingTable) {
-        for (RouteEntry entry : routingTable) {
-            if (entry.getDestinationNode().equals(node) && entry.getDestinationSequenceNum() > 0) {
-                return entry;
-            }
-        }
-        return null;
     }
 
     // TODO: implement

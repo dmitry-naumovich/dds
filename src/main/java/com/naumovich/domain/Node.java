@@ -6,7 +6,7 @@ import com.naumovich.domain.message.aodv.IpMessage;
 import com.naumovich.manager.*;
 import com.naumovich.network.*;
 import com.naumovich.table.FileDistributionTable;
-import com.naumovich.table.RouteEntry;
+import com.naumovich.table.RoutingTable;
 import com.naumovich.util.MathOperations;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,11 +25,6 @@ public class Node {
     private final String nodeID = MathOperations.getRandomHexString(40);
     private ChunkStorage chunkStorage = new ChunkStorage();
 
-    public List<RouteEntry> getRoutingTable() {
-        return routingTable;
-    }
-
-    private List<RouteEntry> routingTable = new ArrayList<>();
     private boolean isOnline = true;
 
     private int amountOfRetransmitted;
@@ -37,7 +32,8 @@ public class Node {
     private long amountOfNodeStatusChecks;
     private long amountOfFindingPath;
 
-    private Map<File, FileDistributionTable> addressTableMap;
+    private RoutingTable routingTable;
+    private Map<File, FileDistributionTable> fileDistributionTableMap;
 
     private ChunkManager chunkManager;
     private AodvRoutingManager routingManager;
@@ -51,7 +47,7 @@ public class Node {
         this.nodeThread = thread;
         this.field = field;
 
-        addressTableMap = new HashMap<>();
+        fileDistributionTableMap = new HashMap<>();
         chunkManager = new ChunkManager(this);
         routingManager = new AodvRoutingManager(this);
         messageManager = new AodvMessageManager(this);
@@ -105,6 +101,10 @@ public class Node {
 
     public ChunkManager getChunkManager() {
         return chunkManager;
+    }
+
+    public RoutingTable getRoutingTable() {
+        return routingTable;
     }
 
     public RreqBufferManager getRreqBufferManager() {
@@ -168,7 +168,7 @@ public class Node {
 
     public void distributeFile(File file) {
         FileDistributionTable table = chunkManager.createAddressTable(file);
-        addressTableMap.put(file, table);
+        fileDistributionTableMap.put(file, table);
         routingManager.distributeChunks(table);
     }
 
@@ -176,7 +176,7 @@ public class Node {
         messageManager.checkMessageContainer();
     }
 
-    public void findNeighbors() { // find neighbors and fill the edgesMatrix
+    public void findNeighbors() {
         ArrayList<Node> nodes = Field.getNodes();
         for (Node n : nodes) {
             amountOfNodeStatusChecks++;
@@ -203,7 +203,7 @@ public class Node {
     }
 
     public void checkNodesStatus() {
-        Iterator it = addressTableMap.entrySet().iterator();
+        Iterator it = fileDistributionTableMap.entrySet().iterator();
         while (it.hasNext()) {
             routingManager.checkNodesStatus((FileDistributionTable)((Map.Entry)it.next()).getValue());
         }
