@@ -12,6 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import static com.naumovich.configuration.ModelConfiguration.*;
 
+/**
+ *
+ * @Author Dzmitry Naumovich
+ */
 //TODO: override toString, hashCode and equals after Node entity completed
 @Slf4j
 public class Node {
@@ -47,6 +51,7 @@ public class Node {
         this.nodeThread = thread;
         this.field = field;
 
+        routingTable = new RoutingTable(this);
         fileDistributionTableMap = new HashMap<>();
         chunkManager = new ChunkManager(this);
         routingManager = new AodvRoutingManager(this);

@@ -2,9 +2,6 @@ package com.naumovich.domain.message.aodv;
 
 import com.naumovich.table.FDTEntry;
 
-/**
- * Created by dzmitry on 10.5.17.
- */
 public class IpMessage {
 
     private String sourceNode;
@@ -30,7 +27,35 @@ public class IpMessage {
         return data.getMessageType();
     }
 
+    public String getSourceNode() {
+        return sourceNode;
+    }
+
+    public void setSourceNode(String sourceNode) {
+        this.sourceNode = sourceNode;
+    }
+
+    public String getDestNode() {
+        return destNode;
+    }
+
+    public void setDestNode(String destNode) {
+        this.destNode = destNode;
+    }
+
     public AodvMessage getData() {
         return data;
+    }
+
+    public void setData(AodvMessage data) {
+        this.data = data;
+    }
+
+    public int getHl() {
+        return hl;
+    }
+
+    public void setHl(int hl) {
+        this.hl = hl;
     }
 }

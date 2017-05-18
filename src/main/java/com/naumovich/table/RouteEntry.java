@@ -1,5 +1,6 @@
 package com.naumovich.table;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,6 +28,10 @@ public class RouteEntry {
         this.nextHop = nextHop;
         this.precursors = precursors;
         this.lifeTime = lifeTime;
+    }
+
+    public RouteEntry() {
+        precursors = new ArrayList<>();
     }
 
     public String getDestNode() {

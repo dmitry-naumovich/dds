@@ -14,9 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Created by dzmitry on 4.5.17.
- */
 @Slf4j
 public class AodvRoutingManager {
 

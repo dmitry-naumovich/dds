@@ -2,6 +2,8 @@ package com.naumovich.manager;
 
 import com.naumovich.domain.Node;
 import com.naumovich.domain.message.aodv.*;
+import com.naumovich.table.RouteEntry;
+import com.naumovich.table.RoutingTable;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Queue;
@@ -10,9 +12,8 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Created by dzmitry on 4.5.17.
- */
+import static com.naumovich.configuration.AodvConfiguration.NODE_TRAVERSAL_TIME;
+import static com.naumovich.configuration.AodvConfiguration.REV_ROUTE_LIFE;
 
 //TODO: change synchronous queue to other implementation so it would be able to store more than 1 element at one moment
 @Slf4j
@@ -74,7 +75,7 @@ public class AodvMessageManager {
             if (request.getDestSN() > owner.getSeqNumber()) {
                 owner.setSeqNumber(request.getDestSN());
             }
-            // generate RREP
+            generateAndSendRrep();
         } else {
             if (owner.getRreqBufferManager().containsRreq(request)) {
                 log.debug(owner.getLogin() + ": I'm not destination, but I've already received such a rreq");
@@ -82,10 +83,9 @@ public class AodvMessageManager {
             } else {
                 maintainReverseRoute(message);
                 log.debug(owner.getLogin() + ": I'm not destination, I proceed this request");
-                // maintain reverse route
                 owner.getRreqBufferManager().addRequestToBuffer(request);
 
-                // check where I've got a route to destination
+                // check whether I've got a route to destination
                 // if yes -> generate RREP
                 // else broadcast further
                 owner.getRoutingManager().broadcastRouteRequest(request);
@@ -94,9 +94,37 @@ public class AodvMessageManager {
 
     }
 
+    private void generateAndSendRrep() {
+        RouteReply reply = new RouteReply();
+        // fill fields etc
+    }
+
     private void maintainReverseRoute(IpMessage rreqIpMessage) {
-        // owner.getRoutingTable() RETURN THE ROUTE IF IT"S PRESENT
-        // compare
+        RouteRequest rreq = (RouteRequest)rreqIpMessage.getData();
+        RoutingTable routingTable = owner.getRoutingTable();
+        RouteEntry routeToOrigin = routingTable.getRouteTo(rreq.getSourceNode());
+        if (routeToOrigin == null) {
+            RouteEntry newRoute = getNewRouteEntryToOrigin(rreqIpMessage, 0);
+            owner.getRoutingTable().addEntry(newRoute);
+        } else {
+            if (rreq.getSourceSN() > routeToOrigin.getDestSN() || (rreq.getSourceSN() == routeToOrigin.getDestSN() && rreq.getHopCount() + 1 < routeToOrigin.getHopCount())) {
+                RouteEntry updatedRoute = getNewRouteEntryToOrigin(rreqIpMessage, routeToOrigin.getLifeTime());
+                routingTable.updateEntry(updatedRoute);
+            }
+        }
+    }
+
+    private RouteEntry getNewRouteEntryToOrigin(IpMessage rreqIpMessage, int lifeTime) {
+        RouteRequest rreq = (RouteRequest)rreqIpMessage.getData();
+        RouteEntry routeEntry = new RouteEntry();
+        routeEntry.setDestNode(rreq.getSourceNode());
+        routeEntry.setDestSN(rreq.getSourceSN());
+        routeEntry.setNextHop(rreqIpMessage.getSourceNode());
+        routeEntry.setHopCount(rreq.getHopCount() + 1);
+        int minLifeTime = (lifeTime + REV_ROUTE_LIFE - routeEntry.getHopCount() * NODE_TRAVERSAL_TIME);
+        routeEntry.setLifeTime(Math.max(lifeTime, minLifeTime));
+        routeEntry.setLastHopCount(rreq.getHopCount() + 1);
+        return routeEntry;
     }
 
     private void proceedRouteReply(RouteReply m) {

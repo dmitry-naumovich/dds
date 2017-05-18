@@ -9,8 +9,8 @@ import java.util.Objects;
 
 /**
  * Created by dzmitry on 17.5.17.
+ * @Author Dzmitry Naumovich
  */
-//TODO: FINISH (equals, hashcode, toString also)
 public class RoutingTable implements Iterable<RouteEntry> {
 
     private Node owner;
@@ -25,6 +25,19 @@ public class RoutingTable implements Iterable<RouteEntry> {
         routingTable.add(entry);
     }
 
+    public void updateEntry(RouteEntry updatedEntry) {
+        for (RouteEntry entry : routingTable) {
+            if (entry.getDestNode().equals(updatedEntry.getDestNode())) {
+                entry.setDestSN(updatedEntry.getDestSN());
+                entry.setNextHop(updatedEntry.getNextHop());
+                entry.setHopCount(updatedEntry.getHopCount());
+                entry.setLastHopCount(updatedEntry.getHopCount());
+                entry.setLifeTime(updatedEntry.getLifeTime());
+                entry.setPrecursors(updatedEntry.getPrecursors());
+            }
+        }
+    }
+
     public RouteEntry getActualRouteTo(String node) {
         for (RouteEntry entry : routingTable) {
             if (entry.getDestNode().equals(node) && entry.getDestSN() > 0) {
@@ -34,8 +47,14 @@ public class RoutingTable implements Iterable<RouteEntry> {
         return null;
     }
 
-
-
+    public RouteEntry getRouteTo(String node) {
+        for (RouteEntry entry : routingTable) {
+            if (entry.getDestNode().equals(node)) {
+                return entry;
+            }
+        }
+        return null;
+    }
 
     @Override
     public Iterator<RouteEntry> iterator() {

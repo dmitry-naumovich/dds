@@ -1,9 +1,7 @@
 package com.naumovich.domain.message.aodv;
 
-/**
- * Created by dzmitry on 2.5.17.
- */
-//TODO: generate equals, hashCode and toString
+import java.util.Objects;
+
 public class RouteRequest extends AodvMessage {
 
     private final static int TYPE = 1;
@@ -83,5 +81,38 @@ public class RouteRequest extends AodvMessage {
 
     public void setSourceSN(int sourceSN) {
         this.sourceSN = sourceSN;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RouteRequest that = (RouteRequest) o;
+        return gFlag == that.gFlag &&
+                hopCount == that.hopCount &&
+                floodId == that.floodId &&
+                destSN == that.destSN &&
+                sourceSN == that.sourceSN &&
+                Objects.equals(destNode, that.destNode) &&
+                Objects.equals(sourceNode, that.sourceNode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(gFlag, hopCount, floodId, destNode, destSN, sourceNode, sourceSN);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("RouteRequest{");
+        sb.append("gFlag=").append(gFlag);
+        sb.append(", hopCount=").append(hopCount);
+        sb.append(", floodId=").append(floodId);
+        sb.append(", destNode='").append(destNode).append('\'');
+        sb.append(", destSN=").append(destSN);
+        sb.append(", sourceNode='").append(sourceNode).append('\'');
+        sb.append(", sourceSN=").append(sourceSN);
+        sb.append('}');
+        return sb.toString();
     }
 }

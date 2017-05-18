@@ -1,8 +1,5 @@
 package com.naumovich.configuration;
 
-/**
- * Created by dzmitry on 2.5.17.
- */
 
 public class AodvConfiguration {
 
@@ -16,6 +13,7 @@ public class AodvConfiguration {
     public static final int NODE_TRAVERSAL_TIME = 40;
     public static final int NEXT_HOP_WAIT = NODE_TRAVERSAL_TIME + 10;
     public static final int NET_TRAVERSAL_TIME = 3 * NODE_TRAVERSAL_TIME * NET_DIAMETER / 2;
+    public static final int REV_ROUTE_LIFE = NET_TRAVERSAL_TIME;
     public static final int FLOOD_RECORD_TIME = 2 * NET_TRAVERSAL_TIME;
     public static final int RREQ_RETRIES = 2;
     public static final int TTL_START = 1;
