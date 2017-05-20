@@ -207,14 +207,13 @@ public class Node {
         return false;
     }
 
-    public void checkNodesStatus() {
-        Iterator it = fileDistributionTableMap.entrySet().iterator();
-        while (it.hasNext()) {
-            routingManager.checkNodesStatus((FileDistributionTable)((Map.Entry)it.next()).getValue());
-        }
+    public void checkNeighbors() {
+            routingManager.checkNeighbors();
     }
 
-    //TODO: consider this method and its usage
+    //TODO: consider this method and its usage (while checking neighbors, if routing manager discovers link break,
+    // it generates RERR, and when any node receives RERR, it checks if any chunk is located there
+    // so as I guess there is not necessity in this method and in relevant flag in thread class
     /*public void makeBackup() {
         (messageManager.makeBackup();
     }*/

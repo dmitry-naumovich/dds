@@ -83,6 +83,10 @@ public class RouteRequest extends AodvMessage {
         this.sourceSN = sourceSN;
     }
 
+    public void incrementHopCount() {
+        hopCount++;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

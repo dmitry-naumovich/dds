@@ -58,4 +58,11 @@ public class IpMessage {
     public void setHl(int hl) {
         this.hl = hl;
     }
+
+    public void incrementHl() {
+        hl++;
+    }
+    public void decrementHl() {
+        hl--;
+    }
 }

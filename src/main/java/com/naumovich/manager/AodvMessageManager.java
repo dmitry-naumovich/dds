@@ -2,36 +2,29 @@ package com.naumovich.manager;
 
 import com.naumovich.domain.Node;
 import com.naumovich.domain.message.aodv.*;
+import com.naumovich.network.Field;
 import com.naumovich.table.RouteEntry;
-import com.naumovich.table.RoutingTable;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
-import static com.naumovich.configuration.AodvConfiguration.NODE_TRAVERSAL_TIME;
-import static com.naumovich.configuration.AodvConfiguration.REV_ROUTE_LIFE;
-
-//TODO: change synchronous queue to other implementation so it would be able to store more than 1 element at one moment
 @Slf4j
 public class AodvMessageManager {
 
     private Node owner;
     private Queue<IpMessage> queue = new ConcurrentLinkedQueue<>();
-    //private Lock lock = new ReentrantLock();
+    private AodvRoutingManager routingManager;
 
     public AodvMessageManager(Node owner) {
         this.owner = owner;
+        routingManager = owner.getRoutingManager();
     }
 
     public void checkMessageContainer() {
-        //lock.lock();
         IpMessage message = queue.poll();
-        //lock.unlock();
         if (message != null) {
+            owner.incrementAmountOfMsgChecks();
             switch (message.getMessageType()) {
                 case 1:
                     proceedRouteRequest(message);
@@ -68,64 +61,40 @@ public class AodvMessageManager {
 
     private void proceedRouteRequest(IpMessage message) {
         RouteRequest request = (RouteRequest)message.getData();
-        log.debug(owner.getLogin() + ": I've received RouteRequest, originator is " + request.getSourceNode());
-        if (request.getDestNode().equals(owner.getLogin())) {
-            log.debug(owner.getLogin() + ": I am destination and I suggest a path me and now I will generate RREP");
-            maintainReverseRoute(message);
+        log.debug(owner + ": I've received RouteRequest, originator is " + request.getSourceNode());
+
+        if (request.getDestNode().equals(owner)) {
+            log.debug(owner + ": I am destination and I suggest a path me and now I will generate RREP");
+
+            RouteEntry reverseRoute = routingManager.maintainReverseRoute(message);
             if (request.getDestSN() > owner.getSeqNumber()) {
                 owner.setSeqNumber(request.getDestSN());
             }
-            generateAndSendRrep();
-        } else {
-            if (owner.getRreqBufferManager().containsRreq(request)) {
-                log.debug(owner.getLogin() + ": I'm not destination, but I've already received such a rreq");
-                // nothing else to do more, the msg is already polled off the queue
-            } else {
-                maintainReverseRoute(message);
-                log.debug(owner.getLogin() + ": I'm not destination, I proceed this request");
-                owner.getRreqBufferManager().addRequestToBuffer(request);
+            routingManager.generateAndSendRrepAsDestination(request, reverseRoute);
 
-                // check whether I've got a route to destination
-                // if yes -> generate RREP
-                // else broadcast further
-                owner.getRoutingManager().broadcastRouteRequest(request);
-            }
-        }
+        } else if (!request.getSourceNode().equals(owner) && owner.getRreqBufferManager().containsRreq(request)) {
+            log.debug(owner + ": I'm intermediate node, I proceed this request");
 
-    }
+            owner.getRreqBufferManager().addRequestToBuffer(request);
 
-    private void generateAndSendRrep() {
-        RouteReply reply = new RouteReply();
-        // fill fields etc
-    }
+            RouteEntry reverseRoute = routingManager.maintainReverseRoute(message);
+            RouteEntry route = owner.getRoutingTable().getActualRouteTo(request.getDestNode());
 
-    private void maintainReverseRoute(IpMessage rreqIpMessage) {
-        RouteRequest rreq = (RouteRequest)rreqIpMessage.getData();
-        RoutingTable routingTable = owner.getRoutingTable();
-        RouteEntry routeToOrigin = routingTable.getRouteTo(rreq.getSourceNode());
-        if (routeToOrigin == null) {
-            RouteEntry newRoute = getNewRouteEntryToOrigin(rreqIpMessage, 0);
-            owner.getRoutingTable().addEntry(newRoute);
-        } else {
-            if (rreq.getSourceSN() > routeToOrigin.getDestSN() || (rreq.getSourceSN() == routeToOrigin.getDestSN() && rreq.getHopCount() + 1 < routeToOrigin.getHopCount())) {
-                RouteEntry updatedRoute = getNewRouteEntryToOrigin(rreqIpMessage, routeToOrigin.getLifeTime());
-                routingTable.updateEntry(updatedRoute);
+            if ((route == null && message.getHl() > 1) || (route != null && route.getDestSN() < request.getDestSN() && message.getHl() > 1)) {
+                message.decrementHl();
+                request.incrementHopCount();
+                owner.incrementAmountOfRetransmitted();
+                routingManager.broadcastRouteRequest(request);
+
+            } else if (route != null && route.getDestSN() >= request.getDestSN()){
+                log.debug(owner + ": I know the actual route to dest, sending RREP to " + request.getSourceNode() + " which generated RREQ. Next hop is: " + reverseRoute.getNextHop());
+
+                routingManager.generateAndSendRrepAsIntermediate(request, reverseRoute, route);
             }
         }
     }
 
-    private RouteEntry getNewRouteEntryToOrigin(IpMessage rreqIpMessage, int lifeTime) {
-        RouteRequest rreq = (RouteRequest)rreqIpMessage.getData();
-        RouteEntry routeEntry = new RouteEntry();
-        routeEntry.setDestNode(rreq.getSourceNode());
-        routeEntry.setDestSN(rreq.getSourceSN());
-        routeEntry.setNextHop(rreqIpMessage.getSourceNode());
-        routeEntry.setHopCount(rreq.getHopCount() + 1);
-        int minLifeTime = (lifeTime + REV_ROUTE_LIFE - routeEntry.getHopCount() * NODE_TRAVERSAL_TIME);
-        routeEntry.setLifeTime(Math.max(lifeTime, minLifeTime));
-        routeEntry.setLastHopCount(rreq.getHopCount() + 1);
-        return routeEntry;
-    }
+
 
     private void proceedRouteReply(RouteReply m) {
 

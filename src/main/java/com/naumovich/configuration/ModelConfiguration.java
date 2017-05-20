@@ -2,10 +2,6 @@ package com.naumovich.configuration;
 
 import java.awt.*;
 
-/**
- * Created by dzmitry on 4.5.17.
- */
-
 //TODO: move here many model parameters
 public class ModelConfiguration {
 

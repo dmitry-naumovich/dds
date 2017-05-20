@@ -86,7 +86,7 @@ public class NodeThread implements Runnable {
 							distributeFlag = false;
 						}
 						node.checkMessageContainer(); // retransmit or receive chunks
-						node.checkNodesStatus();
+						node.checkNeighbors();
 						if (i % 120 == 0) {
 							node.findNeighbors();    // find current neighbors and fill the edgesMatrix
 						}

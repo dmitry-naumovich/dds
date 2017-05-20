@@ -10,9 +10,9 @@ public class RouteReply extends AodvMessage {
     private String destNode;
     private int destSN;
     private String sourceNode;
-    private int lifetime;
+    private long lifetime;
 
-    public RouteReply(int hopCount, String destNode, int destSN, String sourceNode, int lifetime, boolean aFlag) {
+    public RouteReply(int hopCount, String destNode, int destSN, String sourceNode, long lifetime, boolean aFlag) {
         this.hopCount = hopCount;
         this.destNode = destNode;
         this.destSN = destSN;
@@ -68,11 +68,11 @@ public class RouteReply extends AodvMessage {
         this.sourceNode = sourceNode;
     }
 
-    public int getLifetime() {
+    public long getLifetime() {
         return lifetime;
     }
 
-    public void setLifetime(int lifetime) {
+    public void setLifetime(long lifetime) {
         this.lifetime = lifetime;
     }
 

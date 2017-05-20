@@ -8,7 +8,8 @@ import java.util.Objects;
  * This class describes table entry of RoutingTable
  * Created by Dzmitry on 2.5.17.
  *
- * @Author Dzmitry Naumovich
+ * @version 1.0
+ * @author Dzmitry Naumovich
  */
 public class RouteEntry {
 
@@ -18,15 +19,19 @@ public class RouteEntry {
     private int lastHopCount;
     private String nextHop;
     private List<String> precursors;
-    private int lifeTime;
+    private long lifeTime;
 
-    public RouteEntry(String destNode, int destSN, int hopCount, int lastHopCount, String nextHop, List<String> precursors, int lifeTime) {
+    public RouteEntry(String destNode, int destSN, int hopCount, int lastHopCount, String nextHop, List<String> precursors, long lifeTime) {
         this.destNode = destNode;
         this.destSN = destSN;
         this.hopCount = hopCount;
         this.lastHopCount = lastHopCount;
         this.nextHop = nextHop;
-        this.precursors = precursors;
+        if (precursors == null) {
+            this.precursors = new ArrayList<>();
+        } else {
+            this.precursors = precursors;
+        }
         this.lifeTime = lifeTime;
     }
 
@@ -82,12 +87,16 @@ public class RouteEntry {
         this.lastHopCount = lastHopCount;
     }
 
-    public int getLifeTime() {
+    public long getLifeTime() {
         return lifeTime;
     }
 
-    public void setLifeTime(int lifeTime) {
+    public void setLifeTime(long lifeTime) {
         this.lifeTime = lifeTime;
+    }
+
+    public void addPrecursor(String node) {
+        precursors.add(node);
     }
 
     @Override
