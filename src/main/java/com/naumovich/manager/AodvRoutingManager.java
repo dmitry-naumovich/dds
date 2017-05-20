@@ -67,6 +67,7 @@ public class AodvRoutingManager {
         Field.getNodeByLogin(reverseRoute.getNextHop()).receiveMessage(ipMessage);
     }
 
+    //TODO: gratuitous
     protected void generateAndSendRrepAsIntermediate(RouteRequest request, RouteEntry reverseRoute, RouteEntry route) {
         RouteReply reply = new RouteReply(route.getHopCount(), request.getDestNode(), route.getDestSN(), request.getSourceNode(),
                 route.getLifeTime() - System.currentTimeMillis(), false);

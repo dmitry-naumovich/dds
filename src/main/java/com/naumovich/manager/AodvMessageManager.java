@@ -72,7 +72,7 @@ public class AodvMessageManager {
             }
             routingManager.generateAndSendRrepAsDestination(request, reverseRoute);
 
-        } else if (!request.getSourceNode().equals(owner) && owner.getRreqBufferManager().containsRreq(request)) {
+        } else if (!request.getSourceNode().equals(owner) && !owner.getRreqBufferManager().containsRreq(request)) {
             log.debug(owner + ": I'm intermediate node, I proceed this request");
 
             owner.getRreqBufferManager().addRequestToBuffer(request);
