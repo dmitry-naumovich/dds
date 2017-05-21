@@ -1,1 +1,11 @@
-/bin/.settings/.classpath/.idea/.project/LICENSE/statistics.txt/
+.settings
+.classpath
+/.idea
+/dds.iml
+/bin/
+.project
+/target
+/LICENSE
+/logs
+/statistics.txt
+/statistics2.txt
