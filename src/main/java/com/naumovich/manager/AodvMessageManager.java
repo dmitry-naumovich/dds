@@ -31,16 +31,16 @@ public class AodvMessageManager {
             owner.incrementAmountOfMsgChecks();
             switch (message.getMessageType()) {
                 case 1:
-                    proceedRouteRequest(message);
+                    proceedRouteRequest((RouteRequest)message.getData(), message.getSourceNode(), message.getHl());
                     break;
                 case 2:
-                    proceedRouteReply(message);
+                    proceedRouteReply((RouteReply)message.getData(), message.getSourceNode(), message.getHl());
                     break;
                 case 3:
                     proceedRouteError((RouteError)message.getData());
                     break;
                 case 4:
-                    proceedChunkMessage((AodvChunkMessage)message.getData());
+                    proceedChunkMessage((AodvChunkMessage)message.getData(), message.getHl());
                     break;
                 case 5:
                     proceedBackupMessage((AodvBackupMessage)message.getData());
@@ -53,21 +53,24 @@ public class AodvMessageManager {
 
 
 
-    private void proceedChunkMessage(AodvChunkMessage m) {
-
+    private void proceedChunkMessage(AodvChunkMessage chunkMessage, int hl) {
+        if (chunkMessage.getDestNode().equals(owner.getLogin())) {
+            owner.getChunkStorage().add(chunkMessage.getChunk());
+        } else if (hl > 1) {
+            RouteEntry route = owner.getRoutingTable().getActualRouteTo(chunkMessage.getDestNode());
+            routingManager.forwardAodvMessage(chunkMessage, route.getNextHop(), --hl);
+        }
     }
 
     private void proceedBackupMessage(AodvBackupMessage m) {
 
     }
 
-    private void proceedRouteRequest(IpMessage message) {
-        RouteRequest request = (RouteRequest)message.getData();
-
+    private void proceedRouteRequest(RouteRequest request, String prevNode, int hl) {
         if (request.getDestNode().equals(owner.getLogin())) {
             log.debug(owner + ": received RREQ, I'm destination - generating RREP");
 
-            RouteEntry reverseRoute = routingManager.maintainReverseRoute(request, message.getSourceNode());
+            RouteEntry reverseRoute = routingManager.maintainReverseRoute(request, prevNode);
             if (request.getDestSN() > owner.getSeqNumber()) {
                 owner.setSeqNumber(request.getDestSN());
             }
@@ -76,16 +79,15 @@ public class AodvMessageManager {
         } else if (!request.getSourceNode().equals(owner.getLogin()) && !owner.getRreqBufferManager().containsRreq(request)) {
             owner.getRreqBufferManager().addRequestToBuffer(request);
 
-            RouteEntry reverseRoute = routingManager.maintainReverseRoute(request, message.getSourceNode());
+            RouteEntry reverseRoute = routingManager.maintainReverseRoute(request, prevNode);
             RouteEntry route = owner.getRoutingTable().getActualRouteTo(request.getDestNode());
 
-            if ((route == null && message.getHl() > 1) || (route != null && route.getDestSN() < request.getDestSN() && message.getHl() > 1)) {
+            if ((route == null && hl > 1) || (route != null && route.getDestSN() < request.getDestSN() && hl > 1)) {
                 log.debug(owner + ": received RREQ, I'm intermediate, I broadcast it further");
 
-                message.decrementHl();
                 request.incrementHopCount();
                 owner.incrementAmountOfRetransmitted();
-                routingManager.broadcastRouteRequest(request, message.getHl());
+                routingManager.broadcastRouteRequest(request, --hl);
 
             } else if (route != null && route.getDestSN() >= request.getDestSN()){
                 log.debug(owner + ": received RREQ, I'm intermediate, know route to dest - generating RREP to " + request.getSourceNode() + ". Next hop is: " + reverseRoute.getNextHop());
@@ -95,34 +97,29 @@ public class AodvMessageManager {
         }
     }
 
-    private void proceedRouteReply(IpMessage message) {
-        RouteReply reply = (RouteReply)message.getData();
-
+    private void proceedRouteReply(RouteReply reply, String prevNode, int hl) {
         if (reply.getSourceNode().equals(owner.getLogin())) {
             log.debug(owner + ": received RREP, this is a reply for me");
 
             owner.getRrepBufferManager().addNodeToBuffer(reply.getDestNode());
-            RouteEntry route = routingManager.maintainDirectRoute(reply, message.getSourceNode());
+            RouteEntry route = routingManager.maintainDirectRoute(reply, prevNode);
             routingManager.sendChunkToObtainedNode(route);
 
-        } else if (message.getHl() > 1) {
+        } else if (hl > 1) {
             log.debug(owner + ": received RREP for " + reply.getSourceNode() + ", I'm intermediate, I maintain direct route and forward this further");
 
             String nextHop = owner.getRoutingTable().getActualRouteTo(reply.getSourceNode()).getNextHop();
 
-            RouteEntry route = routingManager.maintainDirectRoute(reply, message.getSourceNode());
+            RouteEntry route = routingManager.maintainDirectRoute(reply, prevNode);
             route.addPrecursor(nextHop);
-            message.decrementHl();
             reply.incrementHopCount();
             owner.incrementAmountOfRetransmitted();
 
-
-
-            routingManager.forwardAodvMessage(reply, nextHop, message.getHl());
+            routingManager.forwardAodvMessage(reply, nextHop, --hl);
         }
     }
 
-    private void proceedRouteError(RouteError m) {
+    private void proceedRouteError(RouteError error) {
 
     }
 }

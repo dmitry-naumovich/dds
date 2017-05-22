@@ -1,7 +1,5 @@
 package com.naumovich.domain.message.aodv;
 
-import com.naumovich.table.FDTEntry;
-
 public class IpMessage {
 
     private String sourceNode;
@@ -52,9 +50,6 @@ public class IpMessage {
         this.hl = hl;
     }
 
-    public void incrementHl() {
-        hl++;
-    }
     public void decrementHl() {
         hl--;
     }
