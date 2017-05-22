@@ -76,6 +76,10 @@ public class RouteReply extends AodvMessage {
         this.lifetime = lifetime;
     }
 
+    public void incrementHopCount() {
+        hopCount++;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
