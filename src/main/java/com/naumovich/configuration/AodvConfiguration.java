@@ -16,9 +16,9 @@ public class AodvConfiguration {
     public static final int REV_ROUTE_LIFE = NET_TRAVERSAL_TIME;
     public static final int FLOOD_RECORD_TIME = 2 * NET_TRAVERSAL_TIME;
     public static final int RREQ_RETRIES = 2;
-    public static final int TTL_START = 1;
-    public static final int TTL_INCREMENT = 2;
-    public static final int TTL_THRESHOLD = 7;
+    public static final int HL_START = 1;
+    public static final int HL_INCREMENT = 2;
+    public static final int HL_THRESHOLD = 7;
 
 
 }

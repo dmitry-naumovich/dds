@@ -12,7 +12,7 @@ public class ModelConfiguration {
 
 
     public static final int NODES_AMOUNT_TO_TURN_OFF = 2;
-    public static final int NODES_AMOUNT_TO_ADD = 10;
+    public static final int NODES_AMOUNT_TO_ADD = 40;
     public static final int FILES_AMOUNT_TO_DISTRIBUTE = 1;
     public static final int NEIGHBOR_DISTANCE_PARAMETER = 12;
  }
