@@ -1,7 +1,5 @@
 package com.naumovich.table;
 
-import com.naumovich.domain.Chunk;
-
 import java.util.Objects;
 
 /**
@@ -10,11 +8,11 @@ import java.util.Objects;
 public class FDTEntry {
 
     private int orderNum;
-    private Chunk chunk;
+    private String chunk;
     private String node;
     private int metric;
 
-    public FDTEntry(int orderNum, Chunk chunk, String node, int metric) {
+    public FDTEntry(int orderNum, String chunk, String node, int metric) {
         this.orderNum = orderNum;
         this.chunk = chunk;
         this.node = node;
@@ -29,11 +27,11 @@ public class FDTEntry {
         this.orderNum = orderNum;
     }
 
-    public Chunk getChunk() {
+    public String getChunk() {
         return chunk;
     }
 
-    public void setChunk(Chunk chunk) {
+    public void setChunk(String chunk) {
         this.chunk = chunk;
     }
 
