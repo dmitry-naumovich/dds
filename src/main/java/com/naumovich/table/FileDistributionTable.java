@@ -18,7 +18,7 @@ public class FileDistributionTable implements Iterable<FDTEntry> {
 	}
 
 	public void addRow(int numOfChunk, Chunk chunk, Node node, int metrics) {
-		fdtTable.add(new FDTEntry(numOfChunk, chunk, node.getLogin(), metrics));
+		fdtTable.add(new FDTEntry(numOfChunk, chunk.getChunkName(), node.getLogin(), metrics));
 	}
 	public void setRow(int rowNum, Node node, int metrics) {
 		fdtTable.set(rowNum, new FDTEntry(fdtTable.get(rowNum).getOrderNum(),
@@ -30,6 +30,16 @@ public class FileDistributionTable implements Iterable<FDTEntry> {
 
 	public int getTableSize() {
 		return fdtTable.size();
+	}
+
+	public List<FDTEntry> getEntriesByNode(String node) {
+		List<FDTEntry> entries = new ArrayList<>();
+		for (FDTEntry entry : fdtTable) {
+			if (entry.getNode().equals(node)) {
+				entries.add(entry);
+			}
+		}
+		return entries;
 	}
 	
 	@Override
