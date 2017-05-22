@@ -16,13 +16,6 @@ public class IpMessage {
         this.hl = hl;
     }
 
-    public IpMessage(String sourceNode, String nextHop, FDTEntry entry, int hl) {
-        this.sourceNode = sourceNode;
-        this.destNode = nextHop;
-        data = new AodvChunkMessage(entry.getNode(), entry.getChunk());
-        this.hl = hl;
-    }
-
     public int getMessageType() {
         return data.getMessageType();
     }
