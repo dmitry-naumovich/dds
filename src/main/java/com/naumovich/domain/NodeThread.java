@@ -68,51 +68,50 @@ public class NodeThread implements Runnable {
 		canvas.draw(node);
 		canvas.fill(node);
 	}
-	
-	
+
+	// TODO fieldCanIMove here and remove wait() and notify() perhaps ?
 	@Override
-	public void run() { // runs for every node
+	public void run() {
 		try {
-			while (true) {// TODO remove true and fieldCanIMove here and remove wait() and notify() perhaps ?
+			for (int i = 0; ; i++) {
 				field.canIMove(); // checking whether the "pause" is pressed or not
-				for (int i = 0; i < 120; i++) {
-					if (node.isOnline()) {
-//						if (backupFlag) {
-//							node.makeBackup();
-//							backupFlag = false;
-//						}
-						if (distributeFlag) {
-							node.distributeFile(new File("file " + i * rand.nextInt(1000), 100 + rand.nextInt(10000)));
-							distributeFlag = false;
-						}
-						node.checkMessageContainer(); // retransmit or receive chunks
-						node.checkNeighbors();
-						if (i % 120 == 0) {
-							node.findNeighbors();    // find current neighbors and fill the edgesMatrix
-						}
+				if (node.isOnline()) {
+//					if (backupFlag) {
+//						node.makeBackup();
+//						backupFlag = false;
+//					}
+					if (distributeFlag) {
+						node.distributeFile(new File("file " + i * rand.nextInt(1000), 100 + rand.nextInt(10000)));
+						distributeFlag = false;
 					}
-					if (i % 40 == 0) {
-						if (x + speedX <= RADIUS) {
-							speedX = -speedX;
-							x = RADIUS;
-						} else if (x + speedX >= field.getWidth() - RADIUS) {
-							speedX = -speedX;
-							x = new Double(field.getWidth() - RADIUS).intValue();
-						} else if (y + speedY <= RADIUS) {
-							speedY = -speedY;
-							y = RADIUS;
-						} else if (y + speedY >= field.getHeight() - RADIUS) {
-							speedY = -speedY;
-							y = new Double(field.getHeight() - RADIUS).intValue();
-						} else {
-							x += speedX;
-							y += speedY;
-						}
-						Thread.sleep(1);
+					node.checkMessageContainer(); // retransmit or receive chunks
+					node.checkNeighbors();
+
+					if (i % 120 == 0) {
+						node.findNeighbors();    // find current neighbors and fill the edgesMatrix
 					}
 
-
+					if (x + speedX <= RADIUS) {
+						speedX = -speedX;
+						x = RADIUS;
+					} else if (x + speedX >= field.getWidth() - RADIUS) {
+						speedX = -speedX;
+						x = new Double(field.getWidth() - RADIUS).intValue();
+					} else if (y + speedY <= RADIUS) {
+						speedY = -speedY;
+						y = RADIUS;
+					} else if (y + speedY >= field.getHeight() - RADIUS) {
+						speedY = -speedY;
+						y = new Double(field.getHeight() - RADIUS).intValue();
+					} else {
+						x += speedX;
+						y += speedY;
+					}
+					Thread.sleep(1);
 				}
+
+
+
 			}
 		} catch (InterruptedException ex) {
 		    //TODO handle an exception in any way
