@@ -43,6 +43,7 @@ public class Node {
     private AodvRoutingManager routingManager;
     private AodvMessageManager messageManager;
     private RreqBufferManager rreqBufferManager;
+    private RrepBufferManager rrepBufferManager;
 
     private int floodId;
     private int seqNumber;
@@ -57,6 +58,7 @@ public class Node {
         routingManager = new AodvRoutingManager(this);
         messageManager = new AodvMessageManager(this);
         rreqBufferManager = new RreqBufferManager(this);
+        rrepBufferManager = new RrepBufferManager(this);
 
     }
 
@@ -114,6 +116,10 @@ public class Node {
 
     public RreqBufferManager getRreqBufferManager() {
         return rreqBufferManager;
+    }
+
+    public RrepBufferManager getRrepBufferManager() {
+        return rrepBufferManager;
     }
 
     public AodvRoutingManager getRoutingManager() {
