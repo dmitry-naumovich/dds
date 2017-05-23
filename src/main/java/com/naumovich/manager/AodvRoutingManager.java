@@ -57,34 +57,52 @@ public class AodvRoutingManager {
     //TODO: expanding ring search technique in separate thread
     private void generateRreqFlood(String destination) {
         owner.incrementSeqNumber();
-        RouteRequest request = new RouteRequest(owner.getFloodId() + 1, destination, 0, owner.getLogin(), owner.getSeqNumber());
-        owner.incrementFloodId();
-        broadcastRouteRequest(request, NET_DIAMETER);
-        /*for (int hl = HL_START; hl < HL_THRESHOLD; hl += HL_INCREMENT) {
-            owner.incrementFloodId();
-            broadcastRouteRequest(request, hl);
-            try {
-                Thread.sleep(2 * hl * NODE_TRAVERSAL_TIME);
-            } catch (InterruptedException e) {
-                // TODO: smth
-            }
-            if (owner.getRrepBufferManager().containsNode(destination)) {
-                return;
-            }
+        RouteRequest request = new RouteRequest(owner.getFloodId(), destination, 0, owner.getLogin(), owner.getSeqNumber());
+        //owner.incrementFloodId();
+        //broadcastRouteRequest(request, NET_DIAMETER);
+        Thread flooder = new Thread(new Flooder(request, destination));
+        flooder.start();
+    }
+
+    class Flooder implements Runnable {
+
+        private RouteRequest request;
+        private String destination;
+
+        public Flooder(RouteRequest request, String destination) {
+            this.request = request;
+            this.destination = destination;
         }
 
-        for (int i = 0, hl = NET_DIAMETER; i < RREQ_RETRIES; i++) {
-            owner.incrementFloodId();
-            broadcastRouteRequest(request, hl);
-            try {
-                Thread.sleep(2 * hl * NODE_TRAVERSAL_TIME);
-            } catch (InterruptedException e) {
-                // TODO: smth
+        @Override
+        public void run() {
+            for (int hl = HL_START; hl < HL_THRESHOLD; hl += HL_INCREMENT) {
+                request.setFloodId(owner.incrementFloodId());
+                broadcastRouteRequest(request, hl);
+                try {
+                    Thread.sleep(2 * hl * NODE_TRAVERSAL_TIME);
+                } catch (InterruptedException e) {
+                    // TODO: smth
+                }
+                if (owner.getRrepBufferManager().containsNode(destination)) {
+                    return;
+                }
             }
-            if (owner.getRrepBufferManager().containsNode(destination)) {
-                return;
+
+            for (int i = 0, hl = NET_DIAMETER; i < RREQ_RETRIES; i++) {
+                request.setFloodId(owner.incrementFloodId());
+                broadcastRouteRequest(request, hl);
+                try {
+                    Thread.sleep(2 * hl * NODE_TRAVERSAL_TIME);
+                } catch (InterruptedException e) {
+                    // TODO: smth
+                }
+                if (owner.getRrepBufferManager().containsNode(destination)) {
+                    return;
+                }
             }
-        }*/
+            log.debug(owner + ": I stop retrying to broadcast: dest is unreachable");
+        }
     }
 
     protected void broadcastRouteRequest(RouteRequest request, int hopLimit) {
