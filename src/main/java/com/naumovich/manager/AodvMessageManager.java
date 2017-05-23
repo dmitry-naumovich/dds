@@ -92,6 +92,8 @@ public class AodvMessageManager {
             } else if (route != null && route.getDestSN() >= request.getDestSN()){
                 log.debug(owner + ": received RREQ, I'm intermediate, know route to dest - generating RREP to " + request.getSourceNode() + ". Next hop is: " + reverseRoute.getNextHop());
 
+                route.addPrecursor(reverseRoute.getNextHop());
+                reverseRoute.addPrecursor(route.getNextHop());
                 routingManager.generateAndSendRrepAsIntermediate(request, reverseRoute, route);
             }
         }
@@ -103,7 +105,9 @@ public class AodvMessageManager {
 
             owner.getRrepBufferManager().addNodeToBuffer(reply.getDestNode());
             RouteEntry route = routingManager.maintainDirectRoute(reply, prevNode);
-            routingManager.sendChunkToObtainedNode(route);
+            if (!reply.isgFlag()) {
+                routingManager.sendChunkToObtainedNode(route);
+            }
 
         } else if (hl > 1) {
             log.debug(owner + ": received RREP for " + reply.getSourceNode() + ", I'm intermediate, I maintain direct route and forward this further");

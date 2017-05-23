@@ -5,7 +5,6 @@ import java.util.Objects;
 public class RouteRequest extends AodvMessage {
 
     private final static int TYPE = 1;
-    private boolean gFlag;
     private int hopCount;
     private int floodId;
     private String destNode;
@@ -13,26 +12,17 @@ public class RouteRequest extends AodvMessage {
     private String sourceNode;
     private int sourceSN;
 
-    public RouteRequest(int floodId, String destNode, int destSN, String sourceNode, int sourceSN, boolean gFlag) {
+    public RouteRequest(int floodId, String destNode, int destSN, String sourceNode, int sourceSN) {
         this.floodId = floodId;
         this.destNode = destNode;
         this.destSN = destSN;
         this.sourceNode = sourceNode;
         this.sourceSN = sourceSN;
-        this.gFlag = gFlag;
     }
 
     @Override
     public int getMessageType() {
         return TYPE;
-    }
-
-    public boolean isgFlag() {
-        return gFlag;
-    }
-
-    public void setgFlag(boolean gFlag) {
-        this.gFlag = gFlag;
     }
 
     public int getHopCount() {
@@ -92,8 +82,7 @@ public class RouteRequest extends AodvMessage {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RouteRequest that = (RouteRequest) o;
-        return gFlag == that.gFlag &&
-                hopCount == that.hopCount &&
+        return  hopCount == that.hopCount &&
                 floodId == that.floodId &&
                 destSN == that.destSN &&
                 sourceSN == that.sourceSN &&
@@ -103,14 +92,13 @@ public class RouteRequest extends AodvMessage {
 
     @Override
     public int hashCode() {
-        return Objects.hash(gFlag, hopCount, floodId, destNode, destSN, sourceNode, sourceSN);
+        return Objects.hash(hopCount, floodId, destNode, destSN, sourceNode, sourceSN);
     }
 
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("RouteRequest{");
-        sb.append("gFlag=").append(gFlag);
-        sb.append(", hopCount=").append(hopCount);
+        sb.append("hopCount=").append(hopCount);
         sb.append(", floodId=").append(floodId);
         sb.append(", destNode='").append(destNode).append('\'');
         sb.append(", destSN=").append(destSN);

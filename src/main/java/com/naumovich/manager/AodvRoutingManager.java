@@ -35,7 +35,7 @@ public class AodvRoutingManager {
 
             RouteEntry route = owner.getRoutingTable().getActualRouteTo(entry.getNode());
             if (route != null) {
-                sendChunkByRoute(entry, route);
+                sendChunkAlongTheRoute(entry, route);
             } else {
                 log.debug(owner + ": I don't have a route, starting flood");
                 generateRreqFlood(entry.getNode());
@@ -43,7 +43,7 @@ public class AodvRoutingManager {
         }
     }
 
-    private void sendChunkByRoute(FDTEntry entry, RouteEntry route) {
+    private void sendChunkAlongTheRoute(FDTEntry entry, RouteEntry route) {
         Node nextHop = Field.getNodeByLogin(route.getNextHop());
         Chunk chunkToSend = owner.getChunkStorage().getChunkByName(entry.getChunk());
 
@@ -56,7 +56,7 @@ public class AodvRoutingManager {
     //TODO: expanding ring search technique in separate thread
     private void generateRreqFlood(String destination) {
         owner.incrementSeqNumber();
-        RouteRequest request = new RouteRequest(owner.getFloodId() + 1, destination, 0, owner.getLogin(), owner.getSeqNumber(), true);
+        RouteRequest request = new RouteRequest(owner.getFloodId() + 1, destination, 0, owner.getLogin(), owner.getSeqNumber());
 
         broadcastRouteRequest(request, NET_DIAMETER);
         /*for (int hl = HL_START; hl < HL_THRESHOLD; hl += HL_INCREMENT) {
@@ -109,10 +109,17 @@ public class AodvRoutingManager {
                 route.getLifeTime() - System.currentTimeMillis(), false);
         IpMessage ipMessage = new IpMessage(owner.getLogin(), reverseRoute.getNextHop(), reply, reverseRoute.getHopCount());
 
-        route.addPrecursor(reverseRoute.getNextHop());
-        reverseRoute.addPrecursor(route.getNextHop());
         Field.getNodeByLogin(reverseRoute.getNextHop()).receiveMessage(ipMessage);
-        // gratuitous RREP
+        sendGratuitousReply(request, route);
+    }
+
+    private void sendGratuitousReply(RouteRequest request, RouteEntry route) {
+        log.debug(owner + ": generating GRREP and sending it to " + request.getDestNode());
+
+        RouteReply gratReply = new RouteReply(request.getHopCount(), request.getSourceNode(), request.getSourceSN(),
+                request.getDestNode(), route.getLifeTime(), true);
+        IpMessage ipMessage = new IpMessage(owner.getLogin(), route.getNextHop(), gratReply, route.getHopCount());
+        Field.getNodeByLogin(route.getNextHop()).receiveMessage(ipMessage);
     }
 
     protected void forwardAodvMessage(AodvMessage message, String nextHop, int hopLimit) {
@@ -192,7 +199,7 @@ public class AodvRoutingManager {
     protected void sendChunkToObtainedNode(RouteEntry route) {
         for (FDTEntry entry : fileDistributionTable.getEntriesByNode(route.getDestNode())) {
             log.debug(owner + ": now I've got route to " + route.getDestNode() + " and will send him a chunk");
-            sendChunkByRoute(entry, route);
+            sendChunkAlongTheRoute(entry, route);
         }
     }
 
