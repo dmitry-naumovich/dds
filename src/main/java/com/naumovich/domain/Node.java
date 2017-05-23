@@ -70,8 +70,8 @@ public class Node {
         this.floodId = floodId;
     }
 
-    public void incrementFloodId() {
-        floodId++;
+    public int incrementFloodId() {
+        return ++floodId;
     }
 
     public int getSeqNumber() {
