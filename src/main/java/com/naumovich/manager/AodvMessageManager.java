@@ -99,6 +99,8 @@ public class AodvMessageManager {
                 route.addPrecursor(reverseRoute.getNextHop());
                 reverseRoute.addPrecursor(route.getNextHop());
                 routingManager.generateAndSendRrepAsIntermediate(request, reverseRoute, route);
+            } else {
+                log.debug(owner + ": received RREQ, I'm intermediate, but I discard as hl <= 1");
             }
         }
     }
