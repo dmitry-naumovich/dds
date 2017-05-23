@@ -55,10 +55,13 @@ public class AodvMessageManager {
 
     private void proceedChunkMessage(AodvChunkMessage chunkMessage, int hl) {
         if (chunkMessage.getDestNode().equals(owner.getLogin())) {
+            log.debug(owner + ": I've received Chunk and save it to my local storage");
             owner.getChunkStorage().add(chunkMessage.getChunk());
         } else if (hl > 1) {
             RouteEntry route = owner.getRoutingTable().getActualRouteTo(chunkMessage.getDestNode());
-            routingManager.forwardAodvMessage(chunkMessage, route.getNextHop(), --hl);
+            if (route != null) {
+                routingManager.forwardAodvMessage(chunkMessage, route.getNextHop(), --hl);
+            }
         }
     }
 
@@ -67,8 +70,9 @@ public class AodvMessageManager {
     }
 
     private void proceedRouteRequest(RouteRequest request, String prevNode, int hl) {
-        if (request.getDestNode().equals(owner.getLogin())) {
+        if (request.getDestNode().equals(owner.getLogin()) && !owner.getRreqBufferManager().containsRreq(request)) {
             log.debug(owner + ": received RREQ, I'm destination - generating RREP");
+            owner.getRreqBufferManager().addRequestToBuffer(request);
 
             RouteEntry reverseRoute = routingManager.maintainReverseRoute(request, prevNode);
             if (request.getDestSN() > owner.getSeqNumber()) {

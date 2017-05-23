@@ -46,7 +46,7 @@ public class Node {
     private RrepBufferManager rrepBufferManager;
 
     private int floodId;
-    private int seqNumber;
+    private int seqNumber = 1;
 
     public Node(NodeThread thread, Field field) {
         this.nodeThread = thread;

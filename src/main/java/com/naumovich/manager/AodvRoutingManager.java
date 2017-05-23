@@ -44,20 +44,21 @@ public class AodvRoutingManager {
     }
 
     private void sendChunkAlongTheRoute(FDTEntry entry, RouteEntry route) {
-        Node nextHop = Field.getNodeByLogin(route.getNextHop());
-        Chunk chunkToSend = owner.getChunkStorage().getChunkByName(entry.getChunk());
-
-        AodvChunkMessage chunkMessage = new AodvChunkMessage(entry.getNode(), chunkToSend);
-        IpMessage ipMessage = new IpMessage(owner.getLogin(), nextHop.getLogin(), chunkMessage, route.getHopCount());
-        log.debug(owner + ": I've got a route: " + route);
-        nextHop.receiveMessage(ipMessage);
+        Chunk chunkToSend = owner.getChunkStorage().extractChunkByName(entry.getChunk());
+        if (chunkToSend != null) {
+            Node nextHop = Field.getNodeByLogin(route.getNextHop());
+            AodvChunkMessage chunkMessage = new AodvChunkMessage(entry.getNode(), chunkToSend);
+            IpMessage ipMessage = new IpMessage(owner.getLogin(), nextHop.getLogin(), chunkMessage, route.getHopCount());
+            log.debug(owner + ": I've got a route: " + route);
+            nextHop.receiveMessage(ipMessage);
+        }
     }
 
     //TODO: expanding ring search technique in separate thread
     private void generateRreqFlood(String destination) {
         owner.incrementSeqNumber();
         RouteRequest request = new RouteRequest(owner.getFloodId() + 1, destination, 0, owner.getLogin(), owner.getSeqNumber());
-
+        owner.incrementFloodId();
         broadcastRouteRequest(request, NET_DIAMETER);
         /*for (int hl = HL_START; hl < HL_THRESHOLD; hl += HL_INCREMENT) {
             owner.incrementFloodId();
@@ -103,7 +104,6 @@ public class AodvRoutingManager {
         Field.getNodeByLogin(reverseRoute.getNextHop()).receiveMessage(ipMessage);
     }
 
-    //TODO: gratuitous
     protected void generateAndSendRrepAsIntermediate(RouteRequest request, RouteEntry reverseRoute, RouteEntry route) {
         RouteReply reply = new RouteReply(route.getHopCount(), request.getDestNode(), route.getDestSN(), request.getSourceNode(),
                 route.getLifeTime() - System.currentTimeMillis(), false);

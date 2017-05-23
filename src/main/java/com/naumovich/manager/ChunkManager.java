@@ -32,6 +32,7 @@ public class ChunkManager {
 
 		FileDistributionTable fileDistributionTable = new FileDistributionTable(owner);
 		for (Chunk ch : chunksAndCopies) {
+			owner.getChunkStorage().add(ch);
 			TwoTuple<Node, Integer> tuple = findNodeForChunk(ch);
 			fileDistributionTable.addRow(ch.getOrderNum(), ch, tuple.first, tuple.second);
 		}

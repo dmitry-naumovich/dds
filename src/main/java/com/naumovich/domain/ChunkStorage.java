@@ -23,6 +23,16 @@ public class ChunkStorage {
         return null;
     }
 
+    public Chunk extractChunkByName(String name) {
+        for (Chunk c : chunkStorage) {
+            if (c.getChunkName().equals(name)) {
+                chunkStorage.remove(c);
+                return c;
+            }
+        }
+        return null;
+    }
+
     public void add(Chunk chunk) {
         chunkStorage.add(chunk);
     }
