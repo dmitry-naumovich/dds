@@ -2,7 +2,6 @@ package com.naumovich.manager;
 
 import com.naumovich.domain.Node;
 import com.naumovich.domain.message.aodv.*;
-import com.naumovich.network.Field;
 import com.naumovich.table.RouteEntry;
 import lombok.extern.slf4j.Slf4j;
 
@@ -91,7 +90,7 @@ public class AodvMessageManager {
 
                 request.incrementHopCount();
                 owner.incrementAmountOfRetransmitted();
-                routingManager.broadcastRouteRequest(request, --hl);
+                routingManager.broadcastRreqToNeighbors(request, --hl);
 
             } else if (route != null && route.getDestSN() >= request.getDestSN()){
                 log.debug(owner + ": received RREQ, I'm intermediate, know route to dest - generating RREP to " + request.getSourceNode() + ". Next hop is: " + reverseRoute.getNextHop());
