@@ -1,8 +1,8 @@
-# Model for Distributed Data Storing Algorithm Testing
+# Ad hoc network model for Distributed Data Storage Algorithm Testing
 
 Here goes the short description
 
-## Distributed Data Storing Algorithm
+## Distributed Data Storage Algorithm
 
 ## Dynamic Routing
 
