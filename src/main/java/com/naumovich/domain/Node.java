@@ -169,17 +169,21 @@ public class Node {
         amountOfRetransmitted++;
     }
 
-    public void distributeFile(File file) {
+    void distributeFile(File file) {
         FileDistributionTable table = chunkManager.createAddressTable(file);
         fileDistributionTableMap.put(file, table);
         routingManager.distributeChunks(table);
     }
 
-    public void checkMessageContainer() {
+    void checkMessageContainer() {
         messageManager.checkMessageContainer();
     }
 
-    public void findNeighbors() {
+    void checkNodesStatus() {
+        routingManager.checkNodesStatus();
+    }
+
+    void findNeighbors() {
         ArrayList<Node> nodes = Field.getNodes();
         for (Node n : nodes) {
             amountOfNodeStatusChecks++;
@@ -193,7 +197,7 @@ public class Node {
         }
     }
 
-    public boolean isNeighborWith(Node n) {
+    private boolean isNeighborWith(Node n) {
         if (this.equals(n)) {
             return false;
         }
@@ -203,10 +207,6 @@ public class Node {
             return true;
         }
         return false;
-    }
-
-    public void checkNodesStatus() {
-            routingManager.checkNodesStatus();
     }
 
     //TODO: consider this method and its usage (while checking neighbors, if routing manager discovers link break,
