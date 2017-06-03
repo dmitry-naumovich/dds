@@ -15,6 +15,9 @@ public class RoutingTable implements Iterable<RouteEntry> {
     public RoutingTable(Node owner) {
         this.owner = owner;
         routingTable = new ArrayList<>();
+        ExpiredRouteCleaner routeCleaner = new ExpiredRouteCleaner();
+        Thread routeCleanerThread = new Thread(routeCleaner);
+        routeCleanerThread.start();
     }
 
     public void addEntry(RouteEntry entry) {
@@ -77,7 +80,7 @@ public class RoutingTable implements Iterable<RouteEntry> {
             return routingTable.get(curIndex++);
         }
 
-        //TODO: check this impl
+        //TODO: test this impl
         @Override
         public void remove() {
             if (!canRemove) {
@@ -85,6 +88,21 @@ public class RoutingTable implements Iterable<RouteEntry> {
             }
             canRemove = false;
             routingTable.remove(--curIndex);
+        }
+    }
+
+    private class ExpiredRouteCleaner implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(30000);
+                synchronized (routingTable) {
+                    routingTable.removeIf((RouteEntry entry) -> System.currentTimeMillis() - entry.getLifeTime() >= 0);
+                }
+            } catch (InterruptedException e) {
+                //TODO: handle
+            }
         }
     }
 

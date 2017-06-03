@@ -84,11 +84,11 @@ public class NodeThread implements Runnable {
 						node.distributeFile(new File("file " + i * rand.nextInt(1000), 100 + rand.nextInt(10000)));
 						distributeFlag = false;
 					}
-					node.checkMessageContainer(); // retransmit or receive chunks
-					node.checkNeighbors();
+					node.checkMessageContainer();
+					node.checkNodesStatus();
 
 					if (i % 120 == 0) {
-						node.findNeighbors();    // find current neighbors and fill the edgesMatrix
+						node.findNeighbors();
 					}
 
 					if (x + speedX <= RADIUS) {

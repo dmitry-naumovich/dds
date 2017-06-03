@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * This class describes table entry of RoutingTable
+ * This class describes RoutingTable entry which describes the route, or path, to a node in the network
  * Created by Dzmitry on 2.5.17.
  *
  * @version 1.0
@@ -97,6 +97,10 @@ public class RouteEntry {
 
     public void addPrecursor(String node) {
         precursors.add(node);
+    }
+
+    public void removePrecursor(String node) {
+        precursors.remove(node);
     }
 
     @Override

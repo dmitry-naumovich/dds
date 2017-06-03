@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.naumovich.configuration.AodvConfiguration.*;
@@ -194,7 +195,6 @@ public class AodvRoutingManager {
         routeEntry.setHopCount(rreq.getHopCount() + 1);
         long minLifeTime = (System.currentTimeMillis() + REV_ROUTE_LIFE - routeEntry.getHopCount() * NODE_TRAVERSAL_TIME);
         routeEntry.setLifeTime(Math.max(lifeTime, minLifeTime));
-        routeEntry.setLastHopCount(rreq.getHopCount() + 1);
         return routeEntry;
     }
 
@@ -205,7 +205,6 @@ public class AodvRoutingManager {
         routeEntry.setNextHop(nextHop);
         routeEntry.setHopCount(reply.getHopCount() + 1);
         routeEntry.setLifeTime(System.currentTimeMillis() + reply.getLifetime());
-        routeEntry.setLastHopCount(reply.getHopCount() + 1);
         return routeEntry;
     }
 
@@ -216,8 +215,32 @@ public class AodvRoutingManager {
         }
     }
 
-    // TODO: implement it
-    public void checkNeighbors() {
+    public void checkNodesStatus() {
+        for (RouteEntry route : owner.getRoutingTable()) {
+            owner.incrementAmountOfNodeStatusChecks();
+            if (route.getHopCount() > 0 && !Field.getNodeByLogin(route.getNextHop()).isOnline()) {
+                sendRerrToPreviousHops(route);
+                route.setLastHopCount(route.getHopCount());
+                route.setHopCount(-1);
+                route.setPrecursors(Collections.emptyList());
+                rmUnavailNodeFromAllPrecursorLists(route.getNextHop());
+            }
+        }
+    }
 
+    private void sendRerrToPreviousHops(RouteEntry entry) {
+        RouteError routeError = new RouteError(entry.getDestNode(), entry.getDestSN());
+        for (String precursor : entry.getPrecursors()) {
+            IpMessage ipMessage = new IpMessage(owner.getLogin(), precursor, routeError, NET_DIAMETER); //todo what ttl?
+            Field.getNodeByLogin(precursor).receiveMessage(ipMessage);
+        }
+    }
+
+    private void rmUnavailNodeFromAllPrecursorLists(String unavailNode) {
+        for (RouteEntry route : owner.getRoutingTable()) {
+            if (route.getPrecursors().contains(unavailNode)) {
+                route.removePrecursor(unavailNode);
+            }
+        }
     }
 }

@@ -86,7 +86,7 @@ public class Node {
         seqNumber++;
     }
 
-    public NodeThread getNodeThread() {
+    NodeThread getNodeThread() {
         return nodeThread;
     }
 
@@ -106,10 +106,6 @@ public class Node {
         return chunkStorage;
     }
 
-    public ChunkManager getChunkManager() {
-        return chunkManager;
-    }
-
     public RoutingTable getRoutingTable() {
         return routingTable;
     }
@@ -126,10 +122,6 @@ public class Node {
         return routingManager;
     }
 
-    public AodvMessageManager getMessageManager() {
-        return messageManager;
-    }
-
     public boolean isOnline() {
         return isOnline;
     }
@@ -137,7 +129,7 @@ public class Node {
     public void setOnline(boolean isOnline) {
         this.isOnline = isOnline;
 
-        if (isOnline == false) {
+        if (!isOnline) {
             nodeThread.setColor(WHITE_COLOR);
             log.debug(login + ": I'm offline!");
         } else {
@@ -213,8 +205,8 @@ public class Node {
         return false;
     }
 
-    public void checkNeighbors() {
-            routingManager.checkNeighbors();
+    public void checkNodesStatus() {
+            routingManager.checkNodesStatus();
     }
 
     //TODO: consider this method and its usage (while checking neighbors, if routing manager discovers link break,
