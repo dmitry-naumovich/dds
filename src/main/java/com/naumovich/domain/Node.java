@@ -13,10 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import static com.naumovich.configuration.ModelConfiguration.*;
 
 /**
- *
- * @Author Dzmitry Naumovich
+ * This class describes the node entity
  */
-//TODO: override toString, hashCode and equals after Node entity completed
 @Slf4j
 public class Node {
 
@@ -64,10 +62,6 @@ public class Node {
 
     public int getFloodId() {
         return floodId;
-    }
-
-    public void setFloodId(int floodId) {
-        this.floodId = floodId;
     }
 
     public void incrementFloodId() {
@@ -213,13 +207,6 @@ public class Node {
         return false;
     }
 
-    //TODO: consider this method and its usage (while checking neighbors, if routing manager discovers link break,
-    // it generates RERR, and when any node receives RERR, it checks if any chunk is located there
-    // so as I guess there is not necessity in this method and in relevant flag in thread class
-    /*public void makeBackup() {
-        (messageManager.makeBackup();
-    }*/
-
     @Override
     public String toString() {
         return login;
@@ -227,5 +214,37 @@ public class Node {
 
     public void receiveMessage(IpMessage m) {
         messageManager.receiveMessage(m);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Node node = (Node) o;
+        return persNum == node.persNum &&
+                isOnline == node.isOnline &&
+                amountOfRetransmitted == node.amountOfRetransmitted &&
+                amountOfMsgChecks == node.amountOfMsgChecks &&
+                amountOfNodeStatusChecks == node.amountOfNodeStatusChecks &&
+                amountOfFindingPath == node.amountOfFindingPath &&
+                floodId == node.floodId &&
+                seqNumber == node.seqNumber &&
+                Objects.equals(nodeThread, node.nodeThread) &&
+                Objects.equals(field, node.field) &&
+                Objects.equals(login, node.login) &&
+                Objects.equals(nodeID, node.nodeID) &&
+                Objects.equals(chunkStorage, node.chunkStorage) &&
+                Objects.equals(routingTable, node.routingTable) &&
+                Objects.equals(fileDistributionTableMap, node.fileDistributionTableMap) &&
+                Objects.equals(chunkManager, node.chunkManager) &&
+                Objects.equals(routingManager, node.routingManager) &&
+                Objects.equals(messageManager, node.messageManager) &&
+                Objects.equals(rreqBufferManager, node.rreqBufferManager) &&
+                Objects.equals(rrepBufferManager, node.rrepBufferManager);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nodeThread, field, persNum, login, nodeID, chunkStorage, isOnline, amountOfRetransmitted, amountOfMsgChecks, amountOfNodeStatusChecks, amountOfFindingPath, routingTable, fileDistributionTableMap, chunkManager, routingManager, messageManager, rreqBufferManager, rrepBufferManager, floodId, seqNumber);
     }
 }

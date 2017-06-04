@@ -9,9 +9,9 @@ import static com.naumovich.configuration.ModelConfiguration.*;
 
 import com.naumovich.configuration.ModelConfiguration;
 import com.naumovich.network.Field;
+import lombok.extern.slf4j.Slf4j;
 
-
-//TODO: override toString (?), hashCode and equals after NodeThread completed
+@Slf4j
 public class NodeThread implements Runnable {
 
     private static Random rand = new Random();
@@ -26,8 +26,7 @@ public class NodeThread implements Runnable {
 	private double speedY;
 	
 	private boolean distributeFlag;
-	private boolean backupFlag;
-	
+
 	public NodeThread(Field field) {
 		this.field = field;
 		node = new Node(this, field);
@@ -45,9 +44,6 @@ public class NodeThread implements Runnable {
     }
 	public void setDistributeFlag(boolean distributeFlag) {
 		this.distributeFlag = distributeFlag;
-	}
-	public void setBackupFlag(boolean backupFlag) {
-		this.backupFlag = backupFlag;
 	}
 	public double getX() {
 		return x;
@@ -75,11 +71,9 @@ public class NodeThread implements Runnable {
 		try {
 			for (int i = 0; ; i++) {
 				field.canIMove(); // checking whether the "pause" is pressed or not
+
 				if (node.isOnline()) {
-//					if (backupFlag) {
-//						node.makeBackup();
-//						backupFlag = false;
-//					}
+
 					if (distributeFlag) {
 						node.distributeFile(new File("file " + i * rand.nextInt(1000), 100 + rand.nextInt(10000)));
 						distributeFlag = false;
@@ -114,8 +108,7 @@ public class NodeThread implements Runnable {
 
 			}
 		} catch (InterruptedException ex) {
-		    //TODO handle an exception in any way
-
+		    log.error("InterruptedException occurred in NodeThread of " + node);
         }
 	}
 }

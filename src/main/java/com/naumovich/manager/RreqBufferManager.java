@@ -2,14 +2,14 @@ package com.naumovich.manager;
 
 import com.naumovich.configuration.AodvConfiguration;
 import com.naumovich.domain.Node;
-import com.naumovich.domain.message.aodv.IpMessage;
 import com.naumovich.domain.message.aodv.RouteRequest;
 import com.naumovich.util.tuple.TwoTuple;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
+@Slf4j
 public class RreqBufferManager {
 
     private Node owner;
@@ -46,7 +46,7 @@ public class RreqBufferManager {
                             System.currentTimeMillis() - entry.second >= AodvConfiguration.FLOOD_RECORD_TIME);
                 }
             } catch (InterruptedException e) {
-                //TODO: handle
+                log.error("InterruptedException occured in BufferCleaner in RreqBufferManager of " + owner);
             }
         }
     }

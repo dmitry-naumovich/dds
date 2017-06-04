@@ -48,7 +48,7 @@ public class AodvRoutingManager {
         }
     }
 
-    void sendChunkAlongTheRoute(FDTEntry entry, RouteEntry route) {
+    private void sendChunkAlongTheRoute(FDTEntry entry, RouteEntry route) {
         Chunk chunkToSend = owner.getChunkStorage().extractChunkByName(entry.getChunk());
         if (chunkToSend != null) {
             AodvChunkMessage chunkMessage = new AodvChunkMessage(entry.getNode(), chunkToSend);
@@ -74,7 +74,7 @@ public class AodvRoutingManager {
 
         private String destination;
 
-        public Flooder(String destination) {
+        Flooder(String destination) {
             this.destination = destination;
         }
 
@@ -85,8 +85,8 @@ public class AodvRoutingManager {
                     return;
                 }
             }
-            for (int i = 0, hl = NET_DIAMETER; i < RREQ_RETRIES; i++) {
-                if (broadcastRouteRequest(hl)) {
+            for (int i = 0; i < RREQ_RETRIES; i++) {
+                if (broadcastRouteRequest(NET_DIAMETER)) {
                     return;
                 }
             }
@@ -103,14 +103,11 @@ public class AodvRoutingManager {
                 log.debug(owner + ": InterruptedException occurred in Flooder thread");
                 return false;
             }
-            if (owner.getRrepBufferManager().containsNode(destination)) {
-                return true;
-            }
-            return false;
+            return owner.getRrepBufferManager().containsNode(destination);
         }
     }
 
-    protected void broadcastRreqToNeighbors(RouteRequest request, int hopLimit) {
+    void broadcastRreqToNeighbors(RouteRequest request, int hopLimit) {
         List<Node> neighbors = findNeighbors();
         log.debug(owner + ": my neighbors are: " + Arrays.toString(neighbors.toArray()));
         for (Node neighbor : neighbors) {
@@ -119,14 +116,14 @@ public class AodvRoutingManager {
         }
     }
 
-    protected void generateAndSendRrepAsDestination(RouteRequest request, RouteEntry reverseRoute) {
+    void generateAndSendRrepAsDestination(RouteRequest request, RouteEntry reverseRoute) {
         RouteReply reply = new RouteReply(0, request.getDestNode(), owner.getSeqNumber(), request.getSourceNode(),
                 MY_ROUTE_TIMEOUT_MILLIS, false);
         log.debug(owner + ": Sending RREP to " + reply.getSourceNode() + " which generated RREQ for me. Next hop is: " + reverseRoute.getNextHop());
         forwardAodvMessage(reply, reverseRoute.getNextHop(), reverseRoute.getHopCount());
     }
 
-    protected void generateAndSendRrepAsIntermediate(RouteRequest request, RouteEntry reverseRoute, RouteEntry route) {
+    void generateAndSendRrepAsIntermediate(RouteRequest request, RouteEntry reverseRoute, RouteEntry route) {
         RouteReply reply = new RouteReply(route.getHopCount(), request.getDestNode(), route.getDestSN(), request.getSourceNode(),
                 route.getLifeTime() - System.currentTimeMillis(), false);
         forwardAodvMessage(reply, reverseRoute.getNextHop(), reverseRoute.getHopCount());
@@ -141,7 +138,7 @@ public class AodvRoutingManager {
         forwardAodvMessage(gratReply, route.getNextHop(), route.getHopCount());
     }
 
-    protected void forwardAodvMessage(AodvMessage message, String nextHop, int hopLimit) {
+    void forwardAodvMessage(AodvMessage message, String nextHop, int hopLimit) {
         IpMessage ipMessage = new IpMessage(owner.getLogin(), nextHop, message, hopLimit);
         Field.getNodeByLogin(nextHop).receiveMessage(ipMessage);
     }
@@ -157,7 +154,7 @@ public class AodvRoutingManager {
         return neighbors;
     }
 
-    protected RouteEntry maintainReverseRoute(RouteRequest rreq, String prevNode) {
+    RouteEntry maintainReverseRoute(RouteRequest rreq, String prevNode) {
         RoutingTable routingTable = owner.getRoutingTable();
         RouteEntry routeToOrigin = routingTable.getRouteTo(rreq.getSourceNode());
         if (routeToOrigin == null) {
@@ -174,7 +171,7 @@ public class AodvRoutingManager {
         }
     }
 
-    protected RouteEntry maintainDirectRoute(RouteReply reply, String prevNode) {
+    RouteEntry maintainDirectRoute(RouteReply reply, String prevNode) {
         RoutingTable routingTable = owner.getRoutingTable();
         RouteEntry routeToDestination = routingTable.getRouteTo(reply.getDestNode());
         if (routeToDestination == null) {
@@ -212,7 +209,7 @@ public class AodvRoutingManager {
         return routeEntry;
     }
 
-    protected void sendChunkToObtainedNode(RouteEntry route) {
+    void sendChunkToObtainedNode(RouteEntry route) {
         for (FDTEntry entry : fileDistributionTable.getEntriesByNode(route.getDestNode())) {
             log.debug(owner + ": now I've got route to " + route.getDestNode() + " and will send him a chunk");
             sendChunkAlongTheRoute(entry, route);
@@ -239,7 +236,7 @@ public class AodvRoutingManager {
 
     void sendRerrToPrecursors(RouteError routeError, List<String> precursors) {
         for (String precursor : precursors) {
-            forwardAodvMessage(routeError, precursor, NET_DIAMETER); //todo consider what ttl?
+            forwardAodvMessage(routeError, precursor, NET_DIAMETER);
         }
     }
 

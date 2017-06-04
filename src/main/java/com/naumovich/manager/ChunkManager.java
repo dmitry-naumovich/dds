@@ -23,10 +23,8 @@ public class ChunkManager {
 		this.owner = owner;
 	}
 
-	//TODO: return chunks amount definition depending on size
 	public FileDistributionTable createAddressTable(File file) {
-		//int n = MathOperations.defineChunksAmount(file.getSize());
-		int n = 1;
+		int n = MathOperations.defineChunksAmount(file.getSize());
 		log.info(owner.getLogin() + ": I distribute file '" + file.getFileName() + "' into " + n + " chunks");
 		List<Chunk> chunksAndCopies = createChunksAndCopies(file, n);
 

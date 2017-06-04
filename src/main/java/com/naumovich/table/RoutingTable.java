@@ -1,12 +1,14 @@
 package com.naumovich.table;
 
 import com.naumovich.domain.Node;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 public class RoutingTable implements Iterable<RouteEntry> {
 
     private Node owner;
@@ -65,7 +67,7 @@ public class RoutingTable implements Iterable<RouteEntry> {
         private int curIndex;
         private boolean canRemove = false;
 
-        public RoutingTableIterator() {
+        RoutingTableIterator() {
             this.curIndex = 0;
         }
 
@@ -101,7 +103,7 @@ public class RoutingTable implements Iterable<RouteEntry> {
                     routingTable.removeIf((RouteEntry entry) -> System.currentTimeMillis() - entry.getLifeTime() >= 0);
                 }
             } catch (InterruptedException e) {
-                //TODO: handle
+                log.error("InterruptedException occured in ExpiredRouteCleaner of" + owner);
             }
         }
     }

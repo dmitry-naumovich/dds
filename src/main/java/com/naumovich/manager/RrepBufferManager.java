@@ -1,12 +1,11 @@
 package com.naumovich.manager;
 
 import com.naumovich.domain.Node;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 
-/**
- * Created by dzmitry on 22.5.17.
- */
+@Slf4j
 public class RrepBufferManager {
 
     private Node owner;
@@ -42,7 +41,7 @@ public class RrepBufferManager {
                     }
                 }
             } catch (InterruptedException e) {
-                //TODO: handle
+                log.error("InterruptedException occured in BufferCleaner in RrepBufferManager of " + owner);
             }
         }
     }
