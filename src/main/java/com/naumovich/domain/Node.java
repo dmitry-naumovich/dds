@@ -122,6 +122,10 @@ public class Node {
         return routingManager;
     }
 
+    public ChunkManager getChunkManager() {
+        return chunkManager;
+    }
+
     public boolean isOnline() {
         return isOnline;
     }

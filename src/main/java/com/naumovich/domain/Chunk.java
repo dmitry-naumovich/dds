@@ -1,5 +1,6 @@
 package com.naumovich.domain;
 
+import com.naumovich.configuration.DdsConfiguration;
 import com.naumovich.util.MathOperations;
 
 public class Chunk {
@@ -15,11 +16,20 @@ public class Chunk {
 	
 	public Chunk(Node originalOwner, long chunkSize, String parentFileName, int orderNum) {
 		this.originalOwner = originalOwner;
-		this.chunkID = MathOperations.getRandomHexString(40);
+		this.chunkID = MathOperations.getRandomHexString(DdsConfiguration.ID_LENGTH_IN_HEX);
 		this.chunkSize = chunkSize;
 		this.parentFileName = parentFileName;
 		this.orderNum = orderNum;
 		this.chunkName = "Chunk" + orderNum + counter++;
+	}
+
+	public Chunk(Chunk chunk, String newID) {
+		this.originalOwner = chunk.originalOwner;
+		this.chunkID = newID;
+		this.chunkSize = chunk.chunkSize;
+		this.parentFileName = chunk.parentFileName;
+		this.orderNum = chunk.orderNum;
+		this.chunkName = chunk.chunkName;
 	}
 
 	public Node getOriginalOwner() {

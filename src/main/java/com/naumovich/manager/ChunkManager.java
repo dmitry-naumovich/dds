@@ -33,8 +33,8 @@ public class ChunkManager {
 		FileDistributionTable fileDistributionTable = new FileDistributionTable(owner);
 		for (Chunk ch : chunksAndCopies) {
 			owner.getChunkStorage().add(ch);
-			TwoTuple<Node, Integer> tuple = findNodeForChunk(ch);
-			fileDistributionTable.addRow(ch.getOrderNum(), ch, tuple.first, tuple.second);
+			TwoTuple<String, Integer> tuple = findNodeForChunk(ch.getChunkID());
+			fileDistributionTable.addRow(ch.getOrderNum(), ch.getChunkID(), tuple.first, tuple.second);
 		}
 		return fileDistributionTable;
 	}
@@ -64,15 +64,14 @@ public class ChunkManager {
 		return chs;
 	}
 
-	public TwoTuple<Node, Integer> findNodeForChunk(Chunk chunk) {
-		List<TwoTuple<Node, Integer>> allMetrics = new ArrayList<>();
+	public TwoTuple<String, Integer> findNodeForChunk(String chunkId) {
+		List<TwoTuple<String, Integer>> allMetrics = new ArrayList<>();
 		List<Node> allNodes = new ArrayList<>(Field.getNodes());
-		allNodes.remove(chunk.getOriginalOwner());
+		allNodes.remove(owner);
 		for (Node n: allNodes) {
 			if (n.isOnline())
-				allMetrics.add(new TwoTuple<>(n, MathOperations.findXORMetric(n.getNodeID(), chunk.getChunkID())));
+				allMetrics.add(new TwoTuple<>(n.getLogin(), MathOperations.findXORMetric(n.getNodeID(), chunkId)));
 		}
 		return MathOperations.findMin(allMetrics);
 	}
-
 }

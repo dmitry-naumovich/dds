@@ -1,6 +1,7 @@
 package com.naumovich.table;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -17,8 +18,8 @@ public class FileDistributionTable implements Iterable<FDTEntry> {
 		fdtTable = new ArrayList<>();
 	}
 
-	public void addRow(int numOfChunk, Chunk chunk, Node node, int metrics) {
-		fdtTable.add(new FDTEntry(numOfChunk, chunk.getChunkName(), node.getLogin(), metrics));
+	public void addRow(int numOfChunk, String chunkId, String nodeLogin, int metrics) {
+		fdtTable.add(new FDTEntry(numOfChunk, chunkId, nodeLogin, metrics));
 	}
 	public void setRow(int rowNum, Node node, int metrics) {
 		fdtTable.set(rowNum, new FDTEntry(fdtTable.get(rowNum).getOrderNum(),
@@ -36,6 +37,25 @@ public class FileDistributionTable implements Iterable<FDTEntry> {
 		List<FDTEntry> entries = new ArrayList<>();
 		for (FDTEntry entry : fdtTable) {
 			if (entry.getNode().equals(node)) {
+				entries.add(entry);
+			}
+		}
+		return entries;
+	}
+
+	public FDTEntry getAnotherEntryWithChunkCopy(int orderNum, String node) {
+		for (FDTEntry entry : getEntriesByOrderNum(orderNum)) {
+			if (!entry.getNode().equals(node)) {
+				return entry;
+			}
+		}
+		return null;
+	}
+
+	public List<FDTEntry> getEntriesByOrderNum(int orderNum) {
+		List<FDTEntry> entries = new ArrayList<>();
+		for (FDTEntry entry : fdtTable) {
+			if (entry.getOrderNum() == orderNum) {
 				entries.add(entry);
 			}
 		}

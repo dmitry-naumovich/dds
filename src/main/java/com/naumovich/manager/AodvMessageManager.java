@@ -1,5 +1,6 @@
 package com.naumovich.manager;
 
+import com.naumovich.domain.Chunk;
 import com.naumovich.domain.Node;
 import com.naumovich.domain.message.aodv.*;
 import com.naumovich.table.RouteEntry;
@@ -28,21 +29,25 @@ public class AodvMessageManager {
         IpMessage message = queue.poll();
         if (message != null) {
             owner.incrementAmountOfMsgChecks();
+            AodvMessage data = message.getData();
+            String source = message.getSourceNode();
+            int hl = message.getHl();
+
             switch (message.getMessageType()) {
                 case 1:
-                    proceedRouteRequest((RouteRequest)message.getData(), message.getSourceNode(), message.getHl());
+                    proceedRouteRequest((RouteRequest)data, source, hl);
                     break;
                 case 2:
-                    proceedRouteReply((RouteReply)message.getData(), message.getSourceNode(), message.getHl());
+                    proceedRouteReply((RouteReply)data, source, hl);
                     break;
                 case 3:
-                    proceedRouteError((RouteError)message.getData());
+                    proceedRouteError((RouteError)data, source);
                     break;
                 case 4:
-                    proceedChunkMessage((AodvChunkMessage)message.getData(), message.getHl());
+                    proceedChunkMessage((AodvChunkMessage)data, hl);
                     break;
                 case 5:
-                    proceedBackupMessage((AodvBackupMessage)message.getData());
+                    proceedBackupMessage((AodvBackupMessage)data, hl);
                     break;
                 default:
                     break;
@@ -54,7 +59,7 @@ public class AodvMessageManager {
 
     private void proceedChunkMessage(AodvChunkMessage chunkMessage, int hl) {
         if (chunkMessage.getDestNode().equals(owner.getLogin())) {
-            log.debug(owner + ": I've received Chunk and save it to my local storage");
+            log.debug(owner + ": received Chunk and save it to my local storage");
             owner.getChunkStorage().add(chunkMessage.getChunk());
         } else if (hl > 1) {
             RouteEntry route = owner.getRoutingTable().getActualRouteTo(chunkMessage.getDestNode());
@@ -64,8 +69,31 @@ public class AodvMessageManager {
         }
     }
 
-    private void proceedBackupMessage(AodvBackupMessage m) {
+    private void proceedBackupMessage(AodvBackupMessage backupMessage, int hl) {
+        String newChunkSaver = backupMessage.getNewChunkSaver();
 
+        if (backupMessage.getDestNode().equals(owner.getLogin())) {
+            log.debug(owner + ": received backupMessage, I must back up the chunk to " + newChunkSaver);
+            Chunk existingChunk = owner.getChunkStorage().getChunkByName(backupMessage.getChunkId());
+            Chunk newChunkCopy = new Chunk(existingChunk, backupMessage.getNewChunkId());
+            owner.getChunkStorage().add(newChunkCopy);
+
+            RouteEntry route = owner.getRoutingTable().getActualRouteTo(newChunkSaver);
+            if (route != null) {
+                log.debug(owner + ": I've got a route: " + route);
+                owner.getRoutingManager().sendChunkAlongTheRoute(newChunkCopy.getChunkName(), route);
+            } else {
+                log.debug(owner + ": I don't have a route, starting flood");
+                owner.getRoutingManager().generateRreqFlood(newChunkSaver);
+            }
+        } else if (hl > 1) {
+            log.debug(owner + ": received backupMessage, I'm intermediate, transmit it further");
+
+            String nextHop = owner.getRoutingTable().getActualRouteTo(newChunkSaver).getNextHop();
+            owner.incrementAmountOfRetransmitted();
+
+            routingManager.forwardAodvMessage(backupMessage, nextHop, --hl);
+        }
     }
 
     private void proceedRouteRequest(RouteRequest request, String prevNode, int hl) {
@@ -128,7 +156,22 @@ public class AodvMessageManager {
         }
     }
 
-    private void proceedRouteError(RouteError error) {
+    private void proceedRouteError(RouteError error, String prevNode) {
+        String offlineNode = error.getOffNode();
+        String destNode = error.getDestNode();
+        log.debug(owner + ": received RERR, offline node is = " + offlineNode + " and unachievable is " + destNode);
 
+        AodvRoutingManager routingManager = owner.getRoutingManager();
+        for (RouteEntry route : owner.getRoutingTable()) {
+            if (route.getDestNode().equals(destNode) && route.getNextHop().equals(prevNode)) {
+                route.setDestSN(error.getDestSN());
+                routingManager.sendRerrToPrecursors(error, route.getPrecursors());
+                routingManager.invalidateRoute(route);
+                routingManager.delegateBackupIfNecessary(offlineNode);
+            }
+            if (route.getDestNode().equals(offlineNode) && route.getHopCount() > 0) {
+                routingManager.invalidateRoute(route);
+            }
+        }
     }
 }

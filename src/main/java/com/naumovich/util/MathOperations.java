@@ -42,14 +42,14 @@ public final class MathOperations {
 		return metrics;
 	}
 	
-	public static TwoTuple<Node, Integer> findMin(List<TwoTuple<Node, Integer>> list) {
+	public static TwoTuple<String, Integer> findMin(List<TwoTuple<String, Integer>> list) {
 		if (list.isEmpty()) {
 			return null;
 		} else {
-			Node node = list.get(0).first;
+			String node = list.get(0).first;
 			int minVal = list.get(0).second;
 
-			for (TwoTuple<Node, Integer> el : list) {
+			for (TwoTuple<String, Integer> el : list) {
 				if (el.second <= minVal) {
 					node = el.first;
 					minVal = el.second;
