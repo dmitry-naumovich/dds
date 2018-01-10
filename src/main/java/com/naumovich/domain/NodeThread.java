@@ -9,8 +9,10 @@ import static com.naumovich.configuration.ModelConfiguration.*;
 
 import com.naumovich.configuration.ModelConfiguration;
 import com.naumovich.network.Field;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+@Data
 @Slf4j
 public class NodeThread implements Runnable {
 
@@ -37,24 +39,6 @@ public class NodeThread implements Runnable {
 		color = ModelConfiguration.BLUE_COLOR;
 		x = Math.random()*(field.getSize().getWidth() - 2* RADIUS) + RADIUS;
 		y = Math.random()*(field.getSize().getHeight() - 2* RADIUS) + RADIUS;
-	}
-
-    public void setColor(Color color) {
-        this.color = color;
-    }
-	public void setDistributeFlag(boolean distributeFlag) {
-		this.distributeFlag = distributeFlag;
-	}
-	public double getX() {
-		return x;
-	}
-	public double getY() {
-		return y;
-	}
-	
-	
-	public Node getNode() {
-		return node;
 	}
 
 	public void paint(Graphics2D canvas) {

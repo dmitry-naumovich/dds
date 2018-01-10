@@ -1,13 +1,15 @@
 package com.naumovich.table;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.naumovich.domain.Chunk;
 import com.naumovich.domain.Node;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
+@EqualsAndHashCode
+@ToString
 public class FileDistributionTable implements Iterable<FDTEntry> {
 
 	private Node owner;
@@ -88,44 +90,4 @@ public class FileDistributionTable implements Iterable<FDTEntry> {
 		}
 		
 	}
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((fdtTable == null) ? 0 : fdtTable.hashCode());
-		result = prime * result + ((owner == null) ? 0 : owner.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		FileDistributionTable other = (FileDistributionTable) obj;
-		if (fdtTable == null) {
-			if (other.fdtTable != null)
-				return false;
-		} else if (!fdtTable.equals(other.fdtTable))
-			return false;
-		if (owner == null) {
-			if (other.owner != null)
-				return false;
-		} else if (!owner.equals(other.owner))
-			return false;
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder("This is FileDistributionTable of " + owner.getLogin());
-		for (int i = 0; i < fdtTable.size(); i++) {
-			sb.append("\n" + (fdtTable.get(i)));
-		}
-		return sb.toString();
-	}	
 }

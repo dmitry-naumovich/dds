@@ -8,6 +8,7 @@ import com.naumovich.network.*;
 import com.naumovich.table.FileDistributionTable;
 import com.naumovich.table.RoutingTable;
 import com.naumovich.util.MathOperations;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.naumovich.configuration.ModelConfiguration.*;
@@ -15,6 +16,7 @@ import static com.naumovich.configuration.ModelConfiguration.*;
 /**
  * This class describes the node entity
  */
+@Data
 @Slf4j
 public class Node {
 
@@ -60,68 +62,12 @@ public class Node {
 
     }
 
-    public int getFloodId() {
-        return floodId;
-    }
-
     public void incrementFloodId() {
         floodId++;
     }
 
-    public int getSeqNumber() {
-        return seqNumber;
-    }
-
-    public void setSeqNumber(int seqNumber) {
-        this.seqNumber = seqNumber;
-    }
-
     public void incrementSeqNumber() {
         seqNumber++;
-    }
-
-    NodeThread getNodeThread() {
-        return nodeThread;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public int getPersNum() {
-        return persNum;
-    }
-
-    public String getNodeID() {
-        return nodeID;
-    }
-
-    public ChunkStorage getChunkStorage() {
-        return chunkStorage;
-    }
-
-    public RoutingTable getRoutingTable() {
-        return routingTable;
-    }
-
-    public RreqBufferManager getRreqBufferManager() {
-        return rreqBufferManager;
-    }
-
-    public RrepBufferManager getRrepBufferManager() {
-        return rrepBufferManager;
-    }
-
-    public AodvRoutingManager getRoutingManager() {
-        return routingManager;
-    }
-
-    public ChunkManager getChunkManager() {
-        return chunkManager;
-    }
-
-    public boolean isOnline() {
-        return isOnline;
     }
 
     public void setOnline(boolean isOnline) {
@@ -133,22 +79,6 @@ public class Node {
         } else {
             nodeThread.setColor(BLUE_COLOR);
         }
-    }
-
-    public int getAmountOfRetransmitted() {
-        return amountOfRetransmitted;
-    }
-
-    public long getAmountOfMsgChecks() {
-        return amountOfMsgChecks;
-    }
-
-    public long getAmountOfNodeStatusChecks() {
-        return amountOfNodeStatusChecks;
-    }
-
-    public long getAmountOfFindingPath() {
-        return amountOfFindingPath;
     }
 
     public void incrementAmountOfFindingPath() {
@@ -216,35 +146,4 @@ public class Node {
         messageManager.receiveMessage(m);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Node node = (Node) o;
-        return persNum == node.persNum &&
-                isOnline == node.isOnline &&
-                amountOfRetransmitted == node.amountOfRetransmitted &&
-                amountOfMsgChecks == node.amountOfMsgChecks &&
-                amountOfNodeStatusChecks == node.amountOfNodeStatusChecks &&
-                amountOfFindingPath == node.amountOfFindingPath &&
-                floodId == node.floodId &&
-                seqNumber == node.seqNumber &&
-                Objects.equals(nodeThread, node.nodeThread) &&
-                Objects.equals(field, node.field) &&
-                Objects.equals(login, node.login) &&
-                Objects.equals(nodeID, node.nodeID) &&
-                Objects.equals(chunkStorage, node.chunkStorage) &&
-                Objects.equals(routingTable, node.routingTable) &&
-                Objects.equals(fileDistributionTableMap, node.fileDistributionTableMap) &&
-                Objects.equals(chunkManager, node.chunkManager) &&
-                Objects.equals(routingManager, node.routingManager) &&
-                Objects.equals(messageManager, node.messageManager) &&
-                Objects.equals(rreqBufferManager, node.rreqBufferManager) &&
-                Objects.equals(rrepBufferManager, node.rrepBufferManager);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(nodeThread, field, persNum, login, nodeID, chunkStorage, isOnline, amountOfRetransmitted, amountOfMsgChecks, amountOfNodeStatusChecks, amountOfFindingPath, routingTable, fileDistributionTableMap, chunkManager, routingManager, messageManager, rreqBufferManager, rrepBufferManager, floodId, seqNumber);
-    }
 }

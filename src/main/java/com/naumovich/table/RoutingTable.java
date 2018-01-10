@@ -1,13 +1,16 @@
 package com.naumovich.table;
 
 import com.naumovich.domain.Node;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
+@EqualsAndHashCode
+@ToString
 @Slf4j
 public class RoutingTable implements Iterable<RouteEntry> {
 
@@ -106,28 +109,5 @@ public class RoutingTable implements Iterable<RouteEntry> {
                 log.error("InterruptedException occured in ExpiredRouteCleaner of" + owner);
             }
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RoutingTable that = (RoutingTable) o;
-        return Objects.equals(owner, that.owner) &&
-                Objects.equals(routingTable, that.routingTable);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(owner, routingTable);
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("RoutingTable{");
-        sb.append("owner=").append(owner);
-        sb.append(", routingTable=").append(routingTable);
-        sb.append('}');
-        return sb.toString();
     }
 }

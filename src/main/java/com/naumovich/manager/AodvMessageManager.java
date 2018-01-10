@@ -138,7 +138,7 @@ public class AodvMessageManager {
 
             owner.getRrepBufferManager().addNodeToBuffer(reply.getDestNode());
             RouteEntry route = routingManager.maintainDirectRoute(reply, prevNode);
-            if (!reply.isgFlag()) {
+            if (!reply.isGFlag()) {
                 routingManager.sendChunkToObtainedNode(route);
             }
 
