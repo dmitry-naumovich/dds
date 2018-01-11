@@ -67,7 +67,7 @@ public class Node {
         this.isOnline = isOnline;
         if (!isOnline) {
             nodeThread.setColor(WHITE_COLOR);
-            log.debug(login + ": I'm offline!");
+            log.debug("{}: I'm offline!", login);
         } else {
             nodeThread.setColor(BLUE_COLOR);
         }

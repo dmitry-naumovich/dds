@@ -6,7 +6,6 @@ import com.naumovich.domain.Node;
 import com.naumovich.network.Field;
 import com.naumovich.table.FileDistributionTable;
 import com.naumovich.util.MathOperations;
-import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ public class ChunkManager {
 
 	public FileDistributionTable createAddressTable(File file) {
 		int n = MathOperations.defineChunksAmount(file.getSize());
-		log.info(owner.getLogin() + ": I distribute file '" + file.getFileName() + "' into " + n + " chunks");
+		log.info("{}: I distribute file '{}' into {} chunks", owner, file.getFileName(), n);
 		List<Chunk> chunksAndCopies = createChunksAndCopies(file, n);
 
 		FileDistributionTable fileDistributionTable = new FileDistributionTable(owner);

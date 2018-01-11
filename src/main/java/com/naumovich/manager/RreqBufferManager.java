@@ -46,7 +46,7 @@ public class RreqBufferManager {
                             System.currentTimeMillis() - entry.getRight() >= AodvConfiguration.FLOOD_RECORD_TIME);
                 }
             } catch (InterruptedException e) {
-                log.error("InterruptedException occurred in BufferCleaner in RreqBufferManager of " + owner);
+                log.error("InterruptedException occurred in BufferCleaner in RreqBufferManager of {}", owner);
             }
         }
     }

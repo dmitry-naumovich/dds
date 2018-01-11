@@ -92,7 +92,7 @@ public class RoutingTable implements Iterable<RouteEntry> {
                     routingTable.removeIf((RouteEntry entry) -> System.currentTimeMillis() - entry.getLifeTime() >= 0);
                 }
             } catch (InterruptedException e) {
-                log.error("InterruptedException occurred in ExpiredRouteCleaner of" + owner);
+                log.error("InterruptedException occurred in ExpiredRouteCleaner of {}", owner);
             }
         }
     }

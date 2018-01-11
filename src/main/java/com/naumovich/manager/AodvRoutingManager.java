@@ -36,14 +36,14 @@ public class AodvRoutingManager {
         this.fileDistributionTable = fileDistributionTable;
 
         for (FDTEntry entry : fileDistributionTable) {
-            log.debug(owner + ": I proceed " + entry);
+            log.debug("{}: I proceed {}", owner, entry);
 
             RouteEntry route = owner.getRoutingTable().getActualRouteTo(entry.getNode());
             if (route != null) {
-                log.debug(owner + ": I've got a route: " + route);
+                log.debug("{}: I've got a route: {}", owner, route);
                 sendChunkAlongTheRoute(entry, route);
             } else {
-                log.debug(owner + ": I don't have a route, starting flood");
+                log.debug("{}: I don't have a route, starting flood", owner);
                 generateRreqFlood(entry.getNode());
             }
         }
@@ -91,7 +91,7 @@ public class AodvRoutingManager {
                     return;
                 }
             }
-            log.debug(owner + ": I stop retrying to broadcast: dest is unreachable");
+            log.debug("{}: I stop retrying to broadcast: dest is unreachable", owner);
         }
 
         private boolean broadcastRouteRequest(int hl) {
@@ -101,7 +101,7 @@ public class AodvRoutingManager {
             try {
                 Thread.sleep(2 * hl * NODE_TRAVERSAL_TIME);
             } catch (InterruptedException e) {
-                log.debug(owner + ": InterruptedException occurred in Flooder thread");
+                log.debug("{}: InterruptedException occurred in Flooder thread", owner);
                 return false;
             }
             return owner.getRrepBufferManager().containsNode(destination);
@@ -110,7 +110,8 @@ public class AodvRoutingManager {
 
     void broadcastRreqToNeighbors(RouteRequest request, int hopLimit) {
         List<Node> neighbors = findNeighbors();
-        log.debug(owner + ": my neighbors are: " + Arrays.toString(neighbors.toArray()));
+        log.debug("{}: my neighbors are: {}", owner, Arrays.toString(neighbors.toArray()));
+
         for (Node neighbor : neighbors) {
             IpMessage ipMessage = new IpMessage(owner.getLogin(), neighbor.getLogin(), request, hopLimit);
             neighbor.receiveMessage(ipMessage);
@@ -120,7 +121,7 @@ public class AodvRoutingManager {
     void generateAndSendRrepAsDestination(RouteRequest request, RouteEntry reverseRoute) {
         RouteReply reply = new RouteReply(0, request.getDestNode(), owner.getSeqNumber(), request.getSourceNode(),
                 MY_ROUTE_TIMEOUT_MILLIS, false);
-        log.debug(owner + ": Sending RREP to " + reply.getSourceNode() + " which generated RREQ for me. Next hop is: " + reverseRoute.getNextHop());
+        log.debug("{}: Sending RREP to {} which generated RREQ for me. Next hop is: {}", owner, reply.getSourceNode(), reverseRoute.getNextHop());
         forwardAodvMessage(reply, reverseRoute.getNextHop(), reverseRoute.getHopCount());
     }
 
@@ -132,7 +133,7 @@ public class AodvRoutingManager {
     }
 
     private void sendGratuitousReply(RouteRequest request, RouteEntry route) {
-        log.debug(owner + ": generating GRREP and sending it to " + request.getDestNode());
+        log.debug("{}: generating GRREP and sending it to {}", owner, request.getDestNode());
 
         RouteReply gratReply = new RouteReply(request.getHopCount(), request.getSourceNode(), request.getSourceSN(),
                 request.getDestNode(), route.getLifeTime(), true);
@@ -213,7 +214,7 @@ public class AodvRoutingManager {
 
     void sendChunkToObtainedNode(RouteEntry route) {
         for (FDTEntry entry : fileDistributionTable.getEntriesByNode(route.getDestNode())) {
-            log.debug(owner + ": now I've got route to " + route.getDestNode() + " and will send him a chunk");
+            log.debug("{}: now I've got route to {} and will send him a chunk", owner, route.getDestNode());
             sendChunkAlongTheRoute(entry, route);
         }
     }
@@ -261,15 +262,19 @@ public class AodvRoutingManager {
                     fdtEntry.setNode(nodeAndMetrics.getLeft());
                     fdtEntry.setMetric(nodeAndMetrics.getRight());
                     FDTEntry entry = fileDistributionTable.getAnotherEntryWithChunkCopy(fdtEntry.getOrderNum(), offlineNode);
-                    log.debug(owner + ": sending BackupMessage to " + entry.getNode() + ". He must complete Backup to node " + nodeAndMetrics.getLeft());
 
-                    AodvBackupMessage backupMessage = new AodvBackupMessage(entry.getChunk(), newChunkId, owner.getLogin(), entry.getNode(), nodeAndMetrics.getLeft());
+                    log.debug("{}: sending BackupMessage to {}. He must complete Backup to node {}",
+                            owner, entry.getNode(), nodeAndMetrics.getLeft());
+
+                    AodvBackupMessage backupMessage = new AodvBackupMessage(entry.getChunk(), newChunkId,
+                            owner.getLogin(), entry.getNode(), nodeAndMetrics.getLeft());
                     RouteEntry actualRoute = owner.getRoutingTable().getActualRouteTo(entry.getNode());
+
                     if (actualRoute != null) {
-                        log.debug(owner + ": I've got a route to send backup, nexthop is " + actualRoute.getNextHop());
+                        log.debug("{}: I've got a route to send backup, next hop is {}", owner, actualRoute.getNextHop());
                         forwardAodvMessage(backupMessage, actualRoute.getNextHop(), actualRoute.getHopCount());
                     } else {
-                        log.debug(owner + ": I don't have a route, starting flood");
+                        log.debug("{}: I don't have a route, starting flood", owner);
                         generateRreqFlood(entry.getNode());
                     }
                 }

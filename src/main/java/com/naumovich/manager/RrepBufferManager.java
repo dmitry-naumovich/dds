@@ -37,7 +37,7 @@ public class RrepBufferManager {
                             System.currentTimeMillis() - 3000 >= entry.getValue());
                 }
             } catch (InterruptedException e) {
-                log.error("InterruptedException occured in BufferCleaner in RrepBufferManager of " + owner);
+                log.error("InterruptedException occurred in BufferCleaner in RrepBufferManager of {}", owner);
             }
         }
     }

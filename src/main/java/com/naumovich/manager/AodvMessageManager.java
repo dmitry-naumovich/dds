@@ -59,8 +59,7 @@ public class AodvMessageManager {
 
     private void proceedChunkMessage(AodvChunkMessage chunkMessage, int hl) {
         if (chunkMessage.getDestNode().equals(owner.getLogin())) {
-            //TODO: refactor log messages in the whole project
-            log.debug(owner + ": received Chunk and save it to my local storage");
+            log.debug("{}: received Chunk and save it to my local storage", owner);
             owner.getChunkStorage().add(chunkMessage.getChunk());
         } else if (hl > 1) {
             RouteEntry route = owner.getRoutingTable().getActualRouteTo(chunkMessage.getDestNode());
@@ -74,21 +73,21 @@ public class AodvMessageManager {
         String newChunkSaver = backupMessage.getNewChunkSaver();
 
         if (backupMessage.getDestNode().equals(owner.getLogin())) {
-            log.debug(owner + ": received backupMessage, I must back up the chunk to " + newChunkSaver);
+            log.debug("{}: received backupMessage, I must back up the chunk to {}", owner, newChunkSaver);
             Chunk existingChunk = owner.getChunkStorage().getChunkByName(backupMessage.getChunkId());
             Chunk newChunkCopy = new Chunk(existingChunk, backupMessage.getNewChunkId());
             owner.getChunkStorage().add(newChunkCopy);
 
             RouteEntry route = owner.getRoutingTable().getActualRouteTo(newChunkSaver);
             if (route != null) {
-                log.debug(owner + ": I've got a route: " + route);
+                log.debug("{}: I've got a route: {}", owner, route);
                 owner.getRoutingManager().sendChunkAlongTheRoute(newChunkCopy.getChunkName(), route);
             } else {
-                log.debug(owner + ": I don't have a route, starting flood");
+                log.debug("{}: I don't have a route, starting flood");
                 owner.getRoutingManager().generateRreqFlood(newChunkSaver);
             }
         } else if (hl > 1) {
-            log.debug(owner + ": received backupMessage, I'm intermediate, transmit it further");
+            log.debug("{}: received backupMessage, I'm intermediate, transmit it further", owner);
 
             String nextHop = owner.getRoutingTable().getActualRouteTo(newChunkSaver).getNextHop();
             owner.incrementAmountOfRetransmitted();
@@ -99,7 +98,7 @@ public class AodvMessageManager {
 
     private void proceedRouteRequest(RouteRequest request, String prevNode, int hl) {
         if (request.getDestNode().equals(owner.getLogin()) && !owner.getRreqBufferManager().containsRreq(request)) {
-            log.debug(owner + ": received RREQ, I'm destination - generating RREP");
+            log.debug("{}: received RREQ, I'm destination - generating RREP", owner);
             owner.getRreqBufferManager().addRequestToBuffer(request);
 
             RouteEntry reverseRoute = routingManager.maintainReverseRoute(request, prevNode);
@@ -115,27 +114,28 @@ public class AodvMessageManager {
             RouteEntry route = owner.getRoutingTable().getActualRouteTo(request.getDestNode());
 
             if ((route == null && hl > 1) || (route != null && route.getDestSN() < request.getDestSN() && hl > 1)) {
-                log.debug(owner + ": received RREQ, I'm intermediate, I broadcast it further");
+                log.debug("{}: received RREQ, I'm intermediate, I broadcast it further", owner);
 
                 request.incrementHopCount();
                 owner.incrementAmountOfRetransmitted();
                 routingManager.broadcastRreqToNeighbors(request, --hl);
 
             } else if (route != null && route.getDestSN() >= request.getDestSN()){
-                log.debug(owner + ": received RREQ, I'm intermediate, know route to dest - generating RREP to " + request.getSourceNode() + ". Next hop is: " + reverseRoute.getNextHop());
+                log.debug("{}: received RREQ, I'm intermediate, know route to dest - generating RREP to {}. Next hop is: {}",
+                        owner, request.getSourceNode(), reverseRoute.getNextHop());
 
                 route.addPrecursor(reverseRoute.getNextHop());
                 reverseRoute.addPrecursor(route.getNextHop());
                 routingManager.generateAndSendRrepAsIntermediate(request, reverseRoute, route);
             } else {
-                log.debug(owner + ": received RREQ, I'm intermediate, but I discard as hl <= 1");
+                log.debug("{}: received RREQ, I'm intermediate, but I discard as hl <= 1", owner);
             }
         }
     }
 
     private void proceedRouteReply(RouteReply reply, String prevNode, int hl) {
         if (reply.getSourceNode().equals(owner.getLogin())) {
-            log.debug(owner + ": received RREP, this is a reply for me");
+            log.debug("{}: received RREP, this is a reply for me", owner);
 
             owner.getRrepBufferManager().addNodeToBuffer(reply.getDestNode());
             RouteEntry route = routingManager.maintainDirectRoute(reply, prevNode);
@@ -144,7 +144,8 @@ public class AodvMessageManager {
             }
 
         } else if (hl > 1) {
-            log.debug(owner + ": received RREP for " + reply.getSourceNode() + ", I'm intermediate, I maintain direct route and forward this further");
+            log.debug("{}: received RREP for {}, I'm intermediate, I maintain direct route and forward this further",
+                    owner, reply.getSourceNode());
 
             String nextHop = owner.getRoutingTable().getActualRouteTo(reply.getSourceNode()).getNextHop();
 
@@ -160,7 +161,7 @@ public class AodvMessageManager {
     private void proceedRouteError(RouteError error, String prevNode) {
         String offlineNode = error.getOffNode();
         String destNode = error.getDestNode();
-        log.debug(owner + ": received RERR, offline node is = " + offlineNode + " and unachievable is " + destNode);
+        log.debug("{}: received RERR, offline node is = {} and unachievable is {}", owner, offlineNode, destNode);
 
         AodvRoutingManager routingManager = owner.getRoutingManager();
         for (RouteEntry route : owner.getRoutingTable()) {

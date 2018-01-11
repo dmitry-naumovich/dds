@@ -90,7 +90,7 @@ public class NodeThread implements Runnable {
 				}
 			}
 		} catch (InterruptedException ex) {
-		    log.error("InterruptedException occurred in NodeThread of " + node);
+		    log.error("InterruptedException occurred in NodeThread of {}", node);
         }
 	}
 
