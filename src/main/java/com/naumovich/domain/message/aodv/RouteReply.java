@@ -2,11 +2,13 @@ package com.naumovich.domain.message.aodv;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class RouteReply extends AodvMessage {
 
     private final static int TYPE = 2;

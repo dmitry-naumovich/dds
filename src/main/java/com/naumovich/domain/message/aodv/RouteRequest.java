@@ -1,8 +1,10 @@
 package com.naumovich.domain.message.aodv;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class RouteRequest extends AodvMessage {
 
     private final static int TYPE = 1;
@@ -13,7 +15,6 @@ public class RouteRequest extends AodvMessage {
     private String sourceNode;
     private int sourceSN;
 
-    //TODO: change with @AllArgsConstructor (but clarify when hopCount is set ? never?)
     public RouteRequest(int floodId, String destNode, int destSN, String sourceNode, int sourceSN) {
         this.floodId = floodId;
         this.destNode = destNode;

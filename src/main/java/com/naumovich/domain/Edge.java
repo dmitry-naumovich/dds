@@ -5,7 +5,6 @@ import lombok.Data;
 @Data
 public class Edge {
 
-	//private final String id;
 	private Node left;
 	private Node right;
 	private double weight; // weight is compared with destination between left and right

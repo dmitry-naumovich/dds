@@ -2,11 +2,13 @@ package com.naumovich.domain.message.aodv;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
 @Data
 @AllArgsConstructor
 public class IpMessage {
 
+    @Getter
     private String sourceNode;
     private String destNode;
     private AodvMessage data;
@@ -14,13 +16,5 @@ public class IpMessage {
 
     public int getMessageType() {
         return data.getMessageType();
-    }
-
-    public String getSourceNode() {
-        return sourceNode;
-    }
-
-    public void decrementHl() {
-        hl--;
     }
 }

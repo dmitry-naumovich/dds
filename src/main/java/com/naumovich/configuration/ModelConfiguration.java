@@ -2,6 +2,10 @@ package com.naumovich.configuration;
 
 import java.awt.*;
 
+/**
+ * List of constant parameters for this model
+ *
+ */
 public class ModelConfiguration {
 
     public static final Color WHITE_COLOR = new Color(255, 255, 255);

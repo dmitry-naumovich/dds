@@ -2,11 +2,10 @@ package com.naumovich.domain.message.aodv;
 
 import com.naumovich.domain.Chunk;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-/**
- * Created by dzmitry on 5.5.17.
- */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class AodvChunkMessage extends AodvMessage {
 
     private final static int TYPE = 4;

@@ -1,6 +1,9 @@
 package com.naumovich.configuration;
 
-
+/**
+ * List of static parameters defined in AODV algorithm notation
+ *
+ */
 public class AodvConfiguration {
 
     private static final int ACTIVE_ROUTE_TIMEOUT_MILLIS = 3000;

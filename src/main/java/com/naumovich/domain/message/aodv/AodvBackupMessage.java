@@ -2,12 +2,11 @@ package com.naumovich.domain.message.aodv;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-/**
- * Created by dzmitry on 5.5.17.
- */
 @Data
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class AodvBackupMessage extends AodvMessage {
 
     private final static int TYPE = 5;
