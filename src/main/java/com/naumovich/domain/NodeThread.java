@@ -11,6 +11,7 @@ import com.naumovich.configuration.ModelConfiguration;
 import com.naumovich.network.Field;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 @Data
 @Slf4j
@@ -92,4 +93,25 @@ public class NodeThread implements Runnable {
 		    log.error("InterruptedException occurred in NodeThread of " + node);
         }
 	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NodeThread that = (NodeThread) o;
+
+        return new EqualsBuilder()
+                .appendSuper(super.equals(o))
+                .append(x, that.x)
+                .append(y, that.y)
+                .append(speedX, that.speedX)
+                .append(speedY, that.speedY)
+                .append(distributeFlag, that.distributeFlag)
+                .append(field, that.field)
+                .append(node, that.node)
+                .append(color, that.color)
+                .isEquals();
+    }
 }

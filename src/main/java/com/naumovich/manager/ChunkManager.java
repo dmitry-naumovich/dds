@@ -56,7 +56,8 @@ public class ChunkManager {
 	}
 
 	private List<Chunk> makeChunkCopies(Chunk chunk, int numOfCopies) {
-        List<Chunk> chs =  Arrays.asList(chunk);
+        List<Chunk> chs = new ArrayList<>();
+        chs.add(chunk);
 		for (int i = 0; i < numOfCopies; i++) {
 			chs.add(new Chunk(chunk.getOriginalOwner(), chunk.getChunkSize(), chunk.getParentFileName(), chunk.getOrderNum()));
 		}

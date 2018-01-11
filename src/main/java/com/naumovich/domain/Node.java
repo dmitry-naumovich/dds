@@ -10,6 +10,8 @@ import com.naumovich.table.RoutingTable;
 import com.naumovich.util.MathOperations;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 
 import static com.naumovich.configuration.ModelConfiguration.*;
 
@@ -136,4 +138,36 @@ public class Node {
         messageManager.receiveMessage(m);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Node node = (Node) o;
+
+        return new EqualsBuilder()
+                .appendSuper(super.equals(o))
+                .append(persNum, node.persNum)
+                .append(isOnline, node.isOnline)
+                .append(amountOfRetransmitted, node.amountOfRetransmitted)
+                .append(amountOfMsgChecks, node.amountOfMsgChecks)
+                .append(amountOfNodeStatusChecks, node.amountOfNodeStatusChecks)
+                .append(amountOfFindingPath, node.amountOfFindingPath)
+                .append(floodId, node.floodId)
+                .append(seqNumber, node.seqNumber)
+                .append(nodeThread, node.nodeThread)
+                .append(field, node.field)
+                .append(login, node.login)
+                .append(nodeID, node.nodeID)
+                .append(chunkStorage, node.chunkStorage)
+                .append(routingTable, node.routingTable)
+                .append(fileDistributionTableMap, node.fileDistributionTableMap)
+                .append(chunkManager, node.chunkManager)
+                .append(routingManager, node.routingManager)
+                .append(messageManager, node.messageManager)
+                .append(rreqBufferManager, node.rreqBufferManager)
+                .append(rrepBufferManager, node.rrepBufferManager)
+                .isEquals();
+    }
 }
