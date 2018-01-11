@@ -19,8 +19,7 @@ public class RoutingTable implements Iterable<RouteEntry> {
 
     public RoutingTable(Node owner) {
         this.owner = owner;
-        ExpiredRouteCleaner routeCleaner = new ExpiredRouteCleaner();
-        Thread routeCleanerThread = new Thread(routeCleaner);
+        Thread routeCleanerThread = new Thread(new ExpiredRouteCleaner());
         routeCleanerThread.start();
     }
 
@@ -28,17 +27,15 @@ public class RoutingTable implements Iterable<RouteEntry> {
         routingTable.add(entry);
     }
 
-    public void updateEntry(RouteEntry updatedEntry) {
-        for (RouteEntry entry : routingTable) {
-            if (entry.getDestNode().equals(updatedEntry.getDestNode())) {
-                entry.setDestSN(updatedEntry.getDestSN());
-                entry.setNextHop(updatedEntry.getNextHop());
-                entry.setHopCount(updatedEntry.getHopCount());
-                entry.setLastHopCount(updatedEntry.getHopCount());
-                entry.setLifeTime(updatedEntry.getLifeTime());
-                entry.setPrecursors(updatedEntry.getPrecursors());
-            }
-        }
+    public void updateEntry(RouteEntry updatedRoute) {
+        routingTable.stream().filter(route -> route.getDestNode().equals(updatedRoute.getDestNode())).forEach(route -> {
+            route.setDestSN(updatedRoute.getDestSN());
+            route.setNextHop(updatedRoute.getNextHop());
+            route.setHopCount(updatedRoute.getHopCount());
+            route.setLastHopCount(updatedRoute.getHopCount());
+            route.setLifeTime(updatedRoute.getLifeTime());
+            route.setPrecursors(updatedRoute.getPrecursors());
+        });
     }
 
     public RouteEntry getActualRouteTo(String node) {

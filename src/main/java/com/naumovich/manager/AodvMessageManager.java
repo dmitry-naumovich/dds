@@ -59,6 +59,7 @@ public class AodvMessageManager {
 
     private void proceedChunkMessage(AodvChunkMessage chunkMessage, int hl) {
         if (chunkMessage.getDestNode().equals(owner.getLogin())) {
+            //TODO: refactor log messages in the whole project
             log.debug(owner + ": received Chunk and save it to my local storage");
             owner.getChunkStorage().add(chunkMessage.getChunk());
         } else if (hl > 1) {

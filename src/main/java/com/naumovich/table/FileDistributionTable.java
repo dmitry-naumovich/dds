@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.naumovich.domain.Node;
+import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
@@ -13,55 +14,27 @@ import lombok.ToString;
 public class FileDistributionTable implements Iterable<FDTEntry> {
 
 	private Node owner;
-	private List<FDTEntry> fdtTable;
+	private List<FDTEntry> fdtTable = new ArrayList<>();
 
 	public FileDistributionTable(Node owner) {
 		this.owner = owner;
-		fdtTable = new ArrayList<>();
 	}
 
 	public void addRow(int numOfChunk, String chunkId, String nodeLogin, int metrics) {
 		fdtTable.add(new FDTEntry(numOfChunk, chunkId, nodeLogin, metrics));
 	}
-	public void setRow(int rowNum, Node node, int metrics) {
-		fdtTable.set(rowNum, new FDTEntry(fdtTable.get(rowNum).getOrderNum(),
-				fdtTable.get(rowNum).getChunk(), node.getLogin(), metrics));
-	}
-	public FDTEntry getRow(int rowNum) {
-		return fdtTable.get(rowNum);
-	}
-
-	public int getTableSize() {
-		return fdtTable.size();
-	}
 
 	public List<FDTEntry> getEntriesByNode(String node) {
-		List<FDTEntry> entries = new ArrayList<>();
-		for (FDTEntry entry : fdtTable) {
-			if (entry.getNode().equals(node)) {
-				entries.add(entry);
-			}
-		}
-		return entries;
+	    return fdtTable.stream().filter(entry -> entry.getNode().equals(node)).collect(Collectors.toList());
 	}
 
 	public FDTEntry getAnotherEntryWithChunkCopy(int orderNum, String node) {
-		for (FDTEntry entry : getEntriesByOrderNum(orderNum)) {
-			if (!entry.getNode().equals(node)) {
-				return entry;
-			}
-		}
-		return null;
+        List<FDTEntry> entries = getEntriesByOrderNum(orderNum);
+	    return entries.stream().filter(entry -> !entry.getNode().equals(node)).findFirst().orElse(null);
 	}
 
-	public List<FDTEntry> getEntriesByOrderNum(int orderNum) {
-		List<FDTEntry> entries = new ArrayList<>();
-		for (FDTEntry entry : fdtTable) {
-			if (entry.getOrderNum() == orderNum) {
-				entries.add(entry);
-			}
-		}
-		return entries;
+	private List<FDTEntry> getEntriesByOrderNum(int orderNum) {
+		return fdtTable.stream().filter(entry -> entry.getOrderNum() == orderNum).collect(Collectors.toList());
 	}
 	
 	@Override
@@ -73,21 +46,18 @@ public class FileDistributionTable implements Iterable<FDTEntry> {
 
 		private int curIndex;
 		
-		public FDTIterator() {
+		FDTIterator() {
 			this.curIndex = 0;
 		}
+
 		@Override
 		public boolean hasNext() {
-			if (curIndex < fdtTable.size()) {
-				return true;
-			}
-			return false;
+			return curIndex < fdtTable.size();
 		}
 
 		@Override
 		public FDTEntry next() {
 			return fdtTable.get(curIndex++);
 		}
-		
 	}
 }

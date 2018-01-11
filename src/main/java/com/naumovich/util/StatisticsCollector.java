@@ -1,6 +1,7 @@
 package com.naumovich.util;
 
 import com.naumovich.domain.Node;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -18,9 +19,9 @@ public class StatisticsCollector {
         ArrayList<ArrayList<Integer>> list = new ArrayList<>();
         for (Node n : nodes) {
             ArrayList<Integer> row = new ArrayList<>();
-            row.add(0, n.getPersNum()); // first column - node's number
-            row.add(1, n.getChunkStorage().size()); // second column - number of storing chunks
-            row.add(2, n.getAmountOfRetransmitted()); // third column - number of retransmissions made
+            row.add(n.getPersNum()); // first column - node's number
+            row.add(n.getChunkStorage().size()); // second column - number of storing chunks
+            row.add(n.getAmountOfRetransmitted()); // third column - number of retransmissions made
             list.add(row);
         }
         writeToFile(list, EACH_NODE_STATS_FILE);
@@ -40,7 +41,7 @@ public class StatisticsCollector {
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName), UTF_8_CODING))) {
             for (int i = 0; i < list.size(); i++) {
                 for (int j = 0; j < list.get(0).size(); j++) {
-                    writer.append(list.get(i).get(j).toString() + ";");
+                    writer.append(list.get(i).get(j).toString()).append(';');
                 }
                 writer.append("\r\n");
 
@@ -53,7 +54,7 @@ public class StatisticsCollector {
     private static void writeToFile(long[] array, String fileName) {
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName), UTF_8_CODING))) {
             for (long i : array) {
-                writer.append(String.valueOf(i) + ";");
+                writer.append(String.valueOf(i)).append(';');
             }
         } catch (IOException ex) {
             log.error("Error during writing to the file, fileName = " + fileName);

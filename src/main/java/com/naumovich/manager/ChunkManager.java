@@ -6,6 +6,7 @@ import com.naumovich.domain.Node;
 import com.naumovich.network.Field;
 import com.naumovich.table.FileDistributionTable;
 import com.naumovich.util.MathOperations;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -55,8 +56,7 @@ public class ChunkManager {
 	}
 
 	private List<Chunk> makeChunkCopies(Chunk chunk, int numOfCopies) {
-		List<Chunk> chs = new ArrayList<>();
-		chs.add(chunk);
+        List<Chunk> chs =  Arrays.asList(chunk);
 		for (int i = 0; i < numOfCopies; i++) {
 			chs.add(new Chunk(chunk.getOriginalOwner(), chunk.getChunkSize(), chunk.getParentFileName(), chunk.getOrderNum()));
 		}
@@ -67,10 +67,9 @@ public class ChunkManager {
 		List<Pair<String, Integer>> allMetrics = new ArrayList<>();
 		List<Node> allNodes = new ArrayList<>(Field.getNodes());
 		allNodes.remove(owner);
-		for (Node n: allNodes) {
-			if (n.isOnline())
-				allMetrics.add(Pair.of(n.getLogin(), MathOperations.findXORMetric(n.getNodeID(), chunkId)));
-		}
+		allNodes.stream().filter(Node::isOnline).forEach(n ->
+				allMetrics.add(Pair.of(n.getLogin(), MathOperations.findXORMetric(n.getNodeID(), chunkId))));
+
 		return MathOperations.findMin(allMetrics);
 	}
 }

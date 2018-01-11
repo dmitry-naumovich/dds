@@ -190,24 +190,25 @@ public class AodvRoutingManager {
     }
 
     private RouteEntry getNewRouteEntryToOrigin(RouteRequest rreq, String nextHop, long lifeTime) {
-        RouteEntry routeEntry = new RouteEntry();
-        routeEntry.setDestNode(rreq.getSourceNode());
-        routeEntry.setDestSN(rreq.getSourceSN());
-        routeEntry.setNextHop(nextHop);
-        routeEntry.setHopCount(rreq.getHopCount() + 1);
+        RouteEntry routeEntry = RouteEntry.builder()
+                .destNode(rreq.getSourceNode())
+                .destSN(rreq.getSourceSN())
+                .nextHop(nextHop)
+                .hopCount(rreq.getHopCount() + 1)
+                .build();
         long minLifeTime = (System.currentTimeMillis() + REV_ROUTE_LIFE - routeEntry.getHopCount() * NODE_TRAVERSAL_TIME);
         routeEntry.setLifeTime(Math.max(lifeTime, minLifeTime));
         return routeEntry;
     }
 
     private RouteEntry getNewRouteEntryToDestination(RouteReply reply, String nextHop) {
-        RouteEntry routeEntry = new RouteEntry();
-        routeEntry.setDestNode(reply.getDestNode());
-        routeEntry.setDestSN(reply.getDestSN());
-        routeEntry.setNextHop(nextHop);
-        routeEntry.setHopCount(reply.getHopCount() + 1);
-        routeEntry.setLifeTime(System.currentTimeMillis() + reply.getLifetime());
-        return routeEntry;
+        return RouteEntry.builder()
+                .destNode(reply.getDestNode())
+                .destSN(reply.getDestSN())
+                .nextHop(nextHop)
+                .hopCount(reply.getHopCount() + 1)
+                .lifeTime(System.currentTimeMillis() + reply.getLifetime())
+                .build();
     }
 
     void sendChunkToObtainedNode(RouteEntry route) {
@@ -236,9 +237,7 @@ public class AodvRoutingManager {
     }
 
     void sendRerrToPrecursors(RouteError routeError, List<String> precursors) {
-        for (String precursor : precursors) {
-            forwardAodvMessage(routeError, precursor, NET_DIAMETER);
-        }
+        precursors.forEach(precursor -> forwardAodvMessage(routeError, precursor, NET_DIAMETER));
     }
 
     private void rmOfflineNodeFromAllPrecursorLists(String offlineNode) {

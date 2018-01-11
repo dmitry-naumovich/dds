@@ -40,7 +40,7 @@ public class TestNetwork extends JFrame {
 		
 		JMenu nodeMenu = new JMenu(MenuItemNames.NODE_MENU_NAME);
 		JMenu controlMenu = new JMenu(MenuItemNames.CONTROL_MENU_NAME);
-		
+
 		nodeMenu.add(new AbstractAction(MenuItemNames.ACTION_ADD_NODES) {
 			public void actionPerformed(ActionEvent event) {
 				field.addNodesToField(NODES_AMOUNT_TO_ADD);
@@ -49,12 +49,14 @@ public class TestNetwork extends JFrame {
 				}
 			}
 		});
+
 		nodeMenu.add(new AbstractAction(MenuItemNames.ACTION_TURN_OFF_SOME) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				field.turnOffSomeNodes();
 			}
 		}).setEnabled(true);
+
 		nodeMenu.add(new AbstractAction(MenuItemNames.ACTION_TURN_ON_ALL) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -88,6 +90,7 @@ public class TestNetwork extends JFrame {
 				field.showEdgesMatrix();
 			}
 		}).setEnabled(true);
+
 		controlMenu.add(new AbstractAction(MenuItemNames.ACTION_DISTRIBUTE) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -97,6 +100,7 @@ public class TestNetwork extends JFrame {
 				field.distributeFiles();
 			}
 		}).setEnabled(true);
+
 		controlMenu.add(new AbstractAction(MenuItemNames.ACTION_COLLECT_STATS) {
 			@Override
 			public void actionPerformed(ActionEvent e) {

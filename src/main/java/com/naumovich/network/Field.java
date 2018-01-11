@@ -76,9 +76,7 @@ public class Field extends JPanel {
     }
 
     public void turnOnAllNodes() {
-        for (Node n : nodes) {
-            n.setOnline(true);
-        }
+        nodes.forEach(node -> node.setOnline(true));
     }
 
     @Override

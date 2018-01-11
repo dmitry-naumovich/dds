@@ -87,9 +87,6 @@ public class NodeThread implements Runnable {
 					}
 					Thread.sleep(1);
 				}
-
-
-
 			}
 		} catch (InterruptedException ex) {
 		    log.error("InterruptedException occurred in NodeThread of " + node);
