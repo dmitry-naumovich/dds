@@ -3,17 +3,17 @@ package com.naumovich.manager;
 import com.naumovich.configuration.AodvConfiguration;
 import com.naumovich.domain.Node;
 import com.naumovich.domain.message.aodv.RouteRequest;
-import com.naumovich.util.tuple.TwoTuple;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.tuple.Pair;
 
 @Slf4j
 public class RreqBufferManager {
 
     private Node owner;
-    private List<TwoTuple<RouteRequest, Long>> rreqBuffer;
+    private List<Pair<RouteRequest, Long>> rreqBuffer;
 
     public RreqBufferManager(Node owner) {
         this.owner = owner;
@@ -23,12 +23,12 @@ public class RreqBufferManager {
         thread.start();
     }
     public void addRequestToBuffer(RouteRequest request) {
-        rreqBuffer.add(new TwoTuple<>(request, System.currentTimeMillis()));
+        rreqBuffer.add(Pair.of(request, System.currentTimeMillis()));
     }
 
     public boolean containsRreq(RouteRequest request) {
-        for (TwoTuple<RouteRequest, Long> rec : rreqBuffer) {
-            if (rec.first.equals(request)) {
+        for (Pair<RouteRequest, Long> rec : rreqBuffer) {
+            if (rec.getLeft().equals(request)) {
                 return true;
             }
         }
@@ -42,11 +42,11 @@ public class RreqBufferManager {
             try {
                 Thread.sleep(30000);
                 synchronized (rreqBuffer) {
-                    rreqBuffer.removeIf((TwoTuple<RouteRequest, Long> entry) ->
-                            System.currentTimeMillis() - entry.second >= AodvConfiguration.FLOOD_RECORD_TIME);
+                    rreqBuffer.removeIf(entry ->
+                            System.currentTimeMillis() - entry.getRight() >= AodvConfiguration.FLOOD_RECORD_TIME);
                 }
             } catch (InterruptedException e) {
-                log.error("InterruptedException occured in BufferCleaner in RreqBufferManager of " + owner);
+                log.error("InterruptedException occurred in BufferCleaner in RreqBufferManager of " + owner);
             }
         }
     }

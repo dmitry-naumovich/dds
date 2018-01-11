@@ -3,8 +3,7 @@ package com.naumovich.util;
 import java.util.List;
 import java.util.Random;
 
-import com.naumovich.domain.Node;
-import com.naumovich.util.tuple.TwoTuple;
+import org.apache.commons.lang3.tuple.Pair;
 
 public final class MathOperations {
 
@@ -42,20 +41,20 @@ public final class MathOperations {
 		return metrics;
 	}
 	
-	public static TwoTuple<String, Integer> findMin(List<TwoTuple<String, Integer>> list) {
+	public static Pair<String, Integer> findMin(List<Pair<String, Integer>> list) {
 		if (list.isEmpty()) {
 			return null;
 		} else {
-			String node = list.get(0).first;
-			int minVal = list.get(0).second;
+			String node = list.get(0).getLeft();
+			int minVal = list.get(0).getRight();
 
-			for (TwoTuple<String, Integer> el : list) {
-				if (el.second <= minVal) {
-					node = el.first;
-					minVal = el.second;
+			for (Pair<String, Integer> el : list) {
+				if (el.getRight() <= minVal) {
+					node = el.getLeft();
+					minVal = el.getRight();
 				}
 			}
-			return new TwoTuple<>(node, minVal);
+			return Pair.of(node, minVal);
 		}
 	}
 

@@ -10,13 +10,14 @@ import com.naumovich.table.FileDistributionTable;
 import com.naumovich.table.RouteEntry;
 import com.naumovich.table.RoutingTable;
 import com.naumovich.util.MathOperations;
-import com.naumovich.util.tuple.TwoTuple;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.apache.commons.lang3.tuple.Pair;
+
 
 import static com.naumovich.configuration.AodvConfiguration.*;
 
@@ -251,19 +252,19 @@ public class AodvRoutingManager {
     void delegateBackupIfNecessary(String offlineNode) {
         if (fileDistributionTable != null) {
             for (FDTEntry fdtEntry : fileDistributionTable.getEntriesByNode(offlineNode)) {
-                TwoTuple<String, Integer> nodeAndMetrics = owner.getChunkManager().findNodeForChunk(fdtEntry.getChunk());
+                Pair<String, Integer> nodeAndMetrics = owner.getChunkManager().findNodeForChunk(fdtEntry.getChunk());
 
-                if (nodeAndMetrics.first.equals(offlineNode)) {
+                if (nodeAndMetrics.getLeft().equals(offlineNode)) {
                     return; // the node has become online again, no need in backup
                 } else {
                     String newChunkId = MathOperations.getRandomHexString(DdsConfiguration.ID_LENGTH_IN_HEX);
                     fdtEntry.setChunk(newChunkId);
-                    fdtEntry.setNode(nodeAndMetrics.first);
-                    fdtEntry.setMetric(nodeAndMetrics.second);
+                    fdtEntry.setNode(nodeAndMetrics.getLeft());
+                    fdtEntry.setMetric(nodeAndMetrics.getRight());
                     FDTEntry entry = fileDistributionTable.getAnotherEntryWithChunkCopy(fdtEntry.getOrderNum(), offlineNode);
-                    log.debug(owner + ": sending BackupMessage to " + entry.getNode() + ". He must complete Backup to node " + nodeAndMetrics.first);
+                    log.debug(owner + ": sending BackupMessage to " + entry.getNode() + ". He must complete Backup to node " + nodeAndMetrics.getLeft());
 
-                    AodvBackupMessage backupMessage = new AodvBackupMessage(entry.getChunk(), newChunkId, owner.getLogin(), entry.getNode(), nodeAndMetrics.first);
+                    AodvBackupMessage backupMessage = new AodvBackupMessage(entry.getChunk(), newChunkId, owner.getLogin(), entry.getNode(), nodeAndMetrics.getLeft());
                     RouteEntry actualRoute = owner.getRoutingTable().getActualRouteTo(entry.getNode());
                     if (actualRoute != null) {
                         log.debug(owner + ": I've got a route to send backup, nexthop is " + actualRoute.getNextHop());

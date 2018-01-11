@@ -6,11 +6,12 @@ import com.naumovich.domain.Node;
 import com.naumovich.network.Field;
 import com.naumovich.table.FileDistributionTable;
 import com.naumovich.util.MathOperations;
-import com.naumovich.util.tuple.TwoTuple;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.tuple.Pair;
+
 
 import static com.naumovich.configuration.DdsConfiguration.AMOUNT_OF_CHUNK_COPIES;
 
@@ -31,8 +32,8 @@ public class ChunkManager {
 		FileDistributionTable fileDistributionTable = new FileDistributionTable(owner);
 		for (Chunk ch : chunksAndCopies) {
 			owner.getChunkStorage().add(ch);
-			TwoTuple<String, Integer> tuple = findNodeForChunk(ch.getChunkID());
-			fileDistributionTable.addRow(ch.getOrderNum(), ch.getChunkID(), tuple.first, tuple.second);
+			Pair<String, Integer> pair = findNodeForChunk(ch.getChunkID());
+			fileDistributionTable.addRow(ch.getOrderNum(), ch.getChunkID(), pair.getLeft(), pair.getRight());
 		}
 		return fileDistributionTable;
 	}
@@ -62,13 +63,13 @@ public class ChunkManager {
 		return chs;
 	}
 
-	public TwoTuple<String, Integer> findNodeForChunk(String chunkId) {
-		List<TwoTuple<String, Integer>> allMetrics = new ArrayList<>();
+	public Pair<String, Integer> findNodeForChunk(String chunkId) {
+		List<Pair<String, Integer>> allMetrics = new ArrayList<>();
 		List<Node> allNodes = new ArrayList<>(Field.getNodes());
 		allNodes.remove(owner);
 		for (Node n: allNodes) {
 			if (n.isOnline())
-				allMetrics.add(new TwoTuple<>(n.getLogin(), MathOperations.findXORMetric(n.getNodeID(), chunkId)));
+				allMetrics.add(Pair.of(n.getLogin(), MathOperations.findXORMetric(n.getNodeID(), chunkId)));
 		}
 		return MathOperations.findMin(allMetrics);
 	}
