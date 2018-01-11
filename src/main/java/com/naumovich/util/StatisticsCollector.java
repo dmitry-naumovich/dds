@@ -7,9 +7,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by dzmitry on 29.4.17.
- */
 @Slf4j
 public class StatisticsCollector {
 
@@ -55,8 +52,8 @@ public class StatisticsCollector {
 
     private static void writeToFile(long[] array, String fileName) {
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName), UTF_8_CODING))) {
-            for (int i = 0; i < array.length; i++) {
-                writer.append(String.valueOf(array[i]) + ";");
+            for (long i : array) {
+                writer.append(String.valueOf(i) + ";");
             }
         } catch (IOException ex) {
             log.error("Error during writing to the file, fileName = " + fileName);

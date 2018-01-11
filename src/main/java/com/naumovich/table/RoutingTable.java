@@ -15,11 +15,10 @@ import java.util.List;
 public class RoutingTable implements Iterable<RouteEntry> {
 
     private Node owner;
-    private List<RouteEntry> routingTable;
+    private List<RouteEntry> routingTable = new ArrayList<>();
 
     public RoutingTable(Node owner) {
         this.owner = owner;
-        routingTable = new ArrayList<>();
         ExpiredRouteCleaner routeCleaner = new ExpiredRouteCleaner();
         Thread routeCleanerThread = new Thread(routeCleaner);
         routeCleanerThread.start();
@@ -43,21 +42,11 @@ public class RoutingTable implements Iterable<RouteEntry> {
     }
 
     public RouteEntry getActualRouteTo(String node) {
-        for (RouteEntry entry : routingTable) {
-            if (entry.getDestNode().equals(node) && entry.getDestSN() > 0) {
-                return entry;
-            }
-        }
-        return null;
+        return routingTable.stream().filter(e -> e.getDestNode().equals(node) && e.getDestSN() > 0).findFirst().orElse(null);
     }
 
     public RouteEntry getRouteTo(String node) {
-        for (RouteEntry entry : routingTable) {
-            if (entry.getDestNode().equals(node)) {
-                return entry;
-            }
-        }
-        return null;
+        return routingTable.stream().filter(e -> e.getDestNode().equals(node)).findFirst().orElse(null);
     }
 
     @Override
@@ -106,7 +95,7 @@ public class RoutingTable implements Iterable<RouteEntry> {
                     routingTable.removeIf((RouteEntry entry) -> System.currentTimeMillis() - entry.getLifeTime() >= 0);
                 }
             } catch (InterruptedException e) {
-                log.error("InterruptedException occured in ExpiredRouteCleaner of" + owner);
+                log.error("InterruptedException occurred in ExpiredRouteCleaner of" + owner);
             }
         }
     }

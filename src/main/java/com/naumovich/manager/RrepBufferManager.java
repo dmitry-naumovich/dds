@@ -33,12 +33,8 @@ public class RrepBufferManager {
             try {
                 Thread.sleep(30000);
                 synchronized (rrepBuffer) {
-                    for(Iterator<Map.Entry<String, Long>> it = rrepBuffer.entrySet().iterator(); it.hasNext(); ) {
-                        Map.Entry<String, Long> entry = it.next();
-                        if(entry.getValue() <= System.currentTimeMillis() - 3000) {
-                            it.remove();
-                        }
-                    }
+                    rrepBuffer.entrySet().removeIf(entry ->
+                            System.currentTimeMillis() - 3000 >= entry.getValue());
                 }
             } catch (InterruptedException e) {
                 log.error("InterruptedException occured in BufferCleaner in RrepBufferManager of " + owner);

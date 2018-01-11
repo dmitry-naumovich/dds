@@ -3,34 +3,18 @@ package com.naumovich.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by dzmitry on 28.4.17.
- */
 public class ChunkStorage {
 
-    private List<Chunk> chunkStorage;
-
-    public ChunkStorage() {
-        chunkStorage = new ArrayList<>();
-    }
+    private List<Chunk> chunkStorage = new ArrayList<>();
 
     public Chunk getChunkByName(String name) {
-        for (Chunk c : chunkStorage) {
-            if (c.getChunkName().equals(name)) {
-                return c;
-            }
-        }
-        return null;
+        return chunkStorage.stream().filter(c -> c.getChunkName().equals(name)).findFirst().orElse(null);
     }
 
     public Chunk extractChunkByName(String name) {
-        for (Chunk c : chunkStorage) {
-            if (c.getChunkName().equals(name)) {
-                chunkStorage.remove(c);
-                return c;
-            }
-        }
-        return null;
+        Chunk chunk = chunkStorage.stream().filter(c -> c.getChunkName().equals(name)).findFirst().orElse(null);
+        chunkStorage.remove(chunk);
+        return chunk;
     }
 
     public void add(Chunk chunk) {
@@ -40,6 +24,5 @@ public class ChunkStorage {
     public int size() {
         return chunkStorage.size();
     }
-
 
 }

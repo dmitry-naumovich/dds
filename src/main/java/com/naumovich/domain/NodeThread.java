@@ -59,7 +59,7 @@ public class NodeThread implements Runnable {
 				if (node.isOnline()) {
 
 					if (distributeFlag) {
-						node.distributeFile(new File("file " + i * rand.nextInt(1000), 100 + rand.nextInt(10000)));
+						node.distributeFile(File.generateRandom());
 						distributeFlag = false;
 					}
 					node.checkMessageContainer();

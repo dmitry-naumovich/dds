@@ -11,26 +11,26 @@ import com.naumovich.domain.Node;
 import com.naumovich.domain.NodeThread;
 import com.naumovich.util.MathOperations;
 import com.naumovich.util.StatisticsCollector;
+import lombok.Getter;
+
+
 import static com.naumovich.configuration.ModelConfiguration.*;
 
 public class Field extends JPanel {
 
     private static final Random rand = new Random();
 
+    @Getter
     private static ArrayList<Node> nodes = new ArrayList<>();
     private static ArrayList<NodeThread> nodeThreads = new ArrayList<>();
+    @Getter
     private static int[][] edgesMatrix;
-
 
     private boolean paused;
 
     public Field() {
         setBackground(Color.WHITE);
         new Timer(10, ev -> repaint()).start();
-    }
-
-    public static ArrayList<Node> getNodes() {
-        return nodes;
     }
 
     public void addNodesToField(int amount) {
@@ -56,10 +56,6 @@ public class Field extends JPanel {
         nodeThreads.add(newNodeThread);
         nodes.add(newNodeThread.getNode());
         new Thread(newNodeThread).start();
-    }
-
-    public static int[][] getEdgesMatrix() {
-        return edgesMatrix;
     }
 
     public void setEdgesMatrixCell(int i, int j, int value) {

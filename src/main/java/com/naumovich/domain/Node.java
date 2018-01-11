@@ -36,14 +36,14 @@ public class Node {
     private long amountOfNodeStatusChecks;
     private long amountOfFindingPath;
 
-    private RoutingTable routingTable;
-    private Map<File, FileDistributionTable> fileDistributionTableMap;
+    private RoutingTable routingTable = new RoutingTable(this);
+    private Map<File, FileDistributionTable> fileDistributionTableMap = new HashMap<>();
 
-    private ChunkManager chunkManager;
-    private AodvRoutingManager routingManager;
-    private AodvMessageManager messageManager;
-    private RreqBufferManager rreqBufferManager;
-    private RrepBufferManager rrepBufferManager;
+    private ChunkManager chunkManager = new ChunkManager(this);
+    private AodvRoutingManager routingManager = new AodvRoutingManager(this);
+    private AodvMessageManager messageManager = new AodvMessageManager(this);
+    private RreqBufferManager rreqBufferManager = new RreqBufferManager(this);
+    private RrepBufferManager rrepBufferManager = new RrepBufferManager(this);
 
     private int floodId;
     private int seqNumber = 1;
@@ -51,15 +51,6 @@ public class Node {
     public Node(NodeThread thread, Field field) {
         this.nodeThread = thread;
         this.field = field;
-
-        routingTable = new RoutingTable(this);
-        fileDistributionTableMap = new HashMap<>();
-        chunkManager = new ChunkManager(this);
-        routingManager = new AodvRoutingManager(this);
-        messageManager = new AodvMessageManager(this);
-        rreqBufferManager = new RreqBufferManager(this);
-        rrepBufferManager = new RrepBufferManager(this);
-
     }
 
     public void incrementFloodId() {
@@ -72,7 +63,6 @@ public class Node {
 
     public void setOnline(boolean isOnline) {
         this.isOnline = isOnline;
-
         if (!isOnline) {
             nodeThread.setColor(WHITE_COLOR);
             log.debug(login + ": I'm offline!");
