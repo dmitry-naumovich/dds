@@ -18,20 +18,40 @@ import static com.naumovich.configuration.ModelConfiguration.*;
 
 /**
  * This class describes the Field area JPanel of the model. It is responsible for painting all components, storing all
- * nodes and node threads lists.
+ * nodes and node threads lists, creating node threads and starting them.
  */
 public class Field extends JPanel {
 
+    /**
+     * Random object for generating random numbers
+     */
     private static final Random rand = new Random();
 
+    /**
+     * The list containing all network nodes
+     */
     @Getter
     private static ArrayList<Node> nodes = new ArrayList<>();
+
+    /**
+     * The list containing all created node threads
+     */
     private static ArrayList<NodeThread> nodeThreads = new ArrayList<>();
+
+    /**
+     * The edges matrix (see graph's notation)
+     */
     @Getter
     private static int[][] edgesMatrix;
 
+    /**
+     * The flag which shows whether the field is paused or not
+     */
     private boolean paused;
 
+    /**
+     * Sets background color, creates and starts the repainting timer
+     */
     public Field() {
         setBackground(Color.WHITE);
         new Timer(10, ev -> repaint()).start();

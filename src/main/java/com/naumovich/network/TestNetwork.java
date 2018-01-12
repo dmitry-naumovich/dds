@@ -8,32 +8,68 @@ import javax.swing.*;
 import com.naumovich.util.MenuItemNames;
 import static com.naumovich.configuration.ModelConfiguration.NODES_AMOUNT_TO_ADD;
 
+/**
+ * This class is a JFrame object which is responsible for creating JPanel field object, creating the menu and all its
+ * items. Contains main method for triggering application start.
+ */
 public class TestNetwork extends JFrame {
 
+    /**
+     * JFrame title
+     */
 	private static final String J_FRAME_TITLE = "DDS algorithm testing";
+
+    /**
+     * JFrame's width
+     */
 	private static final int WIDTH = 600;
+
+    /**
+     * JFrame's height
+     */
 	private static final int HEIGHT = 480;
 
+    /**
+     * Pause menu item
+     */
 	private JMenuItem pauseMenuItem;
+
+    /**
+     * Resume menu item
+     */
 	private JMenuItem resumeMenuItem;
+
+    /**
+     * JPanel implementation
+     */
 	private Field field = new Field();
 
-	public TestNetwork() {
-		super(J_FRAME_TITLE);
-		setSize(WIDTH, HEIGHT);
-		Toolkit kit = Toolkit.getDefaultToolkit();
-		setLocation((kit.getScreenSize().width - WIDTH)/2, (kit.getScreenSize().height - HEIGHT)/2);
-		//setExtendedState(MAXIMIZED_BOTH);
-		createMenu();
-		getContentPane().add(field, BorderLayout.CENTER);
-	}
-
+    /**
+     * The application main method. Creates JFrame object, makes it visible and enables exit on close
+     * @param args command line args
+     */
     public static void main(String[] args) {
         TestNetwork testNet = new TestNetwork();
         testNet.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         testNet.setVisible(true);
     }
-	
+
+    /**
+     * Construct JFrame object by setting its title, width and height, location on the screen and creates its menu
+     */
+    private TestNetwork() {
+        super(J_FRAME_TITLE);
+        setSize(WIDTH, HEIGHT);
+        Toolkit kit = Toolkit.getDefaultToolkit();
+        setLocation((kit.getScreenSize().width - WIDTH)/2, (kit.getScreenSize().height - HEIGHT)/2);
+        //setExtendedState(MAXIMIZED_BOTH);
+        createMenu();
+        getContentPane().add(field, BorderLayout.CENTER);
+    }
+
+    /**
+     * Constructs and sets JMenuBar object
+     */
 	private void createMenu() {
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
