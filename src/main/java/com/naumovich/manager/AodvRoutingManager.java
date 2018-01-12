@@ -147,10 +147,10 @@ public class AodvRoutingManager {
 
     private List<Node> findNeighbors() {
         List<Node> neighbors = new ArrayList<>();
-        int[] nodeEdgesMatrixRow = Field.getEdgesMatrix()[owner.getPersNum()];
+        int[] nodeEdgesMatrixRow = Field.getEdgesMatrix()[owner.getId()];
         for (int i = 0; i < nodeEdgesMatrixRow.length; i++) {
             if (nodeEdgesMatrixRow[i] == 1) {
-                neighbors.add(Field.getNodeByPersNum(i));
+                neighbors.add(Field.getNodeById(i));
             }
         }
         return neighbors;

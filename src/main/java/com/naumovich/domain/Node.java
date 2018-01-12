@@ -24,10 +24,11 @@ public class Node {
 
     private static int counter = 0;
 
+    private final int id = counter++;
+    private final String login = "Node" + id;
+
     private NodeThread nodeThread;
     private final Field field;
-    private final int persNum = counter;
-    private final String login = "Node" + counter++;
     private final String nodeID = MathOperations.getRandomHexString(40);
     private ChunkStorage chunkStorage = new ChunkStorage();
 
@@ -108,11 +109,11 @@ public class Node {
         for (Node n : nodes) {
             amountOfNodeStatusChecks++;
             if (isNeighborWith(n) && n.isOnline()) {
-                field.setEdgesMatrixCell(persNum, n.getPersNum(), 1);
-                field.setEdgesMatrixCell(n.getPersNum(), persNum, 1);
+                field.setEdgesMatrixCell(id, n.getId(), 1);
+                field.setEdgesMatrixCell(n.getId(), id, 1);
             } else {
-                field.setEdgesMatrixCell(persNum, n.getPersNum(), 0);
-                field.setEdgesMatrixCell(n.getPersNum(), persNum, 0);
+                field.setEdgesMatrixCell(id, n.getId(), 0);
+                field.setEdgesMatrixCell(n.getId(), id, 0);
             }
         }
     }
@@ -148,7 +149,7 @@ public class Node {
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(persNum, node.persNum)
+                .append(id, node.id)
                 .append(isOnline, node.isOnline)
                 .append(amountOfRetransmitted, node.amountOfRetransmitted)
                 .append(amountOfMsgChecks, node.amountOfMsgChecks)

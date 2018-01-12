@@ -1,7 +1,6 @@
 package com.naumovich.util;
 
 import com.naumovich.domain.Node;
-import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -19,7 +18,7 @@ public class StatisticsCollector {
         ArrayList<ArrayList<Integer>> list = new ArrayList<>();
         for (Node n : nodes) {
             ArrayList<Integer> row = new ArrayList<>();
-            row.add(n.getPersNum()); // first column - node's number
+            row.add(n.getId()); // first column - node's id
             row.add(n.getChunkStorage().size()); // second column - number of storing chunks
             row.add(n.getAmountOfRetransmitted()); // third column - number of retransmissions made
             list.add(row);
